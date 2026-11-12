@@ -1,0 +1,21 @@
+# dsh-chatgpt-ui bundle patch.
+#
+# This file carries the two rows that are not preset declarations:
+#
+#   1. `ui-skin-chatgpt` — the skin: host half (no-op) + browser half (tokens,
+#      stylesheet, mode switcher, dot brand), resolved through this package's
+#      exports.
+#   2. `chat-policy`     — Host enforcement: read-only sandbox + fixed approval
+#      for sessions whose composed preset is `chat` (lib/host/chat-policy.js).
+#
+# The third row, the `preset-chat` declaration itself, lives in
+# presets/chat.patch.yml — the same split the host uses for its own preset rows
+# (`@deepseek-ai/dsh-web-app` lists cordis.patch.yml plus one patch per preset in
+# `dsh.bundle.patch`), so a preset file stays readable on its own.
+- insert:
+    - id: ui-skin-chatgpt
+      name: 'dsh-chatgpt-ui'
+
+- insert:
+    - id: chat-policy
+      name: 'dsh-chatgpt-ui/chat-policy'

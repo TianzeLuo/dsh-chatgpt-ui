@@ -1,0 +1,31 @@
+# Dependencies and build output that must never be published.
+node_modules/
+*.tgz
+
+# Local run artifacts: every isolated DSH_HOME / port / scratch directory the
+# capture scripts create while measuring lives under one of these names.
+.m*-home/
+.m*-tmp/
+.scratch/
+*.log
+*.local.*
+
+# Local capture inputs. docs/reference/ holds screenshots of the maintainer's
+# own desktop, which is reference material for the port — never repository
+# content.
+docs/reference/
+
+# Local capture evidence. The capture scripts write geometry JSON, per-module
+# screenshots and the nine-module status log; all of it quotes live session
+# titles, workspace paths and host DOM from a real instance, so it stays on the
+# machine that produced it (see docs/testing.md → "Why the evidence is local").
+docs/*
+!docs/about.md
+!docs/architecture.md
+!docs/design-tokens.md
+!docs/development.md
+!docs/limitations.md
+!docs/roadmap.md
+!docs/testing.md
+!docs/troubleshooting.md
+!docs/images/

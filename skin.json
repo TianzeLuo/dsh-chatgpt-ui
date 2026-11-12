@@ -1,0 +1,12 @@
+{
+  "id": "chatgpt-ui",
+  "name": "ChatGPT UI",
+  "version": "0.1.0",
+  "tagline": "ChatGPT 风格界面：令牌层 + 全局样式 + Chat/Agent/dot 模式切换",
+  "accent": "#0f1115",
+  "bodyAttr": "data-chatgpt-ui",
+  "package": "dsh-chatgpt-ui",
+  "wiring": {
+    "id": "ui-skin-chatgpt"
+  }
+}

@@ -1,0 +1,58 @@
+# dsh-chatgpt-ui — the `chat` agent preset (M2).
+#
+# Structure copied from the shipped `@deepseek-ai/dsh-web-app/presets/minimal.patch.yml`:
+# one `@deepseek-ai/dsh-agent-preset` row inserted as a sibling of the built-in
+# preset rows. `config.id: chat` is the identity saved in sessions and the one
+# `lib/host/chat-policy.js` looks for.
+#
+# What it does NOT install is the point of the preset: no shell (`dsh-tool-bash`,
+# `dsh-tool-pwsh`, `dsh-terminal`), no file writes (`dsh-tool-fs`), no
+# `dsh-tool-subagent`, no goal / plan-mode. A chat session can therefore only
+# read attachments, ask questions, search the web, and compact.
+#
+# Every child package is shipped by DSH itself; the skin adds no dependency
+# (docs/licenses.md).
+- insert:
+    - id: preset-chat
+      name: '@deepseek-ai/dsh-agent-preset'
+      config:
+        id: chat
+        # The registry has no per-locale label field, so one string serves both
+        # locales; the client's own switcher uses its own bilingual copy.
+        name: Chat
+        description: >-
+          纯对话：联网检索、澄清提问、附件与上下文压缩；无 shell、无文件写、无子代理。
+          Pure chat — web search, clarifying questions, attachments and compaction;
+          no shell, no file writes, no subagents.
+        order: 5
+        plugins:
+          - id: persona
+            name: '@deepseek-ai/dsh-persona'
+            config:
+              prefix: >-
+                You are a conversation partner first and a software engineer second. Answer
+                directly and naturally in Markdown, in the user's language. Prefer plain
+                explanations over implementation detail. You have no shell, no file
+                writing, and no subagents: never claim you ran a command or changed a
+                project file. Search the web when a question is factual or
+                time-sensitive, and ask a clarifying question when the request is
+                ambiguous. Unless the user asks otherwise, answer in Simplified Chinese.
+              complete: true
+              includeRuntimeContext: false
+          - id: tool-ask-user
+            name: '@deepseek-ai/dsh-tool-ask-user'
+          - id: tool-web
+            name: '@deepseek-ai/dsh-tool-web'
+            config:
+              fetch: true
+              searchTimeoutMs: 60000
+          - id: compaction
+            name: cordis:group
+            group: true
+            isolate:
+              compaction: true
+            config:
+              - id: compaction-basic
+                name: '@deepseek-ai/dsh-compaction-basic'
+              - id: command-compact
+                name: '@deepseek-ai/dsh-command-compact'
