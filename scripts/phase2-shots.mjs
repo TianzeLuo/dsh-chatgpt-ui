@@ -36,7 +36,7 @@ try {
   console.error(`playwright-core is required for screenshots (${error.message})`)
   process.exit(2)
 }
-const CHROME = process.env.CHATGPT_UI_CHROME ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
+const CHROME = process.env.CHATGPT_UI_CHROME ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
 const browser = await playwright.chromium.launch({ headless: true, executablePath: CHROME, args: ['--no-sandbox', '--disable-dev-shm-usage'] })
 const failures = []
 const check = (name, condition, detail) => {

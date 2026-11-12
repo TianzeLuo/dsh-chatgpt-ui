@@ -41,8 +41,8 @@ const OUT = resolve(ROOT, typeof args.get('out') === 'string' ? args.get('out') 
 const SHOTS = join(OUT, 'screenshots')
 mkdirSync(SHOTS, { recursive: true })
 
-const playwrightPath = process.env.M29_PLAYWRIGHT ?? '/mnt/f/project/y86/node_modules/playwright/index.mjs'
-const CHROME = process.env.CHATGPT_UI_CHROME ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
+const playwrightPath = process.env.M29_PLAYWRIGHT ?? 'playwright'
+const CHROME = process.env.CHATGPT_UI_CHROME ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
 const { chromium } = await import(playwrightPath)
 
 const redact = (value) => value.replace(/([?&]token=)[^&]+/, '$1***')

@@ -57,7 +57,7 @@ const row = (id, extra = {}) => ({
   check('displayTitle wins', chatgptSessionTitle({ title: 'old', displayTitle: ' new ' }) === 'new')
   const prompted = {
     title: '',
-    cwd: '/mnt/f/project/tools/plugin',
+    cwd: '/srv/plugin',
     displayTitle: 'plugin',
     projectionValues: { turnOutline: [{ prompt: '  请检查  最近分组  ' }] }
   }
@@ -87,7 +87,7 @@ const row = (id, extra = {}) => ({
   )
   check('blank row never shows a project-derived title', chatgptSessionTitle({ title: 'plugin', blank: true }) === '新会话')
   check('project title uses title', chatgptProjectTitle({ title: 'DSH', path: '/x/y' }) === 'DSH')
-  check('project title uses final path segment', chatgptProjectTitle({ path: '/mnt/f/project/tools/plugin/' }) === 'plugin')
+  check('project title uses final path segment', chatgptProjectTitle({ path: '/srv/plugin/' }) === 'plugin')
   check('project title handles an empty path', chatgptProjectTitle({}) === '未命名项目')
 }
 

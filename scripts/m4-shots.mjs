@@ -15,7 +15,7 @@
 import { mkdirSync, readFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { chromium } from '/mnt/f/project/y86/node_modules/playwright/index.mjs'
+import { chromium } from 'playwright'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const OUT = join(ROOT, 'docs/screenshots')
@@ -32,7 +32,7 @@ if (typeof URL !== 'string') {
   process.exit(2)
 }
 const REF_DIR = join(process.env.HOME ?? '', '.cache/dsh-capture/out')
-const CHROME = process.env.CHATGPT_UI_CHROME ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
+const CHROME = process.env.CHATGPT_UI_CHROME ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
 const browser = await chromium.launch({ headless: true, executablePath: CHROME, args: ['--no-sandbox', '--disable-dev-shm-usage'] })
 
 const sleep = (ms) => new Promise((done) => setTimeout(done, ms))

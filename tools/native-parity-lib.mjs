@@ -13,10 +13,10 @@
 
 export const PARITY_TOLERANCE = 1
 export const PARITY_VIEWPORT = { width: 1440, height: 900 }
-export const CHROME = process.env.CHATGPT_UI_CHROME ?? process.env.PLAYWRIGHT_CHROMIUM ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
+export const CHROME = process.env.CHATGPT_UI_CHROME ?? process.env.PLAYWRIGHT_CHROMIUM ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
 export const PLAYWRIGHT_CANDIDATES = [
   process.env.PLAYWRIGHT_MODULE,
-  '/mnt/f/project/y86/node_modules/playwright/index.mjs',
+  'playwright',
   'playwright',
   'playwright-core'
 ].filter((candidate) => typeof candidate === 'string')

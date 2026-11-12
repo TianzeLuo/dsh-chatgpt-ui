@@ -53,7 +53,7 @@ const playwrightArg = typeof args.get('playwright') === 'string' ? args.get('pla
 let playwright
 for (const candidate of [
   ...(playwrightArg === undefined ? [] : [playwrightArg]),
-  '/mnt/f/project/y86/node_modules/playwright/index.mjs',
+  'playwright',
   'playwright',
   'playwright-core'
 ]) {
@@ -67,7 +67,7 @@ if (playwright === undefined) {
   process.exit(2)
 }
 const CHROME =
-  process.env.M11_CHROME ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
+  process.env.M11_CHROME ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
 
 const browser = await playwright.chromium.launch({
   headless: true,

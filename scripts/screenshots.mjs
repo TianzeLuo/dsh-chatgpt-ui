@@ -6,7 +6,7 @@
  * a Chromium build. It is NOT a runtime or build dependency — point NODE_PATH at
  * any existing install (or pass --playwright <dir>):
  *
- *   NODE_PATH=/mnt/f/project/y86/node_modules node scripts/screenshots.mjs \
+ *   NODE_PATH=<node_modules> node scripts/screenshots.mjs \
  *     --url "http://127.0.0.1:3099/?token=..." [--out docs/screenshots]
  *
  * Each shot is taken only after the skin reports itself mounted, the preview
@@ -41,7 +41,7 @@ try {
   process.exit(2)
 }
 
-const CHROME = process.env.CHATGPT_UI_CHROME ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
+const CHROME = process.env.CHATGPT_UI_CHROME ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
 const browser = await playwright.chromium.launch({
   headless: true,
   executablePath: CHROME,

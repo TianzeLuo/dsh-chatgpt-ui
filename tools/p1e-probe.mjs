@@ -26,8 +26,8 @@
  */
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
-const { chromium } = await import(process.env.P1E_PLAYWRIGHT ?? '/mnt/f/project/y86/node_modules/playwright/index.mjs')
-const CHROME = '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
+const { chromium } = await import(process.env.P1E_PLAYWRIGHT ?? 'playwright')
+const CHROME = process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
 const args = process.argv.slice(2)
 const opt = Object.fromEntries(args.filter(a => a.startsWith('--')).map(a => { const s = a.slice(2); const i = s.indexOf('='); return i < 0 ? [s, true] : [s.slice(0, i), s.slice(i + 1)] }))
 

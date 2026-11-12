@@ -35,7 +35,7 @@ const DOCS = join(ROOT, 'docs')
 const SHOTS = join(DOCS, 'screenshots')
 const DEFAULT_OUT = join(ROOT, '.m15-tmp')
 const TOLERANCE = 1
-const CHROME = process.env.M15_CHROME ?? process.env.CHATGPT_UI_CHROME ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
+const CHROME = process.env.M15_CHROME ?? process.env.CHATGPT_UI_CHROME ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
 const VIEWPORT = { width: 1600, height: 1000 }
 const SESSION_TEXT = '跑一下过程区 fixture'
 
@@ -62,7 +62,7 @@ async function loadPlaywright() {
   for (const candidate of [
     explicit,
     process.env.PLAYWRIGHT_DIR,
-    '/mnt/f/project/y86/node_modules/playwright/index.mjs',
+    'playwright',
     'playwright',
     'playwright-core'
   ].filter(Boolean)) {

@@ -135,20 +135,20 @@ const projectCard = `
   <div class="chatgpt-session-menu" data-cgpt-session-menu="project" role="menu" style="left:24px;top:520px">
     <div class="chatgpt-project-menu-card" role="presentation">
       <span class="chatgpt-project-menu-icon" aria-hidden="true">${ICONS.folderOpen}</span>
-      <span class="chatgpt-project-menu-title">系统实践</span>
+      <span class="chatgpt-project-menu-title">示例项目</span>
       <span class="chatgpt-project-menu-star" aria-hidden="true">${ICONS.star}</span>
     </div>
     <div class="chatgpt-project-menu-meta" role="presentation">
       <span class="chatgpt-project-menu-meta-icon" aria-hidden="true">${ICONS.chatCount}</span>3 次聊天
     </div>
     <div class="chatgpt-session-menu-separator" role="separator"></div>
-    <button type="button" class="chatgpt-project-menu-path" role="menuitem" tabindex="-1" title="打开项目：TianzeLuo/Directed-Research-in-AI-System">
+    <button type="button" class="chatgpt-project-menu-path" role="menuitem" tabindex="-1" title="打开项目：example/demo-notes">
       <span class="chatgpt-project-menu-path-icon" aria-hidden="true" data-cgpt-project-path-kind="repo">${ICONS.repoPath}</span>
-      <span class="chatgpt-project-menu-path-text">TianzeLuo/Directed-Research-in-AI-System</span>
+      <span class="chatgpt-project-menu-path-text">example/demo-notes</span>
     </button>
-    <button type="button" class="chatgpt-project-menu-path" role="menuitem" tabindex="-1" title="打开项目：directed-research-in-ai-system">
+    <button type="button" class="chatgpt-project-menu-path" role="menuitem" tabindex="-1" title="打开项目：demo-notes">
       <span class="chatgpt-project-menu-path-icon" aria-hidden="true" data-cgpt-project-path-kind="folder">${ICONS.folderOpen}</span>
-      <span class="chatgpt-project-menu-path-text">directed-research-in-ai-system</span>
+      <span class="chatgpt-project-menu-path-text">demo-notes</span>
     </button>
     <div class="chatgpt-session-menu-separator" role="separator"></div>
     <button type="button" class="chatgpt-session-menu-item" role="menuitem" tabindex="-1">
@@ -201,7 +201,7 @@ ${projectCard}
 ${chip}
 </body></html>`
 
-const playwrightPath = process.env.M26_PLAYWRIGHT ?? '/mnt/f/project/y86/node_modules/playwright/index.mjs'
+const playwrightPath = process.env.M26_PLAYWRIGHT ?? 'playwright'
 const { chromium } = await import(playwrightPath)
 
 const browser = await chromium.launch()

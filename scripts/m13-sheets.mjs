@@ -20,7 +20,7 @@ const SHOTS = join(ROOT, 'docs/screenshots')
 mkdirSync(SHOTS, { recursive: true })
 
 let playwright
-for (const candidate of ['/mnt/f/project/y86/node_modules/playwright/index.mjs', 'playwright', 'playwright-core']) {
+for (const candidate of ['playwright', 'playwright', 'playwright-core']) {
   try {
     playwright = await import(candidate)
     break
@@ -52,7 +52,7 @@ const chatColumns = [
 
 const browser = await playwright.chromium.launch({
   headless: true,
-  executablePath: process.env.M13_CHROME ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome',
+  executablePath: process.env.M13_CHROME ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome',
   args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
 })
 const page = await browser.newPage({ viewport: { width: 1860, height: 900 }, deviceScaleFactor: 2 })

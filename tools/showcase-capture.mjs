@@ -50,8 +50,8 @@ if (parsed.hostname !== '127.0.0.1' || parsed.port !== expectedPort) {
 const OUT = resolve(ROOT, typeof args.get('out') === 'string' ? args.get('out') : 'docs/images')
 mkdirSync(OUT, { recursive: true })
 
-const playwrightPath = process.env.SHOWCASE_PLAYWRIGHT ?? '/mnt/f/project/y86/node_modules/playwright/index.mjs'
-const CHROME = process.env.CHATGPT_UI_CHROME ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
+const playwrightPath = process.env.SHOWCASE_PLAYWRIGHT ?? 'playwright'
+const CHROME = process.env.CHATGPT_UI_CHROME ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
 const { chromium } = await import(playwrightPath)
 const browser = await chromium.launch({ headless: true, executablePath: CHROME, args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu'] })
 const context = await browser.newContext({

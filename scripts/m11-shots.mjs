@@ -30,8 +30,8 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const SHOTS = join(ROOT, 'docs/screenshots')
 const TMP = join(ROOT, '.m11-tmp')
 const CROPS = join(TMP, 'sheets')
-const PLAYWRIGHT = process.env.PLAYWRIGHT_DIR ?? '/mnt/f/project/y86/node_modules/playwright'
-const CHROME = process.env.CHATGPT_UI_CHROME ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
+const PLAYWRIGHT = process.env.PLAYWRIGHT_DIR ?? 'playwright'
+const CHROME = process.env.CHATGPT_UI_CHROME ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
 const CHROME_ARGS = ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--disable-software-rasterizer']
 
 mkdirSync(SHOTS, { recursive: true })

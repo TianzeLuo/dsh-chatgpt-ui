@@ -9,7 +9,7 @@
  * NOT part of dsh-chatgpt-ui: `package.json` does not ship `test/`.
  */
 const LLM_MODULE =
-  'file:///home/user/.nvm/versions/node/v24.21.0/lib/node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-llm/lib/index.js'
+  'file://' + process.env.HOME + '/.nvm/versions/node/v24.21.0/lib/node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-llm/lib/index.js'
 const { LlmAdapter } = await import(LLM_MODULE)
 
 const REPLY = '收到。这条回复只用来占位，方便对齐用户气泡的三种状态。'

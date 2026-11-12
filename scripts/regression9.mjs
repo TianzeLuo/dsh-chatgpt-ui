@@ -25,10 +25,10 @@ for (let i = 2; i < process.argv.length; i += 1) {
 }
 const url = typeof args.get('url') === 'string' ? args.get('url') : process.env.DSH_WEB_URL
 const pwDir = typeof args.get('playwright') === 'string' ? args.get('playwright') : process.env.PLAYWRIGHT_DIR
-const CHROME = process.env.CHATGPT_UI_CHROME ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
+const CHROME = process.env.CHATGPT_UI_CHROME ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
 if (!url) { console.error('usage: node scripts/regression9.mjs --url <DSH Web URL> [--playwright <dir>]'); process.exit(2) }
 let playwright
-for (const candidate of [pwDir, '/mnt/f/project/y86/node_modules/playwright', '/mnt/f/project/y86/node_modules/playwright-core', 'playwright', 'playwright-core'].filter(Boolean)) {
+for (const candidate of [pwDir, 'playwright', 'playwright-core', 'playwright', 'playwright-core'].filter(Boolean)) {
   try { playwright = candidate.includes('/') ? await import(join(candidate, 'index.mjs')) : await import(candidate); break } catch {}
 }
 if (!playwright) { console.error('Playwright is required'); process.exit(2) }

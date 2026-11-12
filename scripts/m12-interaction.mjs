@@ -31,7 +31,7 @@ if (typeof url !== 'string') {
   process.exit(2)
 }
 let playwright
-for (const candidate of ['/mnt/f/project/y86/node_modules/playwright/index.mjs', 'playwright', 'playwright-core']) {
+for (const candidate of ['playwright', 'playwright', 'playwright-core']) {
   try {
     playwright = await import(candidate)
     break
@@ -43,7 +43,7 @@ if (playwright === undefined) {
 }
 const browser = await playwright.chromium.launch({
   headless: true,
-  executablePath: process.env.M12_CHROME ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome',
+  executablePath: process.env.M12_CHROME ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome',
   args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
 })
 const page = await browser.newPage({ viewport: { width: 1600, height: 1000 }, locale: 'zh-CN' })

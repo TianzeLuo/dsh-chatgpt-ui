@@ -57,7 +57,7 @@ const reference = JSON.parse(readFileSync(join(ROOT, 'docs/capture/icons.json'),
 
 // ---- playwright -----------------------------------------------------------
 let playwright
-const candidates = [args.get('playwright'), '/mnt/f/project/y86/node_modules/playwright/index.mjs', 'playwright', 'playwright-core'].filter(Boolean)
+const candidates = [args.get('playwright'), 'playwright', 'playwright', 'playwright-core'].filter(Boolean)
 let lastError
 for (const candidate of candidates) {
   try {
@@ -77,7 +77,7 @@ const browser = await chromium.launch({
   executablePath:
     process.env.CHATGPT_UI_CHROME ??
     process.env.PLAYWRIGHT_CHROMIUM ??
-    '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome',
+    process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome',
   args: ['--no-sandbox']
 })
 const DPR = Number(args.get('dpr') ?? 1)

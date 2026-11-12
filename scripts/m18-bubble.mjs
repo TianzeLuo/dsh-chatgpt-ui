@@ -50,7 +50,7 @@ mkdirSync(LIVE, { recursive: true })
 mkdirSync(SHOTS, { recursive: true })
 
 let playwright
-for (const candidate of ['/mnt/f/project/y86/node_modules/playwright/index.mjs', 'playwright', 'playwright-core']) {
+for (const candidate of ['playwright', 'playwright', 'playwright-core']) {
   try {
     playwright = await import(candidate)
     break
@@ -60,7 +60,7 @@ if (playwright === undefined) {
   console.error('m18-bubble: playwright is required')
   process.exit(2)
 }
-const CHROME = process.env.M18_CHROME ?? process.env.CHATGPT_UI_CHROME ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
+const CHROME = process.env.M18_CHROME ?? process.env.CHATGPT_UI_CHROME ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
 const VIEWPORT = { width: 1440, height: 900 }
 const CLIP = { x: 440, y: 56, width: 960, height: 840 }
 const TEXT_BEFORE = 'P0-7 帧一：先取得一条已稳定的用户气泡，它的底色就是发送瞬间必须保持的颜色。'

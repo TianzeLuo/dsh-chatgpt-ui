@@ -34,7 +34,7 @@ for (let index = 2; index < process.argv.length; index += 1) {
 const CDP = typeof args.get('cdp') === 'string' ? args.get('cdp') : process.env.M28_CDP ?? 'http://127.0.0.1:9224'
 const OUT = resolve(ROOT, typeof args.get('out') === 'string' ? args.get('out') : 'docs/m28-web.json')
 
-const playwrightPath = process.env.M28_PLAYWRIGHT ?? '/mnt/f/project/y86/node_modules/playwright/index.mjs'
+const playwrightPath = process.env.M28_PLAYWRIGHT ?? 'playwright'
 const { chromium } = await import(playwrightPath)
 
 const measure = () => {

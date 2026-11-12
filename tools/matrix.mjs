@@ -75,7 +75,7 @@ let playwright
 try {
   const candidates = []
   if (playwrightArg !== undefined) candidates.push(playwrightArg)
-  candidates.push('/mnt/f/project/y86/node_modules/playwright/index.mjs', 'playwright', 'playwright-core')
+  candidates.push('playwright', 'playwright', 'playwright-core')
   let lastError
   for (const candidate of candidates) {
     try {
@@ -94,7 +94,7 @@ try {
 
 const chromium = playwright.chromium ?? playwright.default?.chromium
 const CHROME =
-  process.env.CHATGPT_UI_CHROME ?? process.env.PLAYWRIGHT_CHROMIUM ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
+  process.env.CHATGPT_UI_CHROME ?? process.env.PLAYWRIGHT_CHROMIUM ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
 const browser = await chromium.launch({
   headless: true,
   executablePath: CHROME,

@@ -41,8 +41,8 @@ const OUT = resolve(ROOT, typeof args.get('out') === 'string' ? args.get('out') 
 const SHOTS = join(OUT, 'screenshots')
 mkdirSync(SHOTS, { recursive: true })
 
-const { chromium } = await import(process.env.M36_PLAYWRIGHT ?? '/mnt/f/project/y86/node_modules/playwright/index.mjs')
-const CHROME = process.env.CHATGPT_UI_CHROME ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
+const { chromium } = await import(process.env.M36_PLAYWRIGHT ?? 'playwright')
+const CHROME = process.env.CHATGPT_UI_CHROME ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
 const COLLAPSE = "[data-slot='sidebar'] [data-window-drag] > button:last-of-type"
 const OLD_COLLAPSE = "[data-slot='sidebar'] [data-window-drag] > button:last-child"
 const FRAME_SELECTOR = '[class*="_frame"]'

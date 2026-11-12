@@ -40,7 +40,7 @@ const OUT = resolve(ROOT, typeof args.get('out') === 'string' ? args.get('out') 
 mkdirSync(OUT, { recursive: true })
 
 let playwright
-for (const candidate of ['/mnt/f/project/y86/node_modules/playwright/index.mjs', 'playwright', 'playwright-core']) {
+for (const candidate of ['playwright', 'playwright', 'playwright-core']) {
   try {
     playwright = await import(candidate)
     break
@@ -50,7 +50,7 @@ if (playwright === undefined) {
   console.error('m14-capture: playwright is required')
   process.exit(2)
 }
-const CHROME = process.env.M14_CHROME ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
+const CHROME = process.env.M14_CHROME ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
 const browser = await playwright.chromium.launch({
   headless: true,
   executablePath: CHROME,

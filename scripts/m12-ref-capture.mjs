@@ -34,7 +34,7 @@ const OUT = resolve(ROOT, typeof args.get('out') === 'string' ? args.get('out') 
 mkdirSync(OUT, { recursive: true })
 
 let playwright
-for (const candidate of ['/mnt/f/project/y86/node_modules/playwright/index.mjs', 'playwright', 'playwright-core']) {
+for (const candidate of ['playwright', 'playwright', 'playwright-core']) {
   try {
     playwright = await import(candidate)
     break

@@ -25,7 +25,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const HOST = process.env.DSH_INSTALL ?? '/home/user/.nvm/versions/node/v24.21.0/lib/node_modules/@deepseek-ai/dsh'
+const HOST = process.env.DSH_INSTALL ?? process.env.HOME + '/.nvm/versions/node/v24.21.0/lib/node_modules/@deepseek-ai/dsh'
 const HOST_PACKAGES = join(HOST, 'node_modules', '@deepseek-ai')
 
 let failures = 0

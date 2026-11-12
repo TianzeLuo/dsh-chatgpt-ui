@@ -48,7 +48,7 @@ const BADGE_STATE = {
 
 const browser = await chromium.launch({
   headless: true,
-  executablePath: args.get('chromium') ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome',
+  executablePath: args.get('chromium') ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome',
   args: ['--no-sandbox', '--disable-dev-shm-usage']
 })
 const page = await browser.newPage({ viewport: { width: 1600, height: 1000 }, colorScheme: 'light' })

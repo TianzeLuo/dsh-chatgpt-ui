@@ -44,9 +44,9 @@ const OUT = resolve(ROOT, typeof args.get('out') === 'string' ? args.get('out') 
 const SHOTS = join(OUT, 'screenshots')
 mkdirSync(SHOTS, { recursive: true })
 
-const playwrightPath = process.env.M38_PLAYWRIGHT ?? '/mnt/f/project/y86/node_modules/playwright/index.mjs'
+const playwrightPath = process.env.M38_PLAYWRIGHT ?? 'playwright'
 const CHROME =
-  process.env.CHATGPT_UI_CHROME ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
+  process.env.CHATGPT_UI_CHROME ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
 const { chromium } = await import(playwrightPath)
 
 const round = (value) => Math.round(value * 100) / 100

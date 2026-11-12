@@ -44,7 +44,7 @@ const SHOTS = join(DOCS, 'screenshots')
 mkdirSync(SHOTS, { recursive: true })
 
 let playwright
-for (const candidate of ['/mnt/f/project/y86/node_modules/playwright/index.mjs', 'playwright', 'playwright-core']) {
+for (const candidate of ['playwright', 'playwright', 'playwright-core']) {
   try {
     playwright = await import(candidate)
     break
@@ -54,7 +54,7 @@ if (playwright === undefined) {
   console.error('m22-capture: playwright is required')
   process.exit(2)
 }
-const CHROME = process.env.M22_CHROME ?? process.env.CHATGPT_UI_CHROME ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
+const CHROME = process.env.M22_CHROME ?? process.env.CHATGPT_UI_CHROME ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
 const browser = await playwright.chromium.launch({
   headless: true,
   executablePath: CHROME,
@@ -346,7 +346,7 @@ const chipInjected = await page.evaluate(() => {
   const label = document.createElement('span')
   label.className = 'chatgpt-work-project-readonly-label'
   label.style.cssText = 'overflow:hidden;max-width:260px;text-overflow:ellipsis;white-space:nowrap;'
-  label.textContent = document.querySelector('.chatgpt-session-row[data-active="true"] .chatgpt-session-project, .chatgpt-session-project')?.textContent?.trim() || '客户门户'
+  label.textContent = document.querySelector('.chatgpt-session-row[data-active="true"] .chatgpt-session-project, .chatgpt-session-project')?.textContent?.trim() || '示例项目'
   chip.append(icon, label)
   row.insertBefore(chip, row.firstChild)
   row.style.flexWrap = 'nowrap'

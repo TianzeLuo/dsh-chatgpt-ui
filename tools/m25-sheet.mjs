@@ -31,7 +31,7 @@ const DPR = Number(args.get('dpr') ?? 4)
 const DARK = args.get('light') !== true
 
 let playwright
-for (const candidate of [args.get('playwright'), '/mnt/f/project/y86/node_modules/playwright/index.mjs', 'playwright', 'playwright-core'].filter(Boolean)) {
+for (const candidate of [args.get('playwright'), 'playwright', 'playwright', 'playwright-core'].filter(Boolean)) {
   try {
     playwright = await import(candidate)
     break
@@ -91,7 +91,7 @@ writeFileSync(file, html)
 
 const browser = await playwright.chromium.launch({
   headless: true,
-  executablePath: process.env.M25_CHROME ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome',
+  executablePath: process.env.M25_CHROME ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome',
   args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
 })
 const page = await browser.newPage({ viewport: { width: 1200, height: 900 }, deviceScaleFactor: DPR })

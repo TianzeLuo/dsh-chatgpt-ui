@@ -41,7 +41,7 @@ mkdirSync(OUT, { recursive: true })
 mkdirSync(SHOTS, { recursive: true })
 
 let playwright
-for (const candidate of ['/mnt/f/project/y86/node_modules/playwright/index.mjs', 'playwright', 'playwright-core']) {
+for (const candidate of ['playwright', 'playwright', 'playwright-core']) {
   try {
     playwright = await import(candidate)
     break
@@ -51,7 +51,7 @@ if (playwright === undefined) {
   console.error('m17-capture: playwright is required')
   process.exit(2)
 }
-const CHROME = process.env.M17_CHROME ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
+const CHROME = process.env.M17_CHROME ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
 const browser = await playwright.chromium.launch({
   headless: true,
   executablePath: CHROME,

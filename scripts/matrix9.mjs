@@ -43,9 +43,9 @@ const noNative = args.has('no-native') || args.get('no-native') === true
 const playwrightDir = typeof args.get('playwright') === 'string'
   ? args.get('playwright')
   : process.env.PLAYWRIGHT_DIR
-const HEADLESS_SHELL = '/home/user/.cache/ms-playwright/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrome-headless-shell'
+const HEADLESS_SHELL = process.env.HOME + '/.cache/ms-playwright/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrome-headless-shell'
 const CHROME = process.env.CHATGPT_UI_CHROME
-  ?? (existsSync(HEADLESS_SHELL) ? HEADLESS_SHELL : '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome')
+  ?? (existsSync(HEADLESS_SHELL) ? HEADLESS_SHELL : process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome')
 /* Headless shell + software Skia; the full Chrome build is blocked by the
    workspace sandbox in some environments, while these flags keep text and
    image rasterisation working for the 1600×620 composites. */
@@ -59,8 +59,8 @@ async function loadPlaywright() {
   const candidates = [
     playwrightDir,
     process.env.PLAYWRIGHT_DIR,
-    '/mnt/f/project/y86/node_modules/playwright',
-    '/mnt/f/project/y86/node_modules/playwright-core',
+    'playwright',
+    'playwright-core',
     'playwright',
     'playwright-core'
   ].filter(Boolean)

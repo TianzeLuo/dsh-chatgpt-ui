@@ -47,7 +47,7 @@ mkdirSync(SHOTS, { recursive: true })
 const masked = url.replace(/token=[^&]+/, 'token=***')
 
 let playwright
-for (const candidate of [args.get('playwright'), '/mnt/f/project/y86/node_modules/playwright/index.mjs', 'playwright', 'playwright-core'].filter(Boolean)) {
+for (const candidate of [args.get('playwright'), 'playwright', 'playwright', 'playwright-core'].filter(Boolean)) {
   try {
     playwright = await import(candidate)
     break
@@ -63,7 +63,7 @@ const iconReport = JSON.parse(readFileSync(join(ROOT, 'docs/m25-icons-diff.json'
 
 const browser = await playwright.chromium.launch({
   headless: true,
-  executablePath: process.env.M25_CHROME ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome',
+  executablePath: process.env.M25_CHROME ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome',
   args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
 })
 

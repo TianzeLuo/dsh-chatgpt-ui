@@ -20,8 +20,8 @@ import { readPng, writePng } from './png-read.mjs'
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const SHOTS = join(ROOT, 'docs/screenshots')
 const TMP = join(ROOT, '.m10-tmp')
-const PLAYWRIGHT = process.env.PLAYWRIGHT_DIR ?? '/mnt/f/project/y86/node_modules/playwright'
-const HEADLESS_SHELL = '/home/user/.cache/ms-playwright/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrome-headless-shell'
+const PLAYWRIGHT = process.env.PLAYWRIGHT_DIR ?? 'playwright'
+const HEADLESS_SHELL = process.env.HOME + '/.cache/ms-playwright/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrome-headless-shell'
 const CHROME = process.env.CHATGPT_UI_CHROME ?? HEADLESS_SHELL
 const CHROME_ARGS = ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--disable-software-rasterizer', '--ozone-platform=headless']
 const css = readdirSync(join(ROOT, 'lib/client/css'))
@@ -132,7 +132,7 @@ const rowsHtml = `
     <div class="chatgpt-sessions" style="height:auto">
       <div class="chatgpt-session-scroll" style="overflow:visible;padding-right:0">
         <div class="chatgpt-section-heading">最近</div>
-        ${row('1104-实验分析', '', true)}
+        ${row('示例会话 A', '', true)}
         ${row('删除故障记录')}
         ${row('介绍BCG')}
         ${row('提高得分作答建议', '<span class="chatgpt-session-project">Native parity</span>')}

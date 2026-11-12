@@ -23,7 +23,7 @@ try {
   console.error(`playwright-core is required for this check (${error.message})`)
   process.exit(2)
 }
-const CHROME = process.env.CHATGPT_UI_CHROME ?? '/home/user/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
+const CHROME = process.env.CHATGPT_UI_CHROME ?? process.env.HOME + '/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome'
 const css = readdirSync(join(ROOT, 'lib/client/css'))
   .filter((name) => name.endsWith('.css'))
   .sort()
