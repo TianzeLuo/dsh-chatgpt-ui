@@ -289,5 +289,13 @@ const permissions = {
   check('palette: the dark card is #212121', darkTokens.includes('--cgpt-work-card-bg: #212121'))
 }
 
+// 13. the effort panel clears the composer card (P1-f2).
+{
+  const composer = read('lib/client/composer.js')
+  const helper = composer.slice(composer.indexOf('function chatgptPopoverAbove'), composer.indexOf('function chatgptPopoverBeside'))
+  check('panel: anchors its bottom edge to the card top, not the pill top', helper.includes("querySelector('[data-composer-card=\"true\"]')") && helper.includes('Math.min(anchor.top, card.top)'))
+  check('panel: right-aligns with the card so the empty-state greeting stays visible', helper.includes('card.right - width'))
+}
+
 console.log(`${failures === 0 ? 'PASS' : 'FAIL'}  work composer: ${checks - failures}/${checks} checks`)
 if (failures > 0) process.exit(1)

@@ -53,10 +53,10 @@ npm test                # 需要本机证据
 ```sh
 export DSH_HOME=$(mktemp -d /tmp/dsh-demo-XXXX)
 dsh plugin --profile web add /path/to/dsh-chatgpt-ui
-dsh web --no-open --port 3104          # 打印带 token 的 URL
+dsh web --no-open --port 3105          # 打印带 token 的 URL
 ```
 
-- **矩阵**：`npm run matrix -- --url "http://127.0.0.1:3104/?token=…" --playwright …`
+- **矩阵**：`npm run matrix -- --url "http://127.0.0.1:3105/?token=…" --playwright …`
   （即 `scripts/matrix9.mjs`），产出 `docs/screenshots/matrix9-*.png` 与
   `docs/matrix9.json`；有 `diff`/`missing` 时非零退出，`--allow-diff` 只报告。
 - **全景矩阵（开发工具）**：`node tools/matrix.mjs --url-dark … --url-light … --out docs`，
@@ -75,13 +75,17 @@ dsh web --no-open --port 3104          # 打印带 token 的 URL
 README 里的四张图由 `tools/showcase-capture.mjs` 生成，同样只连隔离实例：
 
 ```sh
-node tools/showcase-capture.mjs --url "http://127.0.0.1:3104/?token=…"
+node tools/showcase-capture.mjs --url "http://127.0.0.1:3105/?token=…"
 ```
 
-脚本会拒绝非 `127.0.0.1:3104` 的地址，固定 1440×900 @2x、深色、zh-CN，并断言推理
-强度滑块确实展开。演示数据要求：两个项目（`示例项目` / `Demo Project`）加一个空项目
-（`Empty Project`），三个会话（`你好` / `示例会话 B` / `Sample session`）。
-截图里不得出现真实项目名、会话标题、路径或头像——提交前逐张目检。
+脚本默认只接受 `127.0.0.1:3105`（可用 `--port` 改），固定 1440×900 @2x、深色、
+zh-CN，并断言：推理强度滑块确实展开、面板底边与输入卡顶边不重叠、只存在一个展开的
+触发药丸、没有 hover 卡片遮住对话、界面里不出现本机路径。
+
+演示数据全部用英文，避免和中文界面混在一起：三个项目 `Demo Project`（3 条会话）、
+`Personal Notes`（3 条）、`Marketing Site`（2 条），其中 `Draft the README outline`
+有一条完整对话（用户气泡 + 助手回答）。截图里不允许出现真实项目名、会话标题、
+用户路径或头像——提交前逐张目检。
 
 ## 6. 已知的验收边界
 

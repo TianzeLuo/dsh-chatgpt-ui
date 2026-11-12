@@ -7,18 +7,19 @@
  * DSH_HOME, its own port, and demo data created for the purpose (see
  * docs/testing.md → "README screenshots"). It refuses any non-loopback host.
  *
- * Expected demo data — two projects (示例项目 / Demo Project) plus one empty
- * project (Empty Project), one session titled 你好 holding a greeting answer,
- * one session titled 示例会话 B, and one session titled Sample session.
+ * Expected demo data — all English, so the frames carry no Chinese demo text
+ * next to the zh-CN chrome: three projects (Demo Project with three sessions,
+ * Personal Notes with three, Marketing Site with two), and a real transcript in
+ * "Draft the README outline" (user bubble + assistant answer).
  *
- *   node tools/showcase-capture.mjs --url "http://127.0.0.1:3104/?token=…" \
- *     [--out docs/images] [--port 3104]
+ *   node tools/showcase-capture.mjs --url "http://127.0.0.1:3105/?token=…" \
+ *     [--out docs/images] [--port 3105]
  *
  * Every frame is 1440×900 CSS pixels at devicePixelRatio 2, dark theme, zh-CN
  * UI, so the four files share one size and one zoom level:
  *
- *   new-session-effort-dark.png   new Work session, effort slider expanded
- *   new-session-work-dark.png     new Work session with a draft, project bound
+ *   new-session-effort-dark.png   new Chat session, effort slider expanded
+ *   new-session-work-dark.png     new Work session, project bound, one bottom row
  *   session-dark.png              existing session: bubbles + composer + sidebar
  *   project-menu-dark.png         sidebar project ⋯ menu open
  */
@@ -41,7 +42,7 @@ if (typeof url !== 'string') {
   console.error('usage: node tools/showcase-capture.mjs --url <tokenised-url> [--out docs/images]')
   process.exit(2)
 }
-const expectedPort = String(args.get('port') ?? '3104')
+const expectedPort = String(args.get('port') ?? '3105')
 const parsed = new URL(url)
 if (parsed.hostname !== '127.0.0.1' || parsed.port !== expectedPort) {
   console.error(`showcase: refusing ${parsed.hostname}:${parsed.port} — run it against an isolated instance (127.0.0.1:${expectedPort})`)
@@ -62,10 +63,57 @@ const context = await browser.newContext({
 })
 const page = await context.newPage()
 const shot = async (name) => {
+  const text = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '))
+  const leak = text.match(PATH_LEAK)
+  if (leak !== null) throw new Error(`showcase: ${name} shows a host path — ${leak[0]}`)
   await page.screenshot({ path: join(OUT, name) })
   console.log(`showcase: ${name}`)
 }
-const visibleText = () => page.evaluate(() => document.body.innerText.replace(/\s+/g, ' ').trim())
+
+/* Demo data must stay English: the frames sit next to a zh-CN chrome, and a
+   mixed sidebar reads like a real workspace rather than a demo one. */
+const CJK = /[\u3400-\u9fff]/
+const auditSidebar = async () => {
+  const rows = await page.evaluate(() => ({
+    projects: [...document.querySelectorAll('[data-cgpt-project-row]')].map((el) => el.innerText.replace(/\s+/g, ' ').trim()),
+    sessions: [...document.querySelectorAll('[data-cgpt-session-row]')].map((el) => el.innerText.replace(/\s+/g, ' ').trim())
+  }))
+  const offending = [...rows.projects, ...rows.sessions].filter((text) => CJK.test(text))
+  if (offending.length > 0) throw new Error(`showcase: sidebar demo data is not English — ${offending.join(' | ')}`)
+  return rows
+}
+
+/* No frame may show a host path (`/tmp/…`, `/mnt/…`, `F:\…`) — the demo
+   projects use synthetic paths and the audit keeps it that way. */
+const PATH_LEAK = /(\/tmp\/|\/mnt\/|[A-Za-z]:\\|\/home\/)/
+
+/* P1-f2: the panel must clear the whole composer card and stay the only open
+   trigger, otherwise the frame reads as a broken layout. */
+const openEffortPanel = async () => {
+  await page.locator('[data-cgpt-model-pill]').click()
+  await page.waitForTimeout(800)
+  if (await page.locator('.chatgpt-effort-slider').count() === 0) {
+    throw new Error('showcase: the effort slider did not open — is the demo model missing reasoning metadata?')
+  }
+  const geometry = await page.evaluate(() => {
+    const card = document.querySelector('[data-composer-card="true"]').getBoundingClientRect()
+    const menu = document.querySelector('.chatgpt-effort-menu').getBoundingClientRect()
+    return {
+      cardTop: Math.round(card.top),
+      menuTop: Math.round(menu.top),
+      menuBottom: Math.round(menu.bottom),
+      pills: document.querySelectorAll('[data-cgpt-model-pill]').length,
+      open: document.querySelectorAll('[data-cgpt-model-pill][data-open="true"]').length
+    }
+  })
+  if (geometry.menuBottom > geometry.cardTop - 4) {
+    throw new Error(`showcase: the effort panel overlaps the composer card — ${JSON.stringify(geometry)}`)
+  }
+  if (geometry.pills !== 1 || geometry.open !== 1) {
+    throw new Error(`showcase: expected exactly one open trigger — ${JSON.stringify(geometry)}`)
+  }
+  return geometry
+}
 
 await page.goto(url, { waitUntil: 'domcontentloaded' })
 await page.waitForSelector('[data-cgpt-rail-item]', { timeout: 30000 })
@@ -81,39 +129,44 @@ const modeGroup = page.locator('.chatgpt-mode-group')
 const chatTab = modeGroup.getByText('聊天', { exact: true })
 const workTab = modeGroup.getByText('工作', { exact: true })
 
-// 1 — new Work session inside a project, effort panel open.
-await workTab.click()
-await page.waitForTimeout(700)
-const exampleProject = page.locator('[data-cgpt-project-row]').filter({ hasText: '示例项目' }).first()
-await exampleProject.hover()
-await page.waitForTimeout(400)
-await page.locator('[data-cgpt-project-new]').last().click({ force: true })
-await page.waitForTimeout(1500)
-const mode = await page.evaluate(() => document.body.getAttribute('data-chatgpt-mode'))
-if (mode !== 'agent') throw new Error(`showcase: expected Work mode, got ${mode}`)
-await page.locator('[data-cgpt-model-pill]').click()
+// 1 — new Chat session, effort panel open above the card.
+await page.locator('[data-cgpt-new-chat]').first().click()
+await page.waitForTimeout(1200)
+await chatTab.click()
 await page.waitForTimeout(900)
-if (await page.locator('.chatgpt-effort-slider').count() === 0) {
-  throw new Error('showcase: the effort slider did not open — is the demo model missing reasoning metadata?')
-}
+const mode = await page.evaluate(() => document.body.getAttribute('data-chatgpt-mode'))
+if (mode !== 'chat') throw new Error(`showcase: expected Chat mode, got ${mode}`)
+const geometry = await openEffortPanel()
 await shot('new-session-effort-dark.png')
 
-// 2 — same new session, panel closed, a draft typed into the card.
+// 2 — new Work session, project bound, permission chip and the single bottom row.
 await page.keyboard.press('Escape')
 await page.waitForTimeout(400)
-await page.locator('[data-composer-input]').first().click()
-await page.keyboard.type('帮我把这个项目的 README 补一版，先列提纲。', { delay: 12 })
+await workTab.click()
+await page.waitForTimeout(900)
+await page.locator('[data-cgpt-work-tool="project"]').click()
 await page.waitForTimeout(500)
+await page.locator('[data-cgpt-project-option="demo-project"]').click()
+await page.waitForTimeout(800)
+const bound = await page.locator('[data-cgpt-work-tool="project"]').innerText()
+if (!bound.includes('Demo Project')) throw new Error(`showcase: the project chip does not name the demo project — ${bound}`)
 await shot('new-session-work-dark.png')
 
 // 3 — an existing session: bubbles above, docked composer below.
-await page.locator('[data-cgpt-session-row]').filter({ hasText: '你好' }).first().click()
+await page.locator('[data-cgpt-session-row]').filter({ hasText: 'Draft the README outline' }).first().click()
 await page.waitForTimeout(2500)
+// Park the pointer over empty canvas: a resting hover on a project row opens
+// the project card on top of the transcript.
+await page.mouse.move(1400, 860)
+await page.waitForTimeout(400)
+if (await page.locator('.chatgpt-project-card').count() > 0 && await page.locator('.chatgpt-project-card').first().isVisible()) {
+  throw new Error('showcase: the project hover card is covering the transcript')
+}
 await shot('session-dark.png')
 
 // 4 — sidebar detail: the project ⋯ menu.
-const projectForMenu = page.locator('[data-cgpt-project-row]').filter({ hasText: '示例项目' }).first()
-await projectForMenu.hover()
+const projectRow = page.locator('[data-cgpt-project-row]').filter({ hasText: 'Demo Project' }).first()
+await projectRow.hover()
 await page.waitForTimeout(500)
 const more = page.locator('[data-cgpt-project-more]').last()
 try {
@@ -126,6 +179,6 @@ try {
 await page.waitForTimeout(700)
 await shot('project-menu-dark.png')
 
-const text = await visibleText()
+const rows = await auditSidebar()
 await browser.close()
-console.log(`showcase: sidebar text for review — ${text.slice(0, 400)}`)
+console.log(`showcase: panel bottom ${geometry.menuBottom} / card top ${geometry.cardTop}; sidebar — ${rows.projects.join(', ')}; ${rows.sessions.length} sessions`)

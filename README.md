@@ -3,7 +3,7 @@
 ChatGPT 桌面版风格的 DSH Web GUI 皮肤：只换外观，不动行为——装与不装插件，
 任务/目标、执行步骤、文件与输出聚合、折叠面板全部原样保留。
 
-![新建会话（深色），推理强度滑块展开](docs/images/new-session-effort-dark.png)
+![Chat 模式空态（深色），推理强度滑块在输入卡上方展开](docs/images/new-session-effort-dark.png)
 
 ## 亮点
 
@@ -35,12 +35,12 @@ dsh plugin --profile web add /path/to/dsh-chatgpt-ui
 
 ## 截图
 
-1440×900 @2x，深色；演示数据来自临时隔离实例，不含任何真实项目、会话或路径。
+1440×900 @2x，深色；演示数据（`Demo Project` / `Personal Notes` / `Marketing Site`）来自临时隔离实例，统一为英文，不含任何真实项目、会话或路径。
 
-| 新建会话 · 推理强度滑块 | 新建会话 · Work 模式 |
+| Chat 空态 · 推理强度滑块 | Work 空态 · 新建会话 |
 | --- | --- |
-| ![新建会话，模型与推理强度选滑块展开](docs/images/new-session-effort-dark.png) | ![Work 模式新建会话，项目已选，权限按钮与底部一行](docs/images/new-session-work-dark.png) |
-| 点模型药丸展开推理强度滑块，拖动切换档位，最高档走渐变。 | 输入卡、已选项目 `示例项目`、`帮我批准` 权限按钮与底部 `项目 · 文件` 一行。 |
+| ![Chat 模式空态，推理强度滑块在输入卡上方展开](docs/images/new-session-effort-dark.png) | ![Work 模式新建会话，项目已选，权限按钮与底部一行](docs/images/new-session-work-dark.png) |
+| 空态标题 `我们从哪里开始?`，模型药丸展开推理强度滑块：面板贴在卡片上方、不遮挡输入卡，拖动切换档位。 | 输入卡、已选项目 `Demo Project`、`帮我批准` 权限按钮与底部 `项目 · 文件` 一行。 |
 
 | 既有会话 · 消息与输入卡 | 侧栏细节 · 项目菜单 |
 | --- | --- |
