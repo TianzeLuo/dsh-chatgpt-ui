@@ -1,0 +1,105 @@
+/* dsh-chatgpt-ui — 85-a11y.css
+ *
+ * Keyboard focus and reduced-motion contract. Every selector is a skin-owned
+ * class or a host anchor already used by an earlier module; no generic tag
+ * selector is allowed to reach host controls. The ring is 2px with a 2px
+ * offset in both themes, matching the module-8 acceptance note.
+ */
+
+body[data-chatgpt-ui] :is(
+  .chatgpt-brand-switcher,
+  .chatgpt-brand-menu-item,
+  .chatgpt-rail-button,
+  .chatgpt-rail-menu-item,
+  .chatgpt-panel-search,
+  .chatgpt-new-chat,
+  .chatgpt-super-agent,
+  .chatgpt-session-row,
+  .chatgpt-session-more,
+  .chatgpt-projects-heading,
+  .chatgpt-project-row,
+  .chatgpt-project-new,
+  .chatgpt-project-more,
+  .chatgpt-projects-add,
+  .chatgpt-session-menu-item,
+  .chatgpt-session-dialog-button,
+  .chatgpt-session-dialog-primary,
+  .chatgpt-session-dialog-input,
+  .chatgpt-session-search-input,
+  .chatgpt-mode-seg,
+  .chatgpt-model-pill,
+  .chatgpt-effort-choice,
+  .chatgpt-effort-reset,
+  .chatgpt-model-choice,
+  .chatgpt-effort-range,
+  .chatgpt-work-tool,
+  .chatgpt-toast-action,
+  .chatgpt-toast-close,
+  .chatgpt-search-clear,
+  .chatgpt-search-close,
+  .chatgpt-search-tab,
+  .chatgpt-search-row,
+  .chatgpt-search-input,
+  .chatgpt-project-picker-search input,
+  .chatgpt-project-picker-item,
+  .chatgpt-project-picker-new,
+  .chatgpt-project-picker-none,
+  .chatgpt-filepicker-search input,
+  .chatgpt-filepicker-close,
+  .chatgpt-filepicker-item,
+  .chatgpt-project-nameedit input,
+  .chatgpt-project-instructions-edit textarea
+):focus-visible {
+  outline: 2px solid var(--cgpt-focus-ring);
+  outline-offset: 2px;
+}
+
+/* The composer is a surface, not a button: its soft focus shadow stays for
+   pointer focus, while keyboard focus gets the same 2px ring as every control.
+   :has() is already a project baseline (used by the Work card). */
+body[data-chatgpt-ui][data-cgpt-keyboard='true'] [data-slot='conversation.composer.bar'] [data-composer-card='true']:has([data-composer-input='true']:focus-visible) {
+  outline: 2px solid var(--cgpt-focus-ring);
+  outline-offset: 2px;
+}
+
+/* The effort range is visually opacity:0; its parent track receives the ring. */
+body[data-chatgpt-ui] .chatgpt-effort-range:focus-visible {
+  outline: none;
+}
+
+body[data-chatgpt-ui] .chatgpt-effort-track:has(.chatgpt-effort-range:focus-visible) {
+  outline: 2px solid var(--cgpt-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Keep icon geometry crisp at DPR 2: SVG viewBoxes are 20/16/14/12px integers,
+   so geometricPrecision avoids a half-device-pixel edge on the 1px strokes. */
+body[data-chatgpt-ui] :is(
+  .chatgpt-rail-icon,
+  .chatgpt-panel-search,
+  .chatgpt-work-tool,
+  .chatgpt-model-pill,
+  .chatgpt-mode-seg,
+  .chatgpt-search-row-icon,
+  .chatgpt-session-menu-icon
+) svg {
+  shape-rendering: geometricPrecision;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-chatgpt-ui] [class*='_composerHero'] [class*='_stack']::before,
+  body[data-chatgpt-ui] [class*='_composerHero'] [data-composer-card='true'],
+  body[data-chatgpt-ui] .chatgpt-toast,
+  body[data-chatgpt-ui] .chatgpt-session-skeleton-row,
+  body[data-chatgpt-ui] .chatgpt-search-skeleton-row {
+    animation: none !important;
+  }
+
+  body[data-chatgpt-ui] .chatgpt-effort-fill,
+  body[data-chatgpt-ui] .chatgpt-effort-thumb,
+  body[data-chatgpt-ui] .chatgpt-effort-choice,
+  body[data-chatgpt-ui] .chatgpt-toast,
+  body[data-chatgpt-ui] [class*='_composerHero'] [data-composer-card='true'] {
+    transition: none !important;
+  }
+}

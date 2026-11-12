@@ -1,0 +1,54 @@
+/* dsh-chatgpt-ui — 00-tokens.css
+ *
+ * Skin-level copy and content knobs. Palette and geometry live in
+ * 05-cgpt-tokens.css (--cgpt-*); the older --dsh-chatgpt-* aliases there keep
+ * the M0–Phase-1 rules source-compatible.
+ *
+ * Anchors: body[data-chatgpt-ui]; dark is gated on data-ds-dark-theme.
+ */
+body[data-chatgpt-ui] {
+  /* P0-9: one root-scope override for the Host's global squircle. The Host
+     theme ships `*, ::before, ::after { corner-shape: var(--dsw-corner-shape) }`
+     with `:root { --dsw-corner-shape: superellipse(1.5) }`; `corner-shape` is a
+     separate property from `border-radius`, so every `50%` circle and pill was
+     painted as a superellipse. Re-pointing the Host's own knob once at the skin
+     root is enough: the custom property inherits, so the whole subtree (skin
+     panels, the popovers we mount on <body>, and the Host chrome the skin
+     recolours) computes `round`. No universal selector, no per-circle patch.
+     `skin=off` never sets `data-chatgpt-ui`, so the native parity run keeps the
+     Host outline untouched. */
+  --dsw-corner-shape: round;
+
+  /* M11: the conversation column width comes from the Host
+     (`--dsh-chat-content-width`, driven by the native drag handles). Sub-blocks
+     that must follow it read that variable; this alias is the static fallback
+     for surfaces outside the conversation body. */
+  --dsh-chatgpt-content-width: var(--cgpt-msg-max, 920px);
+  --dsh-chatgpt-radius-bubble: 18px;
+  --dsh-chatgpt-radius-card: 26px;
+  /* P0-21: content cap = the Host input max or 40% of the viewport. */
+  --dsh-chatgpt-composer-max-height: min(336px, 40vh);
+
+  /* Empty-state copy. The zh variant is picked by :lang(zh). */
+  --dsh-chatgpt-greeting: '我们从哪里开始？';
+  --dsh-chatgpt-greeting-zh: '我们从哪里开始？';
+  --dsh-chatgpt-brand-name: 'Chat';
+  --dsh-chatgpt-empty-sessions: 'No chats yet';
+  --dsh-chatgpt-empty-sessions-zh: '还没有对话';
+  /* One Chat placeholder for both the blank hero and a started Session. The
+     skin's copy is Chinese-first (the host renders Chinese while keeping
+     `<html lang="en">`, so `:lang()` cannot decide this); override this token
+     for an English deployment. */
+  --dsh-chatgpt-placeholder-chat: '随便问点什么';
+
+  /* The host sizes the native conversation column from its own setting; the
+     skin must not re-point `--dsh-chat-user-width` (that is a native-layout
+     change: 760px vs the host's 742.4px column). */
+
+  /* host surfaces not reached by an alias token */
+  --dsw-specific-bubble: var(--cgpt-code-bg);
+  --dsw-specific-input-major: var(--cgpt-surface-raised);
+  --dsw-specific-sidebar-fill: var(--cgpt-surface-rail);
+  --dsw-specific-sidebar-nav-item-hover: var(--cgpt-surface-hover);
+  --dsw-specific-sidebar-nav-item-active: var(--cgpt-surface-selected);
+}

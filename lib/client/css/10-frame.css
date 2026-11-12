@@ -1,0 +1,20 @@
+/* dsh-chatgpt-ui — 10-frame.css
+ *
+ * The document canvas and the three-column frame. The frame's geometry belongs
+ * to ui-layout's AppFrame (inline gridTemplateColumns), so this file never sets
+ * a width — it only paints.
+ *
+ * Anchors: body[data-chatgpt-ui], [data-slot='main'].
+ */
+/* The document canvas is painted by the host's own alias tokens. The skin does
+   not set a font-family or font-size on <body>: both are inherited by the native
+   transcript and change its measured line boxes. */
+
+body[data-chatgpt-ui] [data-slot='main'] {
+  background-color: var(--dsw-alias-bg-base);
+}
+
+/* The right rail is deliberately untouched: it is a zero-width grid item unless
+   an occupant asks for a track (ui-layout RightbarColumn), so a border here would
+   draw a stray hairline on a collapsed rail.
+ */

@@ -1,0 +1,126 @@
+/* dsh-chatgpt-ui — 06-cgpt-tokens-dark.css
+ *
+ * Dark half of the semantic layer. Kept as its own stylesheet so the light
+ * palette and the dark palette can be diffed and audited independently; the
+ * host's data-ds-dark-theme attribute is the only gate.
+ */
+body[data-chatgpt-ui][data-ds-dark-theme] {
+  /* P0-16: dark empty-state copy/effort grey (sampled 极高 ≈ #afafaf). */
+  --cgpt-empty-composer-muted: #afafaf;
+  --cgpt-surface-main: #0e0e0e;
+  --cgpt-surface-rail: #000000;
+  --cgpt-surface-panel: #0e0e0e;
+  --cgpt-surface-raised: #212121;
+  --cgpt-surface-hover: rgba(255, 255, 255, 0.1);
+  --cgpt-surface-selected: #1a1a1a;
+  --cgpt-rail-active-bg: rgba(255, 255, 255, 0.1);
+  --cgpt-surface-segment: #1b1b1b;
+  --cgpt-surface-thumb: #212121;
+  --cgpt-surface-tooltip: #2f2f2f;
+
+  --cgpt-text-primary: #ededed;
+  --cgpt-text-secondary: #cdcdcd;
+  --cgpt-text-tertiary: #afafaf;
+  --cgpt-text-placeholder: #afafaf;
+  --cgpt-text-disabled: #a3a3a3;
+  --cgpt-text-unselected: #cdcdcd;
+  --cgpt-segment-text: #ffffff;
+  --cgpt-text-danger: #ff8a80;
+  --cgpt-text-on-tooltip: #ededed;
+  /* Dark brand primary is near-white, so a brand-filled button needs dark ink. */
+  --cgpt-text-on-accent: #0d0d0d;
+
+  --cgpt-border-subtle: rgba(255, 255, 255, 0.16);
+  --cgpt-border-strong: rgba(255, 255, 255, 0.24);
+
+  --cgpt-segment-border: transparent;
+  --cgpt-segment-shadow: none;
+  --cgpt-overlay-bg: #2b2b2b;
+  --cgpt-overlay-fg: #ededed;
+  --cgpt-overlay-hover: rgba(255, 255, 255, 0.1);
+  --cgpt-overlay-separator: rgba(255, 255, 255, 0.14);
+  --cgpt-overlay-shadow: 0 18px 52px rgba(0, 0, 0, 0.52), 0 2px 8px rgba(0, 0, 0, 0.32);
+  /* P0-13: the same surfaces measured in the reference's dark theme. */
+  --cgpt-menu-bg: rgba(33, 33, 33, 0.9);
+  --cgpt-menu-shadow: inset 0 0 1px 0 rgba(255, 255, 255, 0.2), 0 8px 16px -4px rgba(0, 0, 0, 0.12);
+  --cgpt-menu-text: #ededed;
+  --cgpt-menu-danger: #ff6764;
+  --cgpt-menu-warning: #e25507;
+  --cgpt-menu-row-hover: rgba(255, 255, 255, 0.1);
+  --cgpt-menu-separator: rgba(255, 255, 255, 0.15);
+  --cgpt-project-title: rgba(237, 237, 237, 0.85);
+  --cgpt-project-icon: #ededed;
+  --cgpt-project-action-color: #cdcdcd;
+  --cgpt-session-menu-bg: var(--cgpt-menu-bg);
+  --cgpt-session-menu-shadow: var(--cgpt-menu-shadow);
+  --cgpt-menu-border: rgba(255, 255, 255, 0.12);
+  --cgpt-menu-selected: var(--cgpt-overlay-hover);
+  /* P0-14: desktop menu colours, sampled from the 2026-11-07 references —
+     labels are pure #ffffff, descriptions #949494, glyphs #cacaca, the header
+     line #979797 and the 完全访问权限 row #ff8549 (the web build's
+     --color-text-warning #e25507 is a different, duller token). */
+  --cgpt-desktop-menu-strong: #ffffff;
+  --cgpt-desktop-menu-title: #979797;
+  --cgpt-desktop-menu-muted: #949494;
+  --cgpt-desktop-menu-icon-color: #cacaca;
+  --cgpt-desktop-menu-warning: #ff8549;
+  --cgpt-desktop-chip-bg: rgba(255, 255, 255, 0.08);
+  --cgpt-desktop-chip-text: #a2a2a2;
+  --cgpt-session-scrim: rgba(0, 0, 0, 0.56);
+  --cgpt-toast-bg: rgba(70, 70, 70, 0.96);
+  --cgpt-toast-border: rgba(255, 255, 255, 0.12);
+
+  --cgpt-composer-border: #3c3c3c;
+  --cgpt-composer-border-focus: #4f4f4f;
+  --cgpt-composer-shadow: 0 2px 6px rgba(0, 0, 0, 0.24), 0 8px 24px rgba(0, 0, 0, 0.24);
+  --cgpt-composer-shadow-focus: 0 2px 8px rgba(0, 0, 0, 0.32), 0 12px 32px rgba(0, 0, 0, 0.32);
+
+  --cgpt-work-card-bg: #212121;
+  /* Reference dark card: a single 1px inset hairline, no outer drop shadow. */
+  --cgpt-work-card-shadow: inset 0 0 1px 0 rgba(255, 255, 255, 0.2);
+  --cgpt-work-tools-bg: #1b1b1b;
+  --cgpt-work-card-border: transparent;
+  --cgpt-work-action-fg: #afafaf;
+  --cgpt-work-action-fg-muted: #afafaf;
+  --cgpt-work-tool-fg: #afafaf;
+  --cgpt-work-voice-fg: #ededed;
+  --cgpt-work-send-fg: #ffffff;
+  --cgpt-work-hover: rgba(255, 255, 255, 0.1);
+  --cgpt-work-divider: rgba(255, 255, 255, 0.12);
+  /* P0-6 desktop panel: #303030 surface (one step above the card), #3A3A3A
+     two-line hover block, #3F3F3F unselected track, #2F7CF6 selected segment,
+     #8B5CF6 top-stop gradient, #8A8A8A unselected stops, 44px pure-white
+     round thumb with no border and no shadow. */
+  --cgpt-effort-track: #3f3f3f;
+  --cgpt-effort-fill: #2f7cf6;
+  --cgpt-effort-gradient-to: #8b5cf6;
+  --cgpt-effort-accent: #4c8dff;
+  --cgpt-effort-model-fg: #d6d6d6;
+  --cgpt-effort-icon: #b4b4b4;
+  --cgpt-effort-tick: #8a8a8a;
+  --cgpt-effort-tick-on: rgba(255, 255, 255, 0.6);
+  --cgpt-effort-thumb: #ffffff;
+  --cgpt-effort-thumb-shadow: none;
+  --cgpt-effort-choice-bg: #3a3a3a;
+  --cgpt-effort-group-bg: #383838;
+  --cgpt-effort-group-fg: #9b9b9b;
+  --cgpt-effort-row-hover: #3a3a3a;
+  --cgpt-effort-menu-bg: var(--cgpt-overlay-bg);
+  --cgpt-effort-menu-shadow: var(--cgpt-overlay-shadow);
+  --cgpt-model-panel-bg: var(--cgpt-overlay-bg);
+  --cgpt-model-panel-shadow: var(--cgpt-overlay-shadow);
+
+  --cgpt-code-bg: #2f2f2f;
+  --cgpt-code-border: #3c3c3c;
+  --cgpt-send-bg: #ffffff;
+  --cgpt-send-bg-hover: #d9d9d9;
+  --cgpt-send-fg: #0d0d0d;
+  --cgpt-send-disabled-bg: #3c3c3c;
+  --cgpt-send-disabled-fg: #8f8f8f;
+
+  --dsw-specific-bubble: var(--cgpt-code-bg);
+  --dsw-specific-input-major: #212121;
+  --dsw-specific-sidebar-fill: var(--cgpt-surface-rail);
+  --dsw-specific-sidebar-nav-item-hover: var(--cgpt-surface-hover);
+  --dsw-specific-sidebar-nav-item-active: var(--cgpt-surface-selected);
+}

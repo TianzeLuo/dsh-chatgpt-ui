@@ -1,0 +1,12 @@
+/* dsh-chatgpt-ui — 50-dark.css
+ *
+ * Dark-mode deltas that a light/dark token pair cannot express: elevation and
+ * hairlines. Values live in 00-tokens.css; this file only re-points them where
+ * the light palette's choice would read wrong on #212121.
+ *
+ * The native transcript is not styled here (see 30-chat.css): its dark palette
+ * comes from the host's own `data-ds-dark-theme` token block.
+ */
+body[data-chatgpt-ui][data-ds-dark-theme] [data-slot='conversation.composer.bar'] [data-composer-card='true'] {
+  border-color: var(--dsw-alias-border-l1);
+}

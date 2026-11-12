@@ -1,0 +1,384 @@
+/* dsh-chatgpt-ui — 05-cgpt-tokens.css
+ *
+ * Semantic layer distilled from the read-only ChatGPT capture at
+ * ~/.cache/dsh-capture/out/ (styles.json + tokens.json, 2026-11-06, 1600×1000 @2x).
+ * Rules outside this file use these names only; raw palette values live here.
+ * Geometry tokens encode the measured desktop shell:
+ *   rail 52 + panel 288 = 340; rail button 36, icon 20, gap 8, radius 10;
+ *   panel radius 16; New chat 276×35 radius 8; search 36×36;
+ *   group heading 14px / 36px row; segment 224×36, thumb 121×37, item 112×36.
+ */
+body[data-chatgpt-ui] {
+  /* surface */
+  --cgpt-surface-main: #fcfcfc;
+  --cgpt-surface-rail: #f9f9f9;
+  --cgpt-surface-panel: #fcfcfc;
+  --cgpt-surface-raised: #ffffff;
+  --cgpt-surface-hover: rgba(13, 13, 13, 0.05);
+  --cgpt-surface-selected: #ececec;
+  --cgpt-surface-segment: rgba(13, 13, 13, 0.03);
+  --cgpt-surface-thumb: #ffffff;
+  --cgpt-surface-tooltip: #0d0d0d;
+
+  /* text */
+  --cgpt-text-primary: #0d0d0d;
+  --cgpt-text-secondary: #5d5d5d;
+  --cgpt-text-tertiary: #8f8f8f;
+  /* Text that must clear AA 4.5:1 on the raised/white surfaces. Kept separate
+     from tertiary because the reference's #8f8f8f is only a 3:1 secondary. */
+  --cgpt-text-placeholder: #767676;
+  --cgpt-text-disabled: #5d5d5d;
+  --cgpt-text-unselected: #5d5d5d;
+  --cgpt-text-danger: #b42318;
+  --cgpt-text-on-tooltip: #ffffff;
+  --cgpt-text-on-accent: #ffffff;
+
+  /* border / focus / accent */
+  --cgpt-border-subtle: rgba(0, 0, 0, 0.1);
+  --cgpt-border-strong: rgba(0, 0, 0, 0.16);
+  /* P0-5: the host's brand primary is neutral (#0f1115 light / #f9fafb dark).
+     The skin previously overrode it to ChatGPT green in theme.js, which turned
+     every native Qoder radio card / selected button green. Use the host value
+     so native controls keep their own accent in both themes. */
+  --cgpt-focus-ring: var(--dsw-alias-brand-primary);
+  --cgpt-accent: var(--dsw-alias-brand-primary);
+
+  /* rail */
+  --cgpt-rail-bg: var(--cgpt-surface-rail);
+  --cgpt-rail-active-bg: var(--cgpt-surface-selected);
+  --cgpt-rail-hover-bg: var(--cgpt-surface-hover);
+  --cgpt-rail-icon: var(--cgpt-text-primary);
+  /* Measured from the reference rail: unselected glyphs use its tertiary text
+     (#8f8f8f light / #afafaf dark), selected uses primary (#0d0d0d / #ededed). */
+  --cgpt-rail-icon-muted: var(--cgpt-text-tertiary);
+
+  /* panel */
+  --cgpt-panel-bg: var(--cgpt-surface-panel);
+  --cgpt-panel-shadow: 0 0 0 0.5px var(--cgpt-border-subtle);
+
+  /* segment */
+  --cgpt-segment-bg: var(--cgpt-surface-segment);
+  --cgpt-segment-thumb: var(--cgpt-surface-thumb);
+  --cgpt-segment-text: var(--cgpt-text-primary);
+  --cgpt-segment-text-muted: var(--cgpt-text-unselected);
+  --cgpt-segment-border: var(--cgpt-border-subtle);
+  --cgpt-segment-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+
+  /* P0-11 one overlay vocabulary: session context, project card/more,
+     permission, model list, `/` and `@`. Surface #FFFFFF light / #2B2B2B dark,
+     16px corners, 8px inset, 40px rows, 12px item padding, 10px row radius. */
+  --cgpt-overlay-bg: #ffffff;
+  --cgpt-overlay-fg: var(--cgpt-text-primary);
+  --cgpt-overlay-radius: 16px;
+  --cgpt-overlay-padding: 8px;
+  --cgpt-overlay-row-height: 40px;
+  --cgpt-overlay-item-padding: 12px;
+  --cgpt-overlay-item-radius: 10px;
+  --cgpt-overlay-hover: var(--cgpt-surface-hover);
+  --cgpt-overlay-separator: var(--cgpt-border-subtle);
+  --cgpt-overlay-shadow: 0 16px 48px rgba(0, 0, 0, 0.16), 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  /* controls / menus / toast */
+  --cgpt-control-hover: var(--cgpt-surface-hover);
+  --cgpt-menu-bg: var(--cgpt-overlay-bg);
+  --cgpt-menu-border: var(--cgpt-border-subtle);
+  --cgpt-menu-shadow: var(--cgpt-overlay-shadow);
+  --cgpt-menu-selected: var(--cgpt-overlay-hover);
+  /* P0-13: the sidebar menus are the measured surfaces, not the generic
+     overlay defaults the earlier phases inherited. */
+  --cgpt-session-menu-bg: rgba(255, 255, 255, 0.9);
+  --cgpt-session-menu-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.1), 0 8px 16px -4px rgba(0, 0, 0, 0.12);
+  --cgpt-session-scrim: rgba(0, 0, 0, 0.32);
+  --cgpt-toast-bg: rgba(32, 32, 32, 0.92);
+  --cgpt-toast-fg: #ffffff;
+  --cgpt-toast-border: rgba(255, 255, 255, 0.08);
+  --cgpt-toast-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+  --cgpt-toast-action-bg: rgba(255, 255, 255, 0.16);
+  --cgpt-toast-action-hover: rgba(255, 255, 255, 0.24);
+  --cgpt-toast-close: rgba(255, 255, 255, 0.62);
+
+  /* composer / code (pre-existing values, moved behind semantics) */
+  --cgpt-composer-border: #e3e3e3;
+  --cgpt-composer-border-focus: #c9c9c9;
+  --cgpt-composer-shadow: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.04);
+  --cgpt-composer-shadow-focus: 0 2px 8px rgba(0, 0, 0, 0.06), 0 12px 32px rgba(0, 0, 0, 0.08);
+
+  /* composer · Work card, thinking effort (Phase 4B) */
+  --cgpt-work-card-bg: #ffffff;
+  /* M13: the reference card has no border; its edge is the first shadow layer.
+     Reference measured style: 0 0 0 1px / 0 2px 8px / 0 4px 80px 8px. */
+  --cgpt-work-card-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.04), 0 4px 80px 8px rgba(0, 0, 0, 0.024);
+  --cgpt-work-tools-bg: #f0f0f0;
+  --cgpt-work-card-border: #e5e5e5;
+  /* Reference (light): action row and tool row both #8F8F8F; the blue voice
+     button carries a dark glyph. */
+  --cgpt-work-action-fg: #767676;
+  --cgpt-work-action-fg-muted: #767676;
+  --cgpt-work-tool-fg: #6b6b6b;
+  --cgpt-work-hover: #f2f2f2;
+  /* P0-18b: on a started Work card the Host action row contributes two 8px
+     flex gaps around its zero-width modes slot, so `+` → the permission chip
+     measured 16px; on a blank card the hidden modes seat contributes one gap.
+     The target is two thirds of the started-card 16px, and both states read
+     this one variable. */
+  --cgpt-work-permission-gap-base: 16px;
+  --cgpt-work-permission-gap: calc(var(--cgpt-work-permission-gap-base) * 2 / 3);
+  --cgpt-work-divider: rgba(13, 13, 13, 0.1);
+  --cgpt-work-voice: #2c67c5;
+  --cgpt-work-voice-fg: #0d0d0d;
+  --cgpt-work-send-fg: #ffffff;
+  /* P0-6 desktop panel: white surface, #F2F2F2 two-line hover block, #E5E5E5
+     unselected track, #2F7CF6 selected segment, #8B5CF6 top-stop gradient,
+     #B0B0B0 unselected stops, 44px white round thumb. */
+  --cgpt-effort-track: #e5e5e5;
+  --cgpt-effort-fill: #2f7cf6;
+  --cgpt-effort-gradient-to: #8b5cf6;
+  --cgpt-effort-accent: #2f7cf6;
+  --cgpt-effort-model-fg: #5d5d5d;
+  --cgpt-effort-icon: #6e6e6e;
+  --cgpt-effort-tick: #b0b0b0;
+  --cgpt-effort-tick-on: rgba(255, 255, 255, 0.6);
+  --cgpt-effort-thumb: #ffffff;
+  --cgpt-effort-thumb-shadow: none;
+  --cgpt-effort-choice-bg: #f2f2f2;
+  --cgpt-effort-group-bg: #f7f7f7;
+  --cgpt-effort-group-fg: #6e6e6e;
+  --cgpt-effort-row-hover: #f2f2f2;
+  --cgpt-effort-menu-bg: var(--cgpt-overlay-bg);
+  --cgpt-effort-menu-shadow: var(--cgpt-overlay-shadow);
+  --cgpt-model-panel-bg: var(--cgpt-overlay-bg);
+  --cgpt-model-panel-shadow: var(--cgpt-overlay-shadow);
+
+  --cgpt-code-bg: #f4f4f4;
+  --cgpt-code-border: #e5e5e5;
+  --cgpt-send-bg: #0d0d0d;
+  --cgpt-send-bg-hover: #2f2f2f;
+  --cgpt-send-fg: #ffffff;
+  --cgpt-send-disabled-bg: #e3e3e3;
+  --cgpt-send-disabled-fg: #5d5d5d;
+
+  /* typography */
+  --cgpt-font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+  --cgpt-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+  --cgpt-font-body-size: 14px;
+  --cgpt-font-title-size: 20px;
+  --cgpt-font-weight-regular: 400;
+  --cgpt-font-weight-medium: 500;
+  --cgpt-font-weight-semibold: 600;
+  --cgpt-line-height-row: 20px;
+  --cgpt-line-height-control: 36px;
+
+  /* geometry: rail / panel */
+  --cgpt-rail-width: 52px;
+  --cgpt-panel-width: 288px;
+  --cgpt-shell-width: 340px;
+  --cgpt-rail-button-size: 36px;
+  --cgpt-rail-icon-size: 20px;
+  --cgpt-rail-gap: 8px;
+  --cgpt-radius-panel: 16px;
+  --cgpt-radius-control: 10px;
+  --cgpt-radius-row: 8px;
+  --cgpt-radius-row-menu: 12px;
+  --cgpt-radius-full: 999px;
+  --cgpt-panel-padding: 6px;
+  --cgpt-panel-header-height: 52px;
+  --cgpt-new-chat-height: 35px;
+  --cgpt-new-chat-width: 276px;
+  --cgpt-search-size: 36px;
+  --cgpt-section-height: 36px;
+
+  /* geometry: session list / row menu / empty-state composer */
+  --cgpt-session-row-height: 36px;
+  --cgpt-session-row-padding: 10px;
+  /* P0-13 (docs/capture/live/project-menus.json): the project row's hover
+     actions are 20×20 buttons with a 14px glyph, 8px apart, 8px from the row's
+     right edge; the row itself is 36px with a 36px leading slot holding a 20px
+     folder, and the title is 14/20 at weight 400. That 20px is the web build's
+     value and stays here as the reference measurement. */
+  --cgpt-session-action-size: 20px;
+  /* P0-19e: the hover backplate follows the sidebar's own 28×28 small buttons
+     (chat files · project page actions · host inline actions) so the ⋯ shares
+     one hit area with its neighbours; only the plate grows, the 14px glyph
+     stays. docs/m37.json records the deviation from the 20px web capture. */
+  --cgpt-sidebar-action-size: 28px;
+  --cgpt-session-action-radius: 9999px;
+  --cgpt-session-action-icon: 14px;
+  --cgpt-session-action-gap: 8px;
+  --cgpt-project-icon-size: 20px;
+  --cgpt-project-action-gap: 8px;
+  --cgpt-project-action-inset: 8px;
+  /* P0-13, measured: the row title is the text colour at 85%, the folder at
+     full strength, and the hover actions sit one step quieter (#cdcdcd in the
+     dark capture; the light capture has no hovered row). */
+  --cgpt-project-title: rgba(13, 13, 13, 0.85);
+  --cgpt-project-icon: #0d0d0d;
+  --cgpt-project-action-color: rgba(13, 13, 13, 0.72);
+  /* P0-13: every menu number below is the measured one, from the live web
+     build's own surfaces (project ⋯, session ⋯) — 160px min width, 10px gutter,
+     16px corner, 36px rows with 6px 10px padding and a 12px corner, a 20px
+     leading slot, 6px between glyph and label, a 17px separator group whose
+     line is inset 8px. M10's 161px frame measurement is the same surface. */
+  --cgpt-session-menu-width: 161px;
+  --cgpt-menu-min-width: 160px;
+  --cgpt-menu-max-width: 360px;
+  --cgpt-menu-gutter: 10px;
+  --cgpt-menu-radius: 16px;
+  --cgpt-menu-blur: 8px;
+  --cgpt-menu-bg: rgba(255, 255, 255, 0.9);
+  --cgpt-menu-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.1), 0 8px 16px -4px rgba(0, 0, 0, 0.12);
+  --cgpt-menu-row-height: 36px;
+  --cgpt-menu-row-radius: 12px;
+  --cgpt-menu-row-pad-y: 6px;
+  --cgpt-menu-row-pad-x: 10px;
+  --cgpt-menu-icon-slot: 20px;
+  --cgpt-menu-icon-gap: 6px;
+  --cgpt-menu-text: #0d0d0d;
+  --cgpt-menu-danger: #fa423e;
+  --cgpt-menu-warning: #923b0f;
+  --cgpt-menu-row-hover: rgba(0, 0, 0, 0.05);
+  --cgpt-menu-separator: rgba(0, 0, 0, 0.1);
+  --cgpt-menu-separator-inset: 8px;
+  --cgpt-session-menu-radius: var(--cgpt-menu-radius);
+  --cgpt-session-menu-padding: var(--cgpt-menu-gutter);
+  --cgpt-session-menu-item-height: var(--cgpt-menu-row-height);
+  --cgpt-session-menu-item-radius: var(--cgpt-menu-row-radius);
+  --cgpt-session-menu-item-padding: var(--cgpt-menu-row-pad-x);
+  --cgpt-session-menu-gap: var(--cgpt-menu-icon-gap);
+  /* P0-14: the desktop app's own menu geometry, measured from the three
+     2026-11-07 2x references (every 1px hairline in those captures is exactly
+     two identical device rows, so one CSS px is 2 physical px; divide by 2).
+     It is denser than the web build the numbers above come from, so it is a
+     separate block: only the three reference surfaces (permission picker,
+     project ⋯ menu, project hover card) and the composer's permission chip opt
+     into it. Light values below; the dark half is in 06-cgpt-tokens-dark.css. */
+  --cgpt-desktop-menu-pad-x: 12px;
+  --cgpt-desktop-menu-pad-y: 4.25px;
+  --cgpt-desktop-menu-row-height: 28.5px;
+  --cgpt-desktop-menu-icon-slot: 18px;
+  --cgpt-desktop-menu-icon-gap: 4px;
+  --cgpt-desktop-menu-font: 13px;
+  --cgpt-desktop-menu-radius: 16px;
+  --cgpt-desktop-menu-separator-inset: 0px;
+  --cgpt-desktop-menu-separator-height: 9.5px;
+  --cgpt-desktop-menu-min-width: 164.5px;
+  --cgpt-desktop-menu-strong: #0d0d0d;
+  --cgpt-desktop-menu-title: #6e6e6e;
+  --cgpt-desktop-menu-muted: #8f8f8f;
+  --cgpt-desktop-menu-icon-color: #5d5d5d;
+  --cgpt-desktop-menu-warning: #923b0f;
+  --cgpt-desktop-permission-width: 298px;
+  /* P0-18: the ChatGPT caption row is gone, so the picker's top inset is now
+     the gap above its first option (reference budget 8–10px). */
+  --cgpt-desktop-permission-pad-y: 9px;
+  --cgpt-desktop-permission-row-height: 42.5px;
+  --cgpt-desktop-permission-row-pad-y: 4.25px;
+  --cgpt-desktop-permission-title-font: 13px;
+  --cgpt-desktop-permission-title-line: 17px;
+  --cgpt-desktop-permission-description-font: 12px;
+  --cgpt-desktop-permission-description-line: 17px;
+  --cgpt-desktop-card-pad-y: 5px;
+  --cgpt-desktop-chip-height: 24px;
+  --cgpt-desktop-chip-pad-x: 8px;
+  --cgpt-desktop-chip-pad-right: 7px;
+  --cgpt-desktop-chip-gap: 4px;
+  --cgpt-desktop-chip-icon: 16px;
+  --cgpt-desktop-chip-bg: rgba(0, 0, 0, 0.06);
+  --cgpt-desktop-chip-text: #5d5d5d;
+  /* geometry: project picker (M10) */
+  --cgpt-project-picker-width: 261px;
+  --cgpt-project-picker-padding: 10px;
+  --cgpt-project-picker-item-height: 36px;
+  --cgpt-project-picker-item-radius: 12px;
+  --cgpt-project-picker-item-padding: 10px;
+  --cgpt-project-picker-search-height: 38px;
+  /* geometry: message column (M11) — the Host owns the width (its clamp tops
+     out at 920px and the native handles drag it). This token is only the skin's
+     upper bound; it must not undercut the Host or the drag appears dead. */
+  --cgpt-msg-max: 920px;
+  --cgpt-composer-empty-height: 52px;
+  --cgpt-composer-empty-radius: 26px;
+  --cgpt-composer-empty-font: 16px;
+  --cgpt-composer-empty-line: 26px;
+  /* P0-17: the blank-page capsule is the desktop reference's measured width,
+     not a viewport ratio. The 2x capture measures 1514 device px (239..995.5
+     CSS px) in a 1233.5-wide window → 757 CSS px, i.e. 0.6137 of that window.
+     A `61vw` token matched it at 1233 but grew without bound on wider windows
+     (the user's report: the empty card looked too wide); 757px keeps the
+     reference width at every window and the narrow-window cap still applies. */
+  --cgpt-empty-composer-w: 757px;
+  /* P0-17: an established Chat conversation keeps one row too, inset 30px from
+     each side of the Host message column: card = column − 60. The column stays
+     Host/drag driven; this token is only the inset. */
+  --cgpt-chat-card-inset: 60px;
+  --cgpt-chat-card-height: 52px;
+  /* P0-16: 8px row inset + 36px add button + 8px gap, measured on the
+     reference's single-line capsule (web: form 586.25 → text 638.25). */
+  --cgpt-empty-composer-pad-left: 52px;
+  /* Text stops 8px before the effort control: 8 row inset + 32 send +
+     12 gap + 82 trigger + 8 gap = 142, plus the 1px card border. */
+  --cgpt-empty-composer-pad-right: 143px;
+  /* P0-16: empty Chat's placeholder and effort label share one muted grey,
+     measured on the web build at 16/26: #8f8f8f on white. The sent composer
+     keeps `--cgpt-text-placeholder` (15px) untouched. */
+  --cgpt-empty-composer-muted: #8f8f8f;
+  /* P0-16: the round send disc's arrow is always white — the dark theme's
+     `--cgpt-text-on-accent` is near-black ink for neutral brand buttons, which
+     is wrong on the blue disc. */
+  --cgpt-send-on-disc-fg: #ffffff;
+
+  /* geometry: segmented control — P0-16 replaces the old 121×37 thumb (which
+     overhung the 112×36 item and painted into the neighbouring half) with the
+     reference's item-sized capsule: 224×36 track, two 112×36 halves. */
+  --cgpt-segment-width: 224px;
+  --cgpt-segment-height: 36px;
+  --cgpt-segment-item-width: 112px;
+  --cgpt-segment-thumb-width: 112px;
+  --cgpt-segment-thumb-height: 36px;
+
+  /* spacing scale */
+  --cgpt-space-1: 2px;
+  --cgpt-space-2: 4px;
+  --cgpt-space-3: 6px;
+  --cgpt-space-4: 8px;
+  --cgpt-space-5: 10px;
+  --cgpt-space-6: 12px;
+
+  /* legacy aliases consumed by the earlier M0–Phase-1 rules */
+  --dsh-chatgpt-hover: var(--cgpt-surface-hover);
+  --dsh-chatgpt-active: var(--cgpt-surface-selected);
+  --dsh-chatgpt-composer-border: var(--cgpt-composer-border);
+  --dsh-chatgpt-composer-shadow: var(--cgpt-composer-shadow);
+  --dsh-chatgpt-composer-focus: var(--cgpt-composer-shadow-focus);
+  --dsh-chatgpt-code-bg: var(--cgpt-code-bg);
+  --dsh-chatgpt-code-border: var(--cgpt-code-border);
+  --dsh-chatgpt-send-bg: var(--cgpt-send-bg);
+  --dsh-chatgpt-send-bg-hover: var(--cgpt-send-bg-hover);
+  --dsh-chatgpt-send-fg: var(--cgpt-send-fg);
+  --dsh-chatgpt-send-bg-disabled: var(--cgpt-send-disabled-bg);
+  --dsh-chatgpt-send-fg-disabled: var(--cgpt-send-disabled-fg);
+  --dsh-chatgpt-focus-ring: var(--cgpt-focus-ring);
+  --dsh-chatgpt-composer-focus-ring: var(--cgpt-surface-hover);
+  --dsh-chatgpt-composer-border-focus: var(--cgpt-composer-border-focus);
+  --dsh-chatgpt-segment-bg: var(--cgpt-segment-bg);
+  --dsh-chatgpt-segment-selected: var(--cgpt-segment-thumb);
+  --dsh-chatgpt-segment-shadow: var(--cgpt-segment-shadow);
+  --dsh-chatgpt-segment-ring: var(--cgpt-border-subtle);
+  --dsh-chatgpt-menu-bg: var(--cgpt-menu-bg);
+  --dsh-chatgpt-menu-border: var(--cgpt-menu-border);
+  --dsh-chatgpt-menu-shadow: var(--cgpt-menu-shadow);
+  --dsh-chatgpt-menu-selected: var(--cgpt-menu-selected);
+  --dsh-chatgpt-toast-bg: var(--cgpt-toast-bg);
+  --dsh-chatgpt-toast-fg: var(--cgpt-toast-fg);
+  --dsh-chatgpt-toast-border: var(--cgpt-toast-border);
+  --dsh-chatgpt-toast-shadow: var(--cgpt-toast-shadow);
+  --dsh-chatgpt-toast-action-bg: var(--cgpt-toast-action-bg);
+  --dsh-chatgpt-toast-action-hover: var(--cgpt-toast-action-hover);
+  --dsh-chatgpt-toast-close: var(--cgpt-toast-close);
+
+  --dsw-alias-bg-base: var(--cgpt-surface-main);
+  --dsw-specific-bubble: var(--cgpt-code-bg);
+  --dsw-specific-input-major: var(--cgpt-surface-raised);
+  --dsw-specific-sidebar-fill: var(--cgpt-surface-rail);
+  --dsw-specific-sidebar-nav-item-hover: var(--cgpt-surface-hover);
+  --dsw-specific-sidebar-nav-item-active: var(--cgpt-surface-selected);
+}

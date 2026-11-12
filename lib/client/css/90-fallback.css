@@ -1,0 +1,20 @@
+/* dsh-chatgpt-ui — 90-fallback.css
+ *
+ * Last file in cascade order. Two jobs:
+ *
+ * 1. Legibility fallbacks for the case where a host upgrade drops one of the
+ *    `--dsw-specific-*` surfaces we rely on. Every declaration here names a
+ *    documented alias token as its fallback, so the skin degrades to "host
+ *    colours, ChatGPT geometry" instead of transparent-on-transparent. The
+ *    native transcript is not painted here: alias tokens already cover it.
+ * 2. The intent note: if a rule in the files above stops matching, the fix is
+ *    to re-capture test/fixtures/dom-snapshot.html and diff it against
+ *    test/contract.json — never to drop the `body[data-chatgpt-ui]` gate.
+ */
+body[data-chatgpt-ui] [data-slot='conversation.composer.bar'] [data-composer-card='true'] {
+  background-color: var(--dsw-specific-input-major, var(--dsw-alias-bg-layer-1));
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] {
+  background-color: var(--dsw-specific-sidebar-fill, var(--dsw-alias-bg-base));
+}
