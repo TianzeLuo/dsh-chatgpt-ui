@@ -1,0 +1,494 @@
+/* dsh-chatgpt-ui — 20-sidebar.css
+ *
+ * ChatGPT shell geometry: a fixed 52px rail (owned by rail.js) plus a 288px
+ * panel whose top-left corner is rounded 16px. The host still owns the sidebar
+ * column and list; the skin only gives that column the measured 340px track
+ * (rail 52 + panel 288), shifts the host root to x=52 and re-paints it.
+ *
+ * Anchors: [data-slot='sidebar'] and the host's stable class suffixes named
+ * below. Structural selectors (direct children, data-window-drag) avoid coupling
+ * to the CSS-module hash while the three list rows remain class-based.
+ */
+
+/* ---- shell: rail fill + floating panel ---------------------------------- */
+body[data-chatgpt-ui] [data-slot='sidebar'] {
+  --dsh-sidebar-inline-padding: var(--cgpt-panel-padding);
+  --dsw-radius-md: var(--cgpt-radius-row);
+  --dsw-radius-lg: var(--cgpt-radius-control);
+  --dsw-alias-interactive-bg-hover: var(--cgpt-surface-hover);
+  color: var(--cgpt-text-primary);
+  background: var(--cgpt-rail-bg);
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] > div {
+  box-sizing: border-box;
+  width: auto !important;
+  height: 100%;
+  margin-left: var(--cgpt-rail-width);
+  padding: 0 var(--cgpt-panel-padding) var(--cgpt-panel-padding);
+  border-radius: var(--cgpt-radius-panel) 0 0 0;
+  background: var(--cgpt-panel-bg);
+  overflow: hidden;
+}
+
+/* The rail's rail: hide the host's inline rail contents when collapsed; the
+   overlay rail in rail.js is the persistent one. */
+body[data-chatgpt-ui] [data-sidebar-collapsed] [data-slot='sidebar'] > div {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Reference header: 52px, title left, search + collapse right. */
+body[data-chatgpt-ui] [data-slot='sidebar'] [data-window-drag] {
+  box-sizing: border-box;
+  height: var(--cgpt-panel-header-height);
+  margin: 0;
+  padding: 0 var(--cgpt-space-5);
+  overflow: visible;
+}
+
+/* P0-19a/P0-19d: the collapse control is the search control's twin — same 36×36
+   box, same 8px radius, same hover tint. Hover paints the background only:
+   geometry stays pinned here so the host's collapsed/hover rules cannot resize
+   it or move the glyph.
+
+   Selector note: the host appends its hover tooltip (`<span role="tooltip">`)
+   as the LAST CHILD of this header after ~500ms. `> button:last-child` stopped
+   matching at that moment, dropping all of the pinned geometry and falling back
+   to the host's 28×28 control (icon 306→310, highlight 36→28). The toggle is
+   still the last *button* among its siblings, so `:last-of-type` survives the
+   tooltip insertion. */
+body[data-chatgpt-ui] [data-slot='sidebar'] [data-window-drag] > button:last-of-type {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--cgpt-rail-button-size);
+  height: var(--cgpt-rail-button-size);
+  min-width: var(--cgpt-rail-button-size);
+  min-height: var(--cgpt-rail-button-size);
+  padding: 0;
+  border: 0;
+  border-radius: var(--cgpt-radius-row);
+  background: transparent;
+  transform: none;
+  transition: background-color 0.12s ease;
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] [data-window-drag] > button:last-of-type > svg {
+  display: block;
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] [data-window-drag] > button:last-of-type:hover {
+  width: var(--cgpt-rail-button-size);
+  height: var(--cgpt-rail-button-size);
+  padding: 0;
+  transform: none;
+  background: var(--cgpt-control-hover);
+}
+
+/* ---- text-only brand (P0-19f) ------------------------------------------- */
+/* The Host still renders a mark wrapper around the (now empty) brand.mark slot;
+   hide that wrapper so the header line starts at the wordmark, with no icon and
+   no 8px gap placeholder. The Host's wordmark keeps its own 24px height and sits
+   centred on the 26px line. */
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_brandMark'] {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden;
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_brandIdentity'] {
+  gap: 0;
+}
+
+/* ---- product switcher + portal menu (retired by P0-19b) ----------------- */
+body[data-chatgpt-ui] [data-slot='sidebar'] .chatgpt-brand-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cgpt-space-3);
+  max-width: 100%;
+  height: 32px;
+  margin: -4px 0;
+  padding: 4px 6px;
+  border-radius: var(--cgpt-radius-row);
+  color: var(--cgpt-text-primary);
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] .chatgpt-brand-switcher:hover {
+  background: var(--cgpt-control-hover);
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] .chatgpt-brand-switcher:focus-visible {
+  outline: 2px solid var(--cgpt-focus-ring);
+  outline-offset: -2px;
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] .chatgpt-brand-mark {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] .chatgpt-brand-mark svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] .chatgpt-brand-switcher-label {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: var(--cgpt-font-weight-semibold);
+  letter-spacing: -0.01em;
+  line-height: 22px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] .chatgpt-brand-chevron {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  color: var(--cgpt-text-tertiary);
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] .chatgpt-brand-chevron svg {
+  display: block;
+}
+
+body[data-chatgpt-ui] .chatgpt-brand-menu {
+  position: fixed;
+  z-index: 1000;
+  box-sizing: border-box;
+  width: 208px;
+  padding: var(--cgpt-space-2);
+  border: 1px solid var(--cgpt-menu-border);
+  border-radius: var(--cgpt-radius-control);
+  background: var(--cgpt-menu-bg);
+  box-shadow: var(--cgpt-menu-shadow);
+  font-family: inherit;
+}
+
+body[data-chatgpt-ui] .chatgpt-brand-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--cgpt-space-5);
+  width: 100%;
+  height: 36px;
+  padding: 0 var(--cgpt-space-5);
+  border: 0;
+  border-radius: var(--cgpt-radius-row);
+  background: transparent;
+  color: var(--cgpt-text-primary);
+  font-family: inherit;
+  font-size: var(--cgpt-font-body-size);
+  font-weight: var(--cgpt-font-weight-medium);
+  text-align: left;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-brand-menu-item:hover,
+body[data-chatgpt-ui] .chatgpt-brand-menu-item[aria-checked='true'] {
+  background: var(--cgpt-menu-selected);
+}
+
+body[data-chatgpt-ui] .chatgpt-brand-menu-item:focus-visible {
+  outline: 2px solid var(--cgpt-focus-ring);
+  outline-offset: -2px;
+}
+
+body[data-chatgpt-ui] .chatgpt-brand-menu-mark {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  color: var(--cgpt-text-secondary);
+}
+
+body[data-chatgpt-ui] .chatgpt-brand-menu-mark svg {
+  display: block;
+}
+
+body[data-chatgpt-ui] .chatgpt-brand-menu-label {
+  flex: 1;
+  min-width: 0;
+}
+
+body[data-chatgpt-ui] .chatgpt-brand-menu-check {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  color: var(--cgpt-text-primary);
+}
+
+/* ---- New chat: 276×35, radius 8, 14px -------------------------------- */
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_newSession'] {
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--cgpt-new-chat-height);
+  min-height: var(--cgpt-new-chat-height);
+  margin: 0 0 var(--cgpt-space-2);
+  padding: var(--cgpt-space-3) var(--cgpt-space-5);
+  border: 0;
+  border-radius: var(--cgpt-radius-row);
+  background: transparent;
+  font-size: var(--cgpt-font-body-size);
+  font-weight: var(--cgpt-font-weight-regular);
+  line-height: var(--cgpt-line-height-row);
+  color: var(--cgpt-text-primary);
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_newSession']:hover {
+  background: var(--cgpt-control-hover);
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_newSessionContent'] {
+  justify-content: flex-start;
+  gap: var(--cgpt-space-4);
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_newSession'] svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Host panel entries (Plugins / Automation / Super-agent) are reached from the
+   permanent rail now; their rows and the old footer Settings trigger are gone. */
+body[data-chatgpt-ui] [data-slot='sidebar'] > div > nav {
+  display: none;
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] > div > div:last-child {
+  display: none;
+}
+
+/* The host's own inline search remains in the list header but is visually
+   replaced by the measured 36×36 search control at the panel's top-right;
+   the custom control clicks this button, so search keeps its host behaviour. */
+body[data-chatgpt-ui] [data-slot='sidebar'] button[class*='_searchButton'] {
+  width: 0;
+  height: 0;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+/* ---- panel rows (list rows only; panel nav is hidden) ------------------- */
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_panelRow'] {
+  min-height: 34px;
+  padding: var(--cgpt-space-3) var(--cgpt-space-4);
+  border-radius: var(--cgpt-radius-row);
+  font-size: 13px;
+  color: var(--cgpt-text-secondary);
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_panelRow']:hover {
+  background: var(--cgpt-control-hover);
+  color: var(--cgpt-text-primary);
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_panelActive'] {
+  background: var(--cgpt-surface-selected);
+  color: var(--cgpt-text-primary);
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_panelGlyph'] svg {
+  width: 15px;
+  height: 15px;
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_panelGlyph'] {
+  color: var(--cgpt-text-tertiary);
+}
+
+/* ---- session / project rows --------------------------------------------- */
+/* M10: host rows were 32px. The reference frame's selected sidebar row is
+   36 CSS high (device y=546..617 @2×, m9-ref-session-menu-light.png), the
+   same height the self-rendered list already uses via
+   --cgpt-session-row-height. Horizontal padding is left to the host class:
+   the self-rendered row measures 10px from the reference, and overriding the
+   host row here would double-pad the icon slot. */
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_sessionRow'] {
+  height: var(--cgpt-session-row-height);
+  border-radius: var(--cgpt-radius-row);
+  font-size: var(--cgpt-font-body-size);
+  line-height: var(--cgpt-line-height-row);
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_sessionRow']:hover {
+  background: var(--cgpt-control-hover);
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_sessionRow'][class*='_selected'] {
+  background: var(--cgpt-surface-selected);
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_projectRow'] {
+  height: var(--cgpt-session-row-height);
+  border-radius: var(--cgpt-radius-row);
+  line-height: var(--cgpt-line-height-row);
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] [data-row-key] [class*='_slot'] svg {
+  width: 16px;
+  height: 16px;
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] [data-row-key] [class*='_title'] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- group headings: 14px / #AFAFAF in dark / 36px row ------------------ */
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_sectionHeader'] {
+  box-sizing: border-box;
+  height: var(--cgpt-section-height);
+  margin: 0 0 var(--cgpt-space-2);
+  padding: 0 var(--cgpt-space-5);
+  justify-content: flex-start;
+  gap: var(--cgpt-space-4);
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_sectionLabel'] {
+  font-size: var(--cgpt-font-body-size);
+  font-weight: var(--cgpt-font-weight-medium);
+  line-height: var(--cgpt-section-height);
+  letter-spacing: 0;
+  color: var(--cgpt-text-tertiary);
+}
+
+/* The host's inline action buttons use 28px; the measured list header controls
+   are 36px, matching the search and rail control size. */
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_sectionHeader'] button {
+  width: var(--cgpt-search-size);
+  height: var(--cgpt-search-size);
+}
+
+/* The measured panel is opaque over the rail fill; the host column border would
+   draw a 0.5px seam at 340px, which the reference does not have. */
+body[data-chatgpt-ui] [class*='_sidebarCol']:has([data-slot='sidebar']) {
+  border-right: 0;
+  background: var(--cgpt-rail-bg);
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] {
+  height: 100%;
+}
+
+/* P0-19b: the sidebar top keeps the Host's own brand; no mark placeholder and
+   no identity overrides, so the Host's native logo, wordmark, gap and title
+   inset are exactly what the Host ships. */
+
+/* The host New-chat button/mask/content each carry their own 6/10px padding.
+   Collapse the two inner boxes so the 276×35 row has one 10px inline inset. */
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_newSession'] {
+  padding: 0 var(--cgpt-space-5);
+  justify-content: flex-start;
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_newSession'] > span {
+  width: 100%;
+  padding: 0;
+  justify-content: flex-start;
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_newSessionContent'] {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  justify-content: flex-start;
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_newSessionContent'] [class*='_newSessionLabel'] {
+  width: auto;
+  text-align: left;
+}
+
+/* The host list's bottom fade ends in --dsw-specific-sidebar-fill (the rail
+   colour). In the floating panel that produced a black strip at the panel's
+   bottom edge in dark mode; end the fade in the panel surface instead. */
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_fade'] {
+  background: linear-gradient(transparent, var(--cgpt-panel-bg));
+}
+
+/* ---- P0-19a: temporary hover/focus reveal of the collapsed sidebar -------
+   The host owns the collapsed state (`[data-sidebar-collapsed]` on the frame,
+   persisted by its layout store). While that state is on, a pointer over the
+   rail or keyboard focus inside the rail/sidebar stamps
+   `body[data-cgpt-sidebar-peek]`; this block then floats the very same panel
+   over the content at the measured 288px width. No second state is stored:
+   removing the attribute (pointer out, focus out, Escape, or the host's own
+   expand) returns the panel to hidden, and clicking 展开侧栏 dispatches the
+   host's native toggle, so the permanent state stays in the host store. */
+body[data-chatgpt-ui][data-cgpt-sidebar-peek] [data-sidebar-collapsed] [data-slot='sidebar'] > div {
+  position: fixed !important;
+  top: 0 !important;
+  left: var(--cgpt-rail-width) !important;
+  /* Below the host's shell overlay layer (z20), which owns the rail and the
+     peek header buttons; above the unpositioned content column. */
+  z-index: 5;
+  box-sizing: border-box;
+  width: var(--cgpt-panel-width) !important;
+  height: 100dvh !important;
+  margin: 0 !important;
+  padding: 0 var(--cgpt-panel-padding) var(--cgpt-panel-padding) !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  border-radius: var(--cgpt-radius-panel) 0 0 0;
+  background: var(--cgpt-panel-bg);
+  box-shadow: var(--cgpt-menu-shadow);
+  animation: chatgpt-sidebar-peek-in 120ms ease-out both;
+}
+
+body[data-chatgpt-ui][data-cgpt-sidebar-peek][data-windows-titlebar] [data-sidebar-collapsed] [data-slot='sidebar'] > div {
+  top: var(--dsh-windows-titlebar-height) !important;
+  height: calc(100dvh - var(--dsh-windows-titlebar-height)) !important;
+}
+
+/* The host's collapsed header only renders its invisible rail toggle; the peek
+   header is drawn by rail.js instead. Keep that native hit area out of the way
+   (its programmatic click still expands permanently). */
+body[data-chatgpt-ui][data-cgpt-sidebar-peek] [data-sidebar-collapsed] [data-slot='sidebar'] [data-window-drag] > button:last-of-type {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@keyframes chatgpt-sidebar-peek-in {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-chatgpt-ui][data-cgpt-sidebar-peek] [data-sidebar-collapsed] [data-slot='sidebar'] > div {
+    animation: none;
+  }
+}

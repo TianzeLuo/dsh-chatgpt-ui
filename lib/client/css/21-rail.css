@@ -1,0 +1,249 @@
+/* dsh-chatgpt-ui — 21-rail.css
+ *
+ * Fixed 52px rail. It sits outside the host grid so it survives the sidebar's
+ * width animation and the 0px collapsed track on macOS/Windows titlebar.
+ * Only rail-owned DOM is styled here; the host sidebar keeps its own width,
+ * drag handle and collapse state.
+ */
+body[data-chatgpt-ui] .chatgpt-rail {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--cgpt-rail-gap);
+  box-sizing: border-box;
+  width: var(--cgpt-rail-width);
+  height: 100dvh;
+  padding: var(--cgpt-space-4) var(--cgpt-space-4);
+  background: var(--cgpt-rail-bg);
+  -webkit-app-region: no-drag;
+}
+
+body[data-chatgpt-ui][data-windows-titlebar] .chatgpt-rail {
+  top: var(--dsh-windows-titlebar-height);
+  height: calc(100dvh - var(--dsh-windows-titlebar-height));
+}
+
+body[data-chatgpt-ui] .chatgpt-rail-spacer {
+  flex: 1 1 auto;
+  min-height: var(--cgpt-space-4);
+}
+
+body[data-chatgpt-ui] .chatgpt-rail-button {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--cgpt-rail-button-size);
+  height: var(--cgpt-rail-button-size);
+  margin: 0;
+  /* 36×36 button with a 20px glyph leaves the reference's 8px inner pad. */
+  padding: var(--cgpt-rail-button-padding, 8px);
+  border: 0;
+  border-radius: var(--cgpt-radius-control);
+  background: transparent;
+  color: var(--cgpt-rail-icon-muted);
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+/* P0-11: hover paints only the pill; the glyph keeps its muted/selected
+   color so the outline→filled switch belongs to selection alone. */
+body[data-chatgpt-ui] .chatgpt-rail-button:hover {
+  background: var(--cgpt-rail-hover-bg);
+}
+
+body[data-chatgpt-ui] .chatgpt-rail-button:focus-visible {
+  outline: 2px solid var(--cgpt-focus-ring);
+  outline-offset: 1px;
+}
+
+body[data-chatgpt-ui] .chatgpt-rail-button[aria-current='page'],
+body[data-chatgpt-ui] .chatgpt-rail-button[aria-pressed='true'] {
+  background: var(--cgpt-rail-active-bg);
+  color: var(--cgpt-rail-icon);
+}
+
+body[data-chatgpt-ui] .chatgpt-rail-button:disabled {
+  cursor: default;
+}
+
+body[data-chatgpt-ui] .chatgpt-rail-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cgpt-rail-icon-size);
+  height: var(--cgpt-rail-icon-size);
+}
+
+/* Intrinsic size wins: sprite glyphs are 20px, the dot row glyph is 16px. */
+body[data-chatgpt-ui] .chatgpt-rail-icon svg {
+  display: block;
+}
+
+body[data-chatgpt-ui] .chatgpt-rail-button[data-cgpt-rail-state='selected'],
+body[data-chatgpt-ui] .chatgpt-rail-button[data-cgpt-rail-state='selected']:hover {
+  background: var(--cgpt-rail-active-bg);
+  color: var(--cgpt-rail-icon);
+}
+
+body[data-chatgpt-ui] .chatgpt-rail-tooltip {
+  position: absolute;
+  left: calc(100% + var(--cgpt-space-4));
+  top: 50%;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 var(--cgpt-space-4);
+  border-radius: var(--cgpt-radius-row);
+  background: var(--cgpt-surface-tooltip);
+  color: var(--cgpt-text-on-tooltip);
+  font-size: 12px;
+  font-weight: var(--cgpt-font-weight-medium);
+  line-height: 16px;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateY(-50%);
+  box-shadow: var(--cgpt-menu-shadow);
+}
+
+/* 更多: a small popover for Work/Super-agent/定时任务. It is fixed so the
+   52px nav never clips it; geometry follows the measured menu vocabulary. */
+body[data-chatgpt-ui] .chatgpt-rail-menu {
+  position: fixed;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-sizing: border-box;
+  width: 190px;
+  padding: 6px;
+  border: 1px solid var(--cgpt-menu-border);
+  border-radius: 12px;
+  background: var(--cgpt-menu-bg);
+  box-shadow: var(--cgpt-menu-shadow);
+}
+
+body[data-chatgpt-ui] .chatgpt-rail-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--cgpt-text-primary);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: var(--cgpt-font-weight-regular);
+  line-height: 16px;
+  text-align: left;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-rail-menu-item:hover,
+body[data-chatgpt-ui] .chatgpt-rail-menu-item:focus-visible {
+  background: var(--cgpt-control-hover);
+  outline: none;
+}
+
+body[data-chatgpt-ui] .chatgpt-rail-menu-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--cgpt-text-secondary);
+}
+
+body[data-chatgpt-ui] .chatgpt-rail-menu-icon svg {
+  display: block;
+}
+
+body[data-chatgpt-ui] .chatgpt-rail-menu-label {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Panel-header search, aligned to rail 52 + panel 288 − right inset. The
+   peek-time 展开侧栏 control reuses the same geometry, so it lands exactly
+   where the expanded header's collapse button sits (36×36, 8px radius). */
+body[data-chatgpt-ui] .chatgpt-panel-search,
+body[data-chatgpt-ui] .chatgpt-peek-expand {
+  position: fixed;
+  top: var(--cgpt-space-4);
+  z-index: 31;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--cgpt-search-size);
+  height: var(--cgpt-search-size);
+  padding: 0;
+  border: 0;
+  border-radius: var(--cgpt-radius-row);
+  background: transparent;
+  color: var(--cgpt-text-secondary);
+  cursor: pointer;
+  transform: none;
+  -webkit-app-region: no-drag;
+}
+
+body[data-chatgpt-ui][data-windows-titlebar] .chatgpt-panel-search,
+body[data-chatgpt-ui][data-windows-titlebar] .chatgpt-peek-expand {
+  top: calc(var(--dsh-windows-titlebar-height) + var(--cgpt-space-4));
+}
+
+/* P0-19a: the search glyph used to sit on the inline baseline, 2px above the
+   button's centre while the collapse glyph sat on it. One flex wrapper per
+   control puts both icon centres on the same horizontal line (cy=26). */
+body[data-chatgpt-ui] .chatgpt-panel-search > span,
+body[data-chatgpt-ui] .chatgpt-peek-expand > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+}
+
+body[data-chatgpt-ui] .chatgpt-panel-search svg,
+body[data-chatgpt-ui] .chatgpt-peek-expand svg {
+  display: block;
+  flex: none;
+}
+
+body[data-chatgpt-ui] .chatgpt-panel-search:hover,
+body[data-chatgpt-ui] .chatgpt-peek-expand:hover {
+  width: var(--cgpt-search-size);
+  height: var(--cgpt-search-size);
+  padding: 0;
+  transform: none;
+  background: var(--cgpt-control-hover);
+  color: var(--cgpt-text-primary);
+}
+
+body[data-chatgpt-ui] .chatgpt-panel-search:focus-visible,
+body[data-chatgpt-ui] .chatgpt-peek-expand:focus-visible {
+  outline: 2px solid var(--cgpt-focus-ring);
+  outline-offset: 1px;
+}
+
+/* On macOS / Windows titlebar the frame's collapsed track is 0px. Reserve the
+   rail width inside the center column so content and scrollbars are not hidden
+   under the overlay. Linux/web keeps the host's 56px track and needs no shift. */
+body[data-chatgpt-ui][data-platform='darwin'] [data-sidebar-collapsed] [data-slot='main'],
+body[data-chatgpt-ui][data-windows-titlebar] [data-sidebar-collapsed] [data-slot='main'] {
+  box-sizing: border-box;
+  padding-left: var(--cgpt-rail-width);
+}

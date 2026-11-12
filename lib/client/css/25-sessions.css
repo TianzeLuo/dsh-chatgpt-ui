@@ -1,0 +1,1260 @@
+/* dsh-chatgpt-ui — 25-sessions.css
+ *
+ * The self-rendered `sidebar.workspaces` occupant: New chat, pinned Sessions,
+ * project groups, recent Sessions, the row/project menus, rename dialog and the
+ * Host-backed search surface.
+ *
+ * Measured from the read-only ChatGPT capture (2026-11-06, 1587×907 CSS px,
+ * 2×): row 266×36 at x58, 10px inline padding, ellipsis action 20×20 radius4 at
+ * the row's right 10px; group heading 36px, 14px tertiary (#AFAFAF dark);
+ * menu 161px wide (M10: side borders at device x=593/914), 16px radius, 10px
+ * padding, 36px rows, 12px row radius, 14px label, 10px inline padding,
+ * 17px separators, hover rgba(255,255,255,.1).
+ *
+ * All colours and measurements come from 05/06-cgpt-tokens.css.
+ */
+
+/* ---- region shell ------------------------------------------------------- */
+body[data-chatgpt-ui] .chatgpt-sessions {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  /* P0-10B: the list used to be a fixed 288px column. The Host splitter owns
+     the sidebar track (clamp 264–420) and rewrites the frame's grid template,
+     so a fixed width left the panel's background moving while every row — and
+     the scrollbar — stayed at 288. Follow the Host track instead: 100% of the
+     Host region is track − 52px, but that region overhangs the panel's border
+     box by 6px (its own -12px right margin minus the panel's 6px padding),
+     which also clipped the 4px scroll thumb. Subtracting the 8px gutter puts
+     the thumb 2px inside the panel edge at every width. */
+  width: calc(100% - 8px);
+  height: calc(100vh - 52px);
+  min-height: 0;
+  overflow: hidden;
+  color: var(--cgpt-text-primary);
+  font-family: inherit;
+}
+
+/* P0-10A: 新聊天 + super-agent live here, outside the scrollport. The host
+   sidebar clips overflow, so the fixed block must reserve its own height and
+   the scroll container must start below it (flex column, not padding). */
+body[data-chatgpt-ui] .chatgpt-session-fixed {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0 8px 0 0;
+  background: var(--cgpt-panel-bg);
+}
+
+body[data-chatgpt-ui] .chatgpt-session-scroll {
+  box-sizing: border-box;
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  /* P0-5: the Host's 22px right padding plus the 4px scrollbar read as a
+     wide empty gutter. Keep 8px between the content edge and the container;
+     the 4px thumb overlays the last 4px, so the visible gap is 4px. */
+  padding: 0 8px 8px 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--cgpt-border-strong) transparent;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--cgpt-border-strong);
+}
+
+body[data-chatgpt-ui] .chatgpt-session-scroll::-webkit-scrollbar-thumb:hover,
+body[data-chatgpt-ui] .chatgpt-session-scroll:hover {
+  scrollbar-color: var(--cgpt-text-tertiary) transparent;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--cgpt-text-tertiary);
+}
+
+/* The shell's own New Session row is replaced by the list's first row. The
+   action itself is unchanged: both call ctx.uiWorkspace.startSession(). */
+body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_newSession'] {
+  display: none;
+}
+
+/* ---- New chat ----------------------------------------------------------- */
+body[data-chatgpt-ui] .chatgpt-new-chat {
+  position: relative;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--cgpt-new-chat-height);
+  /* Reference: 新聊天 ends at y=87 and the super-agent row starts at 88 (1px). */
+  margin: 0 0 1px;
+  padding: 0 var(--cgpt-session-row-padding);
+  gap: var(--cgpt-space-5);
+  border: 0;
+  border-radius: var(--cgpt-radius-row);
+  background: transparent;
+  color: var(--cgpt-text-primary);
+  font-family: inherit;
+  font-size: var(--cgpt-font-body-size);
+  font-weight: var(--cgpt-font-weight-regular);
+  line-height: var(--cgpt-line-height-row);
+  text-align: left;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-new-chat:hover {
+  background: var(--cgpt-control-hover);
+}
+
+body[data-chatgpt-ui] .chatgpt-new-chat:focus-visible {
+  outline: 2px solid var(--cgpt-focus-ring);
+  outline-offset: -2px;
+}
+
+body[data-chatgpt-ui] .chatgpt-new-chat-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--cgpt-text-primary);
+}
+
+body[data-chatgpt-ui] .chatgpt-new-chat-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+body[data-chatgpt-ui] .chatgpt-new-chat-icon svg {
+  display: block;
+}
+
+/* ---- super-agent row -------------------------------------------------- */
+/* Reference: 你的 Dot sits directly under 新聊天, same 35px row, one 16px
+   leading glyph, and a right-aligned unread badge. It opens dot's main panel. */
+body[data-chatgpt-ui] .chatgpt-super-agent {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--cgpt-new-chat-height);
+  /* Reference: the dot row ends at 123 and 项目 starts at 136 (12px gap). */
+  margin: 0 0 12px;
+  padding: 0 var(--cgpt-session-row-padding);
+  gap: var(--cgpt-space-5);
+  border: 0;
+  border-radius: var(--cgpt-radius-row);
+  background: transparent;
+  color: var(--cgpt-text-primary);
+  font-family: inherit;
+  font-size: var(--cgpt-font-body-size);
+  font-weight: var(--cgpt-font-weight-regular);
+  line-height: var(--cgpt-line-height-row);
+  text-align: left;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-super-agent:hover {
+  background: var(--cgpt-control-hover);
+}
+
+body[data-chatgpt-ui] .chatgpt-super-agent:focus-visible {
+  outline: 2px solid var(--cgpt-focus-ring);
+  outline-offset: -2px;
+}
+
+body[data-chatgpt-ui] .chatgpt-super-agent-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--cgpt-text-secondary);
+}
+
+body[data-chatgpt-ui] .chatgpt-super-agent-icon svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+body[data-chatgpt-ui] .chatgpt-super-agent-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+body[data-chatgpt-ui] .chatgpt-super-agent-badge {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--cgpt-text-primary);
+  color: var(--cgpt-surface-raised);
+  font-size: 11px;
+  font-weight: var(--cgpt-font-weight-medium);
+  line-height: 1;
+}
+
+body[data-chatgpt-ui] .chatgpt-new-chat-label {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ---- ordinary Session row ---------------------------------------------- */
+body[data-chatgpt-ui] .chatgpt-session-item {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--cgpt-session-row-height);
+}
+
+body[data-chatgpt-ui] .chatgpt-session-row {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--cgpt-session-row-height);
+  padding: 0 34px 0 var(--cgpt-session-row-padding);
+  border: 0;
+  border-radius: var(--cgpt-radius-row);
+  background: transparent;
+  color: var(--cgpt-text-primary);
+  font-family: inherit;
+  font-size: var(--cgpt-font-body-size);
+  font-weight: var(--cgpt-font-weight-regular);
+  line-height: var(--cgpt-line-height-row);
+  text-align: left;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-item-indented .chatgpt-session-row {
+  padding-left: 26px;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-row:hover {
+  background: var(--cgpt-control-hover);
+}
+
+body[data-chatgpt-ui] .chatgpt-session-row[aria-current='page'] {
+  background: var(--cgpt-surface-selected);
+}
+
+body[data-chatgpt-ui] .chatgpt-session-row:focus-visible {
+  outline: 2px solid var(--cgpt-focus-ring);
+  outline-offset: -2px;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Host `SessionStatus.running` indicator. No decorative timer: the element is
+   rendered only while the watched store says true, and disappears with it.
+   P0-19a: the reference's 0.9s spin read as a fast flicker; the rotation is
+   slowed to half speed (0.9s → 1.8s). Only session rows render this node. */
+body[data-chatgpt-ui] .chatgpt-session-running {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  color: var(--cgpt-text-secondary);
+  animation: chatgpt-session-spin 1.8s linear infinite;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-running svg {
+  display: block;
+}
+
+@keyframes chatgpt-session-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-chatgpt-ui] .chatgpt-session-running {
+    animation-duration: 4.8s;
+  }
+}
+
+/* Phase 4C-3 — the project marker in 最近.
+   Rules, in order: only when it differs from the title (the component already
+   drops the equal case), only when the row has room, never at the title's
+   expense, and gone entirely in a narrow row. The row is a size container, so
+   "narrow" follows the actual list width instead of the window. */
+body[data-chatgpt-ui] .chatgpt-session-row {
+  container-type: inline-size;
+  container-name: cgpt-session-row;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-project {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 38%;
+  margin-left: 8px;
+  overflow: hidden;
+  color: var(--cgpt-text-tertiary);
+  font-size: 11px;
+  font-weight: var(--cgpt-font-weight-regular);
+  line-height: 16px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Below ~180px the label plus a readable title no longer fit together. */
+@container cgpt-session-row (max-width: 180px) {
+  body[data-chatgpt-ui] .chatgpt-session-project,
+  body[data-chatgpt-ui] .chatgpt-session-project {
+    display: none;
+  }
+}
+
+body[data-chatgpt-ui] .chatgpt-session-more {
+  position: absolute;
+  top: calc((var(--cgpt-session-row-height) - var(--cgpt-sidebar-action-size)) / 2);
+  right: var(--cgpt-session-row-padding);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--cgpt-sidebar-action-size);
+  height: var(--cgpt-sidebar-action-size);
+  padding: 0;
+  border: 0;
+  border-radius: var(--cgpt-session-action-radius);
+  background: transparent;
+  color: var(--cgpt-text-secondary);
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.1s ease, background-color 0.1s ease;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-item:hover .chatgpt-session-more,
+body[data-chatgpt-ui] .chatgpt-session-item:focus-within .chatgpt-session-more {
+  opacity: 1;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-more:hover {
+  background: var(--cgpt-control-hover);
+  color: var(--cgpt-text-primary);
+}
+
+body[data-chatgpt-ui] .chatgpt-session-more:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--cgpt-focus-ring);
+  outline-offset: -2px;
+}
+
+/* ---- group headings ---------------------------------------------------- */
+body[data-chatgpt-ui] .chatgpt-projects-heading,
+body[data-chatgpt-ui] .chatgpt-section-heading {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--cgpt-section-height);
+  margin: 0;
+  padding: 0 var(--cgpt-session-row-padding);
+  border: 0;
+  border-radius: var(--cgpt-radius-row);
+  background: transparent;
+  color: var(--cgpt-text-tertiary);
+  font-family: inherit;
+  font-size: var(--cgpt-font-body-size);
+  font-weight: var(--cgpt-font-weight-medium);
+  line-height: var(--cgpt-line-height-row);
+  text-align: left;
+}
+
+body[data-chatgpt-ui] .chatgpt-projects-heading {
+  gap: var(--cgpt-space-3);
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-projects-heading:hover {
+  color: var(--cgpt-text-primary);
+}
+
+body[data-chatgpt-ui] .chatgpt-projects-heading:focus-visible {
+  outline: 2px solid var(--cgpt-focus-ring);
+  outline-offset: -2px;
+}
+
+body[data-chatgpt-ui] .chatgpt-section-chevron {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  margin-left: auto;
+  transition: transform 0.12s ease;
+}
+
+body[data-chatgpt-ui] .chatgpt-section-chevron.is-open {
+  transform: rotate(90deg);
+}
+
+body[data-chatgpt-ui] .chatgpt-section-chevron svg {
+  display: block;
+}
+
+body[data-chatgpt-ui] .chatgpt-section-heading {
+  color: var(--cgpt-text-tertiary);
+}
+
+/* A project group: 36px row with folder + name. P0-10A removes the leading
+   chevron; the row itself toggles expansion, and hover reveals 新建会话 + ⋯. */
+body[data-chatgpt-ui] .chatgpt-project-head {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--cgpt-section-height);
+}
+
+body[data-chatgpt-ui] .chatgpt-project-row {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--cgpt-section-height);
+  /* P0-13, measured: the row is 36px with no padding of its own; the 20px
+     folder sits 10px in, the title starts 36px from the row edge (a 36px
+     leading slot), and the two 20px hover actions keep 8px between them and
+     8px from the row's right edge — 56px of reserve. */
+  padding: 0 56px 0 var(--cgpt-session-row-padding);
+  gap: 6px;
+  border: 0;
+  border-radius: var(--cgpt-radius-row);
+  background: transparent;
+  color: var(--cgpt-project-title);
+  font-family: inherit;
+  font-size: var(--cgpt-font-body-size);
+  font-weight: var(--cgpt-font-weight-regular);
+  line-height: 20px;
+  text-align: left;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-project-row:hover {
+  background: var(--cgpt-control-hover);
+  color: var(--cgpt-text-primary);
+}
+
+body[data-chatgpt-ui] .chatgpt-project-row:focus-visible {
+  outline: 2px solid var(--cgpt-focus-ring);
+  outline-offset: -2px;
+}
+
+body[data-chatgpt-ui] .chatgpt-project-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  /* P0-13: the reference renders the 16-unit folder at 20px inside a 36px
+     slot; the glyph itself carries the row colour at full strength. */
+  width: var(--cgpt-project-icon-size);
+  height: var(--cgpt-project-icon-size);
+  color: var(--cgpt-project-icon);
+}
+
+body[data-chatgpt-ui] .chatgpt-project-icon svg {
+  display: block;
+  width: var(--cgpt-project-icon-size);
+  height: var(--cgpt-project-icon-size);
+}
+
+body[data-chatgpt-ui] .chatgpt-project-title {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+body[data-chatgpt-ui] .chatgpt-project-actions {
+  position: absolute;
+  top: calc((var(--cgpt-section-height) - var(--cgpt-sidebar-action-size)) / 2);
+  right: var(--cgpt-project-action-inset);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--cgpt-project-action-gap);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s ease;
+}
+
+body[data-chatgpt-ui] .chatgpt-project-head:hover .chatgpt-project-actions,
+body[data-chatgpt-ui] .chatgpt-project-head:focus-within .chatgpt-project-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+body[data-chatgpt-ui] .chatgpt-project-new,
+body[data-chatgpt-ui] .chatgpt-project-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--cgpt-sidebar-action-size);
+  height: var(--cgpt-sidebar-action-size);
+  padding: 0;
+  border: 0;
+  border-radius: var(--cgpt-session-action-radius);
+  background: transparent;
+  color: var(--cgpt-project-action-color);
+  cursor: pointer;
+}
+
+/* P0-19e: the session ⋯ had no glyph rule of its own, so the inline SVG sat on
+   the text baseline and rode 2px high inside its plate. Blockifying it (as the
+   project actions already do) puts the 14px glyph in the plate's centre. */
+body[data-chatgpt-ui] .chatgpt-session-more svg,
+body[data-chatgpt-ui] .chatgpt-project-new svg,
+body[data-chatgpt-ui] .chatgpt-project-more svg {
+  display: block;
+  width: var(--cgpt-session-action-icon);
+  height: var(--cgpt-session-action-icon);
+}
+
+body[data-chatgpt-ui] .chatgpt-project-new:hover,
+body[data-chatgpt-ui] .chatgpt-project-more:hover {
+  background: var(--cgpt-control-hover);
+  color: var(--cgpt-text-primary);
+}
+
+body[data-chatgpt-ui] .chatgpt-project-new:focus-visible,
+body[data-chatgpt-ui] .chatgpt-project-more:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--cgpt-focus-ring);
+  outline-offset: -2px;
+}
+
+body[data-chatgpt-ui] .chatgpt-project,
+body[data-chatgpt-ui] .chatgpt-project-body,
+body[data-chatgpt-ui] .chatgpt-project-groups,
+body[data-chatgpt-ui] .chatgpt-pinned,
+body[data-chatgpt-ui] .chatgpt-recent {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+body[data-chatgpt-ui] .chatgpt-project-empty {
+  box-sizing: border-box;
+  height: var(--cgpt-section-height);
+  padding: 0 10px 0 20px;
+  color: var(--cgpt-text-tertiary);
+  font-size: 13px;
+  line-height: var(--cgpt-section-height);
+}
+
+body[data-chatgpt-ui] .chatgpt-projects-none {
+  padding-left: 20px;
+}
+
+/* ---- empty / loading / error ------------------------------------------- */
+body[data-chatgpt-ui] .chatgpt-session-empty {
+  padding: 28px 10px 24px;
+  text-align: center;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-empty-title {
+  margin: 0 0 4px;
+  color: var(--cgpt-text-secondary);
+  font-size: var(--cgpt-font-body-size);
+  font-weight: var(--cgpt-font-weight-medium);
+  line-height: 20px;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-empty-note {
+  margin: 0;
+  color: var(--cgpt-text-tertiary);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-skeleton {
+  padding: 4px 5px 0 0;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-skeleton-row {
+  height: var(--cgpt-session-row-height);
+  margin-bottom: 4px;
+  border-radius: var(--cgpt-radius-row);
+  background: linear-gradient(90deg, var(--cgpt-control-hover), var(--cgpt-surface-hover), var(--cgpt-control-hover));
+  background-size: 200% 100%;
+  animation: chatgpt-session-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes chatgpt-session-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+body[data-chatgpt-ui] .chatgpt-session-error {
+  margin: 8px 5px 0 0;
+  padding: 10px;
+  border: 1px solid var(--cgpt-border-subtle);
+  border-radius: var(--cgpt-radius-row);
+  color: var(--cgpt-text-secondary);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-error-retry {
+  margin-top: 8px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--cgpt-border-strong);
+  border-radius: var(--cgpt-radius-row);
+  background: transparent;
+  color: var(--cgpt-text-primary);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-load-more {
+  width: calc(100% - 5px);
+  height: var(--cgpt-section-height);
+  margin: 4px 0 0;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--cgpt-radius-row);
+  background: transparent;
+  color: var(--cgpt-text-secondary);
+  font-family: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-load-more:hover {
+  background: var(--cgpt-control-hover);
+  color: var(--cgpt-text-primary);
+}
+
+/* P0-22: project-local 显示更多 sits inside the project body and aligns with
+   its indented session rows; it is not the retired global project pager. */
+body[data-chatgpt-ui] .chatgpt-project-load-more {
+  box-sizing: border-box;
+  margin: 0 0 2px;
+  padding-left: 26px;
+  color: var(--cgpt-text-tertiary);
+}
+
+body[data-chatgpt-ui] .chatgpt-recent-more {
+  margin-top: 0;
+}
+
+/* ---- row / project menu ------------------------------------------------ */
+body[data-chatgpt-ui] .chatgpt-session-menu {
+  position: fixed;
+  z-index: 1000;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  /* P0-13: measured — the reference menu is content-sized with a 160px floor
+     (min-w-[160px]); a fixed 161px only matched the one frame M10 measured. */
+  width: max-content;
+  min-width: var(--cgpt-menu-min-width);
+  max-width: min(var(--cgpt-menu-max-width), calc(100vw - 16px));
+  max-height: calc(100vh - 16px);
+  padding: var(--cgpt-menu-gutter);
+  overflow-y: auto;
+  border: 0;
+  border-radius: var(--cgpt-menu-radius);
+  background: var(--cgpt-menu-bg);
+  box-shadow: var(--cgpt-menu-shadow);
+  backdrop-filter: blur(var(--cgpt-menu-blur));
+  -webkit-backdrop-filter: blur(var(--cgpt-menu-blur));
+  color: var(--cgpt-menu-text);
+  font-family: inherit;
+  font-size: var(--cgpt-font-body-size);
+  line-height: 20px;
+  outline: none;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-menu-item {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--cgpt-menu-row-height);
+  padding: var(--cgpt-menu-row-pad-y) var(--cgpt-menu-row-pad-x);
+  gap: var(--cgpt-menu-icon-gap);
+  border: 0;
+  border-radius: var(--cgpt-menu-row-radius);
+  background: transparent;
+  color: var(--cgpt-menu-text);
+  font-family: inherit;
+  font-size: var(--cgpt-font-body-size);
+  font-weight: var(--cgpt-font-weight-regular);
+  line-height: 20px;
+  text-align: left;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-menu-item:hover,
+body[data-chatgpt-ui] .chatgpt-session-menu-item:focus-visible {
+  background: var(--cgpt-menu-row-hover);
+  outline: none;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-menu-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  /* P0-13: the reference's leading slot is 20×20; the glyph inside it is 18px
+     when it comes from the menu's mask SVG and 16px when it comes from the
+     sprite. Both sizes are baked into the captured markup, so the slot must
+     not rescale them. */
+  width: var(--cgpt-menu-icon-slot);
+  height: var(--cgpt-menu-icon-slot);
+  color: currentColor;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-menu-icon svg {
+  width: auto;
+  height: auto;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-menu-icon svg {
+  display: block;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-menu-label {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-menu-trailing {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  margin-left: auto;
+  color: var(--cgpt-text-tertiary);
+}
+
+/* P0-19c: the project ⋯ menu and the session ⋯ menu are one component. The
+   session popover used to inherit the web row (36px rows / 6×10 padding / 20px
+   glyph slot / 17px inset divider) while this one ran the desktop surface
+   (28.5px / 0 / 18px / 9.5px), which is why they read as two different menus.
+   Both now take the desktop numbers docs/m26.json measured — the size envelope
+   (width/padding/radius) lives in 76-overlay.css, the rows/glyph/divider here.
+   `[role='menu']` keeps this rule above 76-overlay's (0,4,1) row rule, which
+   still serves the permission and work menus. */
+body[data-chatgpt-ui] :is(
+    .chatgpt-session-menu[data-cgpt-session-menu='project-hover'],
+    .chatgpt-session-menu[data-cgpt-session-menu='session']
+  )[role='menu'] .chatgpt-session-menu-item {
+  height: var(--cgpt-desktop-menu-row-height);
+  min-height: var(--cgpt-desktop-menu-row-height);
+  padding: 0;
+  gap: var(--cgpt-desktop-menu-icon-gap);
+  font-size: var(--cgpt-desktop-menu-font);
+  line-height: 20px;
+  color: var(--cgpt-desktop-menu-strong);
+}
+
+body[data-chatgpt-ui] :is(
+    .chatgpt-session-menu[data-cgpt-session-menu='project-hover'],
+    .chatgpt-session-menu[data-cgpt-session-menu='session']
+  )[role='menu'] .chatgpt-session-menu-icon {
+  width: var(--cgpt-desktop-menu-icon-slot);
+  height: var(--cgpt-desktop-menu-icon-slot);
+  color: var(--cgpt-desktop-menu-strong);
+}
+
+body[data-chatgpt-ui] :is(
+    .chatgpt-session-menu[data-cgpt-session-menu='project-hover'],
+    .chatgpt-session-menu[data-cgpt-session-menu='session']
+  ) .chatgpt-session-menu-separator {
+  height: var(--cgpt-desktop-menu-separator-height);
+  min-height: var(--cgpt-desktop-menu-separator-height);
+  padding: calc((var(--cgpt-desktop-menu-separator-height) - 1px) / 2) var(--cgpt-desktop-menu-separator-inset);
+}
+
+body[data-chatgpt-ui] .chatgpt-project-hover-menu .chatgpt-session-menu-item.is-disabled {
+  background: transparent;
+  color: var(--cgpt-text-disabled);
+  cursor: default;
+}
+
+body[data-chatgpt-ui] .chatgpt-project-hover-menu .chatgpt-session-menu-item.is-disabled:hover {
+  background: transparent;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-menu-separator {
+  box-sizing: border-box;
+  width: 100%;
+  height: 17px;
+  padding: 8px var(--cgpt-menu-separator-inset);
+}
+
+body[data-chatgpt-ui] .chatgpt-session-menu-separator::before {
+  display: block;
+  width: 100%;
+  border-top: 1px solid var(--cgpt-menu-separator);
+  content: '';
+}
+
+/* P0-5 project card: header / chat count / repo path / divider / 编辑项目.
+   The session menu stays 161px; this card needs room for a real path. */
+body[data-chatgpt-ui] .chatgpt-session-menu[data-cgpt-session-menu='project'] {
+  /* P0-14: the surface (8px side gutter, 6px top/bottom, 16px corner) is set in
+     76-overlay.css, which loads last. The card's own rows are below: 26.5px
+     header and count rows, 24px path/编辑项目 rows, 13px/14px type and the
+     reference's separators, which run out to the card's right edge. */
+  width: max-content;
+  max-width: min(360px, calc(100vw - 16px));
+}
+
+body[data-chatgpt-ui] .chatgpt-session-menu[data-cgpt-session-menu='project'] .chatgpt-project-menu-card {
+  height: 27.5px;
+  padding: 0;
+  gap: 6px;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-menu[data-cgpt-session-menu='project'] .chatgpt-project-menu-icon,
+body[data-chatgpt-ui] .chatgpt-session-menu[data-cgpt-session-menu='project'] .chatgpt-project-menu-star,
+body[data-chatgpt-ui] .chatgpt-session-menu[data-cgpt-session-menu='project'] .chatgpt-project-menu-meta-icon,
+body[data-chatgpt-ui] .chatgpt-session-menu[data-cgpt-session-menu='project'] .chatgpt-project-menu-path-icon {
+  width: var(--cgpt-desktop-menu-icon-slot);
+  height: var(--cgpt-desktop-menu-icon-slot);
+}
+
+body[data-chatgpt-ui] .chatgpt-session-menu[data-cgpt-session-menu='project'] .chatgpt-project-menu-title {
+  color: var(--cgpt-desktop-menu-strong);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-menu[data-cgpt-session-menu='project'] .chatgpt-project-menu-star {
+  color: var(--cgpt-desktop-menu-title);
+}
+
+body[data-chatgpt-ui] .chatgpt-session-menu[data-cgpt-session-menu='project'] .chatgpt-project-menu-meta {
+  height: 27.5px;
+  padding: 0;
+  gap: 6px;
+  color: var(--cgpt-desktop-menu-muted);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-menu[data-cgpt-session-menu='project'] .chatgpt-project-menu-path {
+  height: 24px;
+  min-height: 24px;
+  padding: 0;
+  gap: 6px;
+  color: var(--cgpt-desktop-menu-muted);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-menu[data-cgpt-session-menu='project'][role='menu'] .chatgpt-session-menu-item {
+  height: 24px;
+  min-height: 24px;
+  padding: 0;
+  gap: 6px;
+  color: var(--cgpt-desktop-menu-strong);
+  font-size: var(--cgpt-desktop-menu-font);
+  line-height: 20px;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-menu[data-cgpt-session-menu='project'] .chatgpt-session-menu-separator {
+  height: var(--cgpt-desktop-menu-separator-height);
+  min-height: var(--cgpt-desktop-menu-separator-height);
+  margin-right: -8px;
+  padding: calc((var(--cgpt-desktop-menu-separator-height) - 1px) / 2) 0;
+}
+
+body[data-chatgpt-ui] .chatgpt-project-menu-card {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  gap: var(--cgpt-menu-icon-gap);
+  min-width: 0;
+  height: var(--cgpt-menu-row-height);
+  padding: var(--cgpt-menu-row-pad-y) var(--cgpt-menu-row-pad-x);
+}
+
+body[data-chatgpt-ui] .chatgpt-project-menu-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--cgpt-menu-icon-slot);
+  height: var(--cgpt-menu-icon-slot);
+  color: var(--cgpt-project-icon);
+}
+
+body[data-chatgpt-ui] .chatgpt-project-menu-title {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  color: var(--cgpt-menu-text);
+  font-size: var(--cgpt-font-body-size);
+  font-weight: var(--cgpt-font-weight-semibold);
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body[data-chatgpt-ui] .chatgpt-project-menu-star {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--cgpt-menu-icon-slot);
+  height: var(--cgpt-menu-icon-slot);
+  color: var(--cgpt-text-tertiary);
+}
+
+body[data-chatgpt-ui] .chatgpt-project-menu-meta {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  gap: var(--cgpt-menu-icon-gap);
+  height: var(--cgpt-menu-row-height);
+  padding: var(--cgpt-menu-row-pad-y) var(--cgpt-menu-row-pad-x);
+  color: var(--cgpt-menu-text);
+  font-size: var(--cgpt-font-body-size);
+  line-height: 20px;
+}
+
+body[data-chatgpt-ui] .chatgpt-project-menu-meta-icon,
+body[data-chatgpt-ui] .chatgpt-project-menu-path-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+}
+
+body[data-chatgpt-ui] .chatgpt-project-menu-path {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  gap: var(--cgpt-menu-icon-gap);
+  height: var(--cgpt-menu-row-height);
+  padding: var(--cgpt-menu-row-pad-y) var(--cgpt-menu-row-pad-x);
+  border: 0;
+  border-radius: var(--cgpt-menu-row-radius);
+  background: transparent;
+  color: var(--cgpt-menu-text);
+  font-family: inherit;
+  font-size: var(--cgpt-font-body-size);
+  line-height: 20px;
+  text-align: left;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-project-menu-path:hover,
+body[data-chatgpt-ui] .chatgpt-project-menu-path:focus-visible {
+  background: var(--cgpt-menu-row-hover);
+  color: var(--cgpt-menu-text);
+  outline: none;
+}
+
+body[data-chatgpt-ui] .chatgpt-project-menu-path-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body[data-chatgpt-ui] .chatgpt-project-menu-path:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+body[data-chatgpt-ui] .chatgpt-project-menu-path:disabled:hover {
+  background: transparent;
+  color: var(--cgpt-menu-text);
+}
+
+/* ---- search ------------------------------------------------------------ */
+body[data-chatgpt-ui] .chatgpt-session-search {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 2px 5px 8px 0;
+  background: var(--cgpt-panel-bg);
+}
+
+body[data-chatgpt-ui] .chatgpt-session-search-bar {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--cgpt-search-size);
+  padding: 0 4px 0 10px;
+  gap: 8px;
+  border: 1px solid var(--cgpt-border-subtle);
+  border-radius: var(--cgpt-radius-control);
+  background: var(--cgpt-surface-raised);
+}
+
+body[data-chatgpt-ui] .chatgpt-session-search-icon {
+  display: inline-flex;
+  flex: none;
+  color: var(--cgpt-text-secondary);
+}
+
+body[data-chatgpt-ui] .chatgpt-session-search-input {
+  flex: 1;
+  min-width: 0;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--cgpt-text-primary);
+  font-family: inherit;
+  font-size: var(--cgpt-font-body-size);
+  line-height: 20px;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-search-input::placeholder {
+  color: var(--cgpt-text-placeholder);
+}
+
+body[data-chatgpt-ui] .chatgpt-session-search-close {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--cgpt-radius-row);
+  background: transparent;
+  color: var(--cgpt-text-secondary);
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-search-close:hover {
+  background: var(--cgpt-control-hover);
+  color: var(--cgpt-text-primary);
+}
+
+body[data-chatgpt-ui] .chatgpt-session-search-results {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-top: 8px;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-search-note {
+  margin: 0;
+  padding: 10px;
+  color: var(--cgpt-text-tertiary);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-search-result {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: var(--cgpt-radius-row);
+  background: transparent;
+  color: var(--cgpt-text-primary);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-search-result:hover {
+  background: var(--cgpt-control-hover);
+}
+
+body[data-chatgpt-ui] .chatgpt-session-search-result-title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: var(--cgpt-font-body-size);
+  line-height: 20px;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-search-result-snippet {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--cgpt-text-tertiary);
+  font-size: 12px;
+  line-height: 17px;
+}
+
+/* ---- rename dialog ----------------------------------------------------- */
+body[data-chatgpt-ui] .chatgpt-session-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: var(--cgpt-session-scrim);
+}
+
+body[data-chatgpt-ui] .chatgpt-session-dialog {
+  box-sizing: border-box;
+  width: min(360px, calc(100vw - 32px));
+  padding: 20px;
+  border: 1px solid var(--cgpt-menu-border);
+  border-radius: var(--cgpt-session-menu-radius);
+  background: var(--cgpt-menu-bg);
+  box-shadow: var(--cgpt-menu-shadow);
+  color: var(--cgpt-text-primary);
+  font-family: inherit;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-dialog-title {
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: var(--cgpt-font-weight-semibold);
+  line-height: 22px;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-dialog-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--cgpt-text-secondary);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-dialog-input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--cgpt-border-strong);
+  border-radius: var(--cgpt-radius-control);
+  outline: none;
+  background: var(--cgpt-surface-raised);
+  color: var(--cgpt-text-primary);
+  font-family: inherit;
+  font-size: var(--cgpt-font-body-size);
+  line-height: 20px;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-dialog-input:focus {
+  border-color: var(--cgpt-text-tertiary);
+}
+
+body[data-chatgpt-ui] .chatgpt-session-dialog-error {
+  margin: 8px 0 0;
+  color: var(--cgpt-text-danger);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-dialog-button {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--cgpt-border-subtle);
+  border-radius: var(--cgpt-radius-row);
+  background: transparent;
+  color: var(--cgpt-text-primary);
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-dialog-button:hover:not(:disabled) {
+  background: var(--cgpt-control-hover);
+}
+
+body[data-chatgpt-ui] .chatgpt-session-dialog-primary {
+  border-color: transparent;
+  background: var(--cgpt-send-bg);
+  color: var(--cgpt-send-fg);
+}
+
+body[data-chatgpt-ui] .chatgpt-session-dialog-primary:hover:not(:disabled) {
+  background: var(--cgpt-send-bg-hover);
+}
+
+body[data-chatgpt-ui] .chatgpt-session-dialog-button:disabled {
+  background: transparent;
+  color: var(--cgpt-text-disabled);
+  opacity: 1;
+  cursor: default;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-dialog-primary:disabled {
+  background: var(--cgpt-control-hover);
+  color: var(--cgpt-text-disabled);
+}
+
+/* ---- transient notice -------------------------------------------------- */
+body[data-chatgpt-ui] .chatgpt-session-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 1200;
+  max-width: min(520px, calc(100vw - 32px));
+  padding: 8px 14px;
+  border: 1px solid var(--cgpt-toast-border);
+  border-radius: var(--cgpt-radius-control);
+  background: var(--cgpt-toast-bg);
+  color: var(--cgpt-toast-fg);
+  box-shadow: var(--cgpt-toast-shadow);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 18px;
+  transform: translateX(-50%);
+}
