@@ -1,0 +1,1069 @@
+/* dsh-chatgpt-ui — 65-work-card.css
+ *
+ * Phase 4B: the Work input card as three bands (input / actions / tools) plus
+ * the thinking-effort control. Chat keeps the Phase 3 fold (768×52, radius 26,
+ * one row) — every rule here is scoped to `body[data-chatgpt-mode='agent']`.
+ *
+ * Measured on the reference (work-mode.json, effort.json):
+ *   card      768 wide, radius 28, #212121 dark, pad 15 / 18 / 8
+ *   editor    52 high, 16px/26
+ *   actions   36 high, gaps 5, buttons radius 9999, one 36 blue round send
+ *   tools     732 × 48 under the card, buttons 36 high, 14px, #AFAFAF
+ *   effort    P0-8 panel: track 248 × 30 r15, fill #2F7CF6, thumb 34 circle,
+ *             four 4px stops, top tier #4F6BFF → #A855F7 → #7C3AED + stars
+ *   menu      280 wide, r20, #303030, 1px inset hairline
+ *
+ * Anchors: [data-composer-card], [data-input-scroll], [data-composer-input],
+ * class suffixes _row / _tools / _trailing / _standardControls / _add /
+ * _primary, and this skin's [data-cgpt-effort*], [data-cgpt-work-*] nodes.
+ */
+
+/* ---- the three-band card ------------------------------------------------ */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  /* P0-10B: the card is the Host reading column, not a fixed 768px fold. Both
+     the transcript column and this card read `--dsh-chat-content-width`, the
+     variable the native width handles rewrite during a drag, so one drag moves
+     the card and the text together (difference 0–1px at every width). */
+  width: 100%;
+  max-width: var(--dsh-chat-content-width, var(--cgpt-msg-max, 920px));
+  height: auto;
+  min-height: 0;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 15px 18px 8px;
+  border: 0;
+  border-radius: 28px;
+  background: var(--cgpt-work-card-bg);
+  box-shadow: var(--cgpt-work-card-shadow);
+  overflow: visible;
+  /* M11: the 48px reserve belongs to the tool bar below, not to every Work
+     card. Standard mode renders no `.chatgpt-work-tools`, so the reserve used
+     to push the stats row 52px away from the card (native: 4px). */
+  margin-bottom: 0;
+}
+
+/* Only reserve the band when the skin actually injects its tool bar. */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true']:has(.chatgpt-work-tools) {
+  margin-bottom: 48px;
+}
+
+/* P0-18: the blank Work card is the same width as the blank Chat card. The Work
+   hero reads the one `--cgpt-empty-composer-w` token in 60-hero.css; the card
+   fills the hero instead of re-reading it (one value, not two copies). */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [class*='_composerHero'] [data-composer-card='true'] {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Pointer focus keeps the reference card edge (keyboard focus gets the 2px
+   outline from 85-a11y). The old focus shadow was the Host's 12/32 pair, which
+   read as a different card the moment the editor was clicked. */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true']:focus-within {
+  border-color: transparent;
+  box-shadow: var(--cgpt-work-card-shadow);
+}
+
+/* band 1 — the editor itself, no overlay row */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-input-scroll='true'] {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: var(--dsh-chatgpt-composer-max-height);
+  /* M13: the reference editor reserves 52px (a 26px line box plus 26px of
+     breathing room) with the text still on the first line. M11 removed this
+     because the block placeholder opened a second line; the placeholder is
+     absolutely positioned now, so 52px adds no empty text line. */
+  min-height: 52px;
+  margin: 0;
+}
+
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-input-scroll='true'] > div {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-input='true'] {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 26px;
+  padding: 0;
+  font-size: 16px;
+  line-height: 26px;
+}
+
+/* band 2 — the action row, in normal flow under the editor */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [class*='_row'] {
+  position: static;
+  inset: auto;
+  z-index: auto;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  /* M11-7: one gap for the whole row (the reference reads 8–12px); 5px packed
+     the 400K chip against the model pill while the send sat 10px away. */
+  gap: 8px;
+  height: 36px;
+  /* M13: the reference puts `+` 8px from the card edge and the send disc 8px
+     from the opposite edge. The card keeps its 18px text gutter; the action
+     row cancels 10px of it instead of adding a second padding layer. */
+  margin: 16px -10px 0;
+  padding: 0;
+  pointer-events: auto;
+}
+
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [class*='_row'] > div {
+  position: static;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [class*='_row'] > div > div[class*='_standardControls'] {
+  display: flex;
+}
+
+/* The permission seat moves into the tool row as 帮我批准, so only that seat is
+   hidden here — everything else the Host puts in `_modes` (the plan-mode seat
+   included) is a DSH-only control and stays where the Host renders it. */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [class*='_row'] > div > div[class*='_modes'] > [data-slot='conversation.input.permission'] {
+  display: none !important;
+}
+
+/* 60-hero.css pins the folded row's two groups (`.tools` / `.trailing`) to the
+   card's corners. The Work card puts them back in flow; without this, `.tools`
+   would become the containing block of the absolutely positioned tool bar and
+   collapse it to the add button's 36px. */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [class*='_row'] > div:first-child,
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [class*='_row'] > div:last-child {
+  position: static;
+  inset: auto;
+}
+
+/* `.tools` is the containing block for its absolutely positioned children; the
+   tool bar must hang off the card instead, so it stops being positioned. */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [class*='_tools'] {
+  position: static;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [class*='_trailing'] {
+  gap: 8px;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [class*='_standardControls'] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* The Host's stop/activity seat wraps an empty slot while idle. The Host hides
+   the seat with `:empty`, but the wrapper always holds that slot node, so the
+   seat stayed as a 0×0 flex item and the send disc sat one extra 8px gap away
+   from the model pill (M11-7: 16px vs 8px). Hide the seat while its slot is
+   empty; a live activity fills the slot and the seat comes back. */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [class*='_activity']:has(> [data-slot]:empty),
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [class*='_activity']:empty {
+  display: none;
+}
+
+/* the add button is 36 in this card, not the folded row's 30 */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] button[class*='_add'] {
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  color: var(--cgpt-work-action-fg);
+}
+
+/* M11-7: a 16px glyph inside the 36px disc (the Host draws 14). */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] button[class*='_add'] svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* The reference ends the row in one blue circular button (36). The Host's send
+   button takes that seat, so no placeholder voice button is painted next to it. */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [class*='_trailing'] button[class*='_primary'] {
+  box-sizing: border-box;
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  background: var(--cgpt-work-voice);
+  color: var(--cgpt-work-send-fg);
+}
+
+/* The reference keeps the seat solid blue even with an empty composer, so the
+   disabled state dims the glyph instead of the disc. */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [class*='_trailing'] button[class*='_primary']:disabled {
+  opacity: 1;
+}
+
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [class*='_trailing'] button[class*='_primary']:disabled svg {
+  opacity: 1;
+}
+
+/* The Host's model seat is the one thing the merged pill replaces: its slot
+   node is `display: contents`, so the child the Host renders inside it is what
+   gets hidden. The merged model+effort pill in this same row owns both choices.
+
+   The `400K` context-window chip is deliberately NOT hidden: it is a DSH
+   capability with no reference counterpart, and Phase 5b keeps it (visual fit
+   only). */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-slot='conversation.input.model'] > :not([data-cgpt-root]) {
+  display: none !important;
+}
+
+/* The Host's placeholder is English; the skin's copy is Chinese-first (same
+   technique as Chat: a zero-width base plus a token-backed ::after).
+   M11-6: the ::after must stay inline. As a block it opened a second line box,
+   and the zero-width base text left a full 26px empty line above the copy —
+   the "blank line" between the card's top edge and the placeholder. */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-placeholder='true'] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0;
+  font-size: 0;
+  line-height: 26px;
+  color: var(--cgpt-text-placeholder);
+  transform: none;
+}
+
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-placeholder='true']::after {
+  content: var(--dsh-chatgpt-placeholder-work, '描述你想构建的东西，/ 命令、@ 文件或会话');
+  display: inline;
+  font-size: 16px;
+  line-height: 26px;
+  color: var(--cgpt-text-placeholder);
+}
+
+/* the host model chip: 36 high, 14px, quiet until hover */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-slot='conversation.input.model'] button {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 36px;
+  max-width: 220px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--cgpt-work-action-fg);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-slot='conversation.input.model'] button:hover {
+  background: var(--cgpt-work-hover);
+}
+
+/* The reference's action row has ONE pill — model name + effort name + chevron —
+   and opening it shows the model list above the effort slider. The Host's own
+   model seat is a second pill with its own menu, so Work mode hides it and the
+   merged control ([data-cgpt-model-pill]) takes the seat. Chat keeps the Host
+   seat: its card is a single row and has no effort.
+   The rule targets the seat's slot node and the wrapper that only holds it, so
+   the row does not keep a 36px hole. */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-slot='conversation.input.model'] {
+  display: none;
+}
+
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [data-slot='conversation.input.model'] button > span[class*='_triggerLabel'] {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* the effort text lives in our own chip; the host's copy would duplicate it */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [data-slot='conversation.input.model'] [class*='_triggerEffort'] {
+  display: none;
+}
+
+/* [data-slot] wrappers are display:contents so our buttons join the row's flex */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-slot='conversation.input.right'] {
+  display: contents;
+}
+
+/* M11-7: whatever a slot occupant mounts in this seat (the Host/plugin `400K`
+   context chip) shares the row with the model pill, so it takes the same chip
+   geometry: 36 high, pill radius, secondary ink, tabular figures. Without this
+   it rendered as bare 14px label-primary text — darker and shorter than the
+   pill next to it and packed 5px away. Buttons keep their own rules. */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [data-slot='conversation.input.right'] > :not([data-cgpt-root]):not(button) {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  flex: none;
+  height: 36px;
+  padding: 0;
+  border-radius: 9999px;
+  color: var(--cgpt-work-action-fg);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* M12: the context chip is itself a <button> inside a padded root. Give the
+   button the same 36px pill geometry/ink as the model pill, and drop the
+   root's 10px padding so the visible gaps are the row's 8px on both sides.
+   The reference has no 400K control; its model pill is the geometry source. */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [data-slot='conversation.input.right'] button[aria-label='选择上下文大小'] {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 36px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--cgpt-work-action-fg);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [data-slot='conversation.input.right'] button[aria-label='选择上下文大小']:hover,
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [data-slot='conversation.input.right'] button[aria-label='选择上下文大小'][aria-expanded='true'] {
+  background: var(--cgpt-work-hover);
+}
+
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [data-slot='conversation.input.right'] button[aria-label='选择上下文大小'] svg {
+  width: 16px;
+  height: 16px;
+}
+
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [data-slot='conversation.input.right'] button[aria-label='选择上下文大小'] [class*='_chevron'] svg {
+  width: 12px;
+  height: 12px;
+  opacity: 0.55;
+}
+
+/* ---- the merged model + effort pill ------------------------------------- */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) .chatgpt-model-pill {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  max-width: 320px;
+  min-width: 0;
+  flex: 0 1 auto;
+  padding: 0 8px 0 10px;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--cgpt-work-action-fg);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) .chatgpt-model-pill:hover {
+  background: var(--cgpt-work-hover);
+}
+
+/* P0-6: the reference has no focus ring on the open pill — only the grey
+   fill — so the old 1.5px blue box-shadow is gone. Geometry is unchanged. */
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) .chatgpt-model-pill[aria-expanded='true'] {
+  background: var(--cgpt-work-hover);
+  box-shadow: none;
+}
+
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) .chatgpt-model-pill-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) .chatgpt-model-pill-effort {
+  color: var(--cgpt-text-secondary);
+  font-weight: 400;
+}
+
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) .chatgpt-model-pill-placeholder {
+  color: var(--cgpt-text-primary);
+}
+
+body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) .chatgpt-model-pill-chevron {
+  display: inline-flex;
+  opacity: 0.55;
+}
+
+/* ---- the pill's popover ------------------------------------------------ */
+/* P0-8 desktop form: 280px wide, 20px corners, 12/16/16 inner padding. The
+   lightning glyph is gone (its 20px column + 12px gap stay blank), the two
+   header lines are one 126×44 hover block (16px/600 name over 14px/400 model),
+   the reset sits on the first text line, and the slider is a 100% × 30 pill
+   with a 34px perfect white circle. The model list below is grouped by the
+   Host provider and keeps its M14 geometry. */
+/* P0-8 root cause: the Host theme ships
+     @deepseek-ai/dsh-client-ui-theme/corner-shape.css
+     @supports (corner-shape:superellipse(1.5)) {
+       :root { --dsw-corner-shape: superellipse(1.5) }
+       *, :before, :after { corner-shape: var(--dsw-corner-shape) }
+     }
+   `corner-shape` is a separate property from `border-radius`, so a 34px
+   `border-radius: 50%` element inherits `superellipse(1.5)` and paints a
+   squircle, no matter how many times the radius is changed. Every round
+   surface in this panel opts back into a true circle. */
+body[data-chatgpt-ui] :is(
+  .chatgpt-effort-menu,
+  .chatgpt-effort-choice,
+  .chatgpt-effort-reset,
+  .chatgpt-effort-track,
+  .chatgpt-effort-fill,
+  .chatgpt-effort-tick,
+  .chatgpt-effort-star,
+  .chatgpt-effort-thumb
+) {
+  corner-shape: round;
+}
+
+/* P0-8 palette. The shared Phase-4 effort tokens keep their values for the
+   rest of the skin; the panel owns the new reference colours. */
+body[data-chatgpt-ui] {
+  --cgpt-effort-track: #e9e9e9;
+  --cgpt-effort-fill: #2f7cf6;
+  --cgpt-effort-accent: #4c8dff;
+  --cgpt-effort-accent-max: #9333ea;
+  --cgpt-effort-model-fg: #5d5d5d;
+  --cgpt-effort-tick: #8b8b8b;
+  --cgpt-effort-max-a: #6e84ff;
+  --cgpt-effort-max-b: #b57bf6;
+  --cgpt-effort-max-c: #8b5cf6;
+}
+
+body[data-chatgpt-ui][data-ds-dark-theme] {
+  --cgpt-effort-track: #3f3f3f;
+  --cgpt-effort-accent: #4c8dff;
+  --cgpt-effort-accent-max: #c084fc;
+  --cgpt-effort-model-fg: #d0d0d0;
+  --cgpt-effort-tick: #8b8b8b;
+  --cgpt-effort-max-a: #4f6bff;
+  --cgpt-effort-max-b: #a855f7;
+  --cgpt-effort-max-c: #7c3aed;
+}
+
+body[data-chatgpt-ui] .chatgpt-effort-menu {
+  position: fixed;
+  z-index: 2147483000;
+  box-sizing: border-box;
+  padding: 0;
+  border-radius: var(--cgpt-overlay-radius);
+  background: var(--cgpt-model-panel-bg);
+  box-shadow: var(--cgpt-model-panel-shadow);
+  color: var(--cgpt-text-primary);
+  overflow: hidden;
+}
+
+body[data-chatgpt-ui] .chatgpt-model-menu[data-view='advanced'] {
+  max-height: 420px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* simple view — the two-line choice block over the pill slider */
+body[data-chatgpt-ui] .chatgpt-model-simple {
+  box-sizing: border-box;
+  /* Outer menu inset 8 + 4/8/8 = the reference's 12/16/16 content rhythm. */
+  padding: 4px 8px 8px;
+}
+
+/* P0-8: the top row is three fixed pieces — a blank 20px lightning column,
+   the 126px choice block, and the 20px reset. Both side pieces reserve
+   20 + 12px, so the block is dead centre on the 280px panel and the reset
+   keeps a 16px right inset. `align-items: start` puts the reset on the first
+   text line (panel padding-top is 12), not in the middle of the header. */
+body[data-chatgpt-ui] .chatgpt-effort-head {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) 20px;
+  align-items: start;
+  column-gap: 12px;
+  min-height: 44px;
+}
+
+body[data-chatgpt-ui] .chatgpt-effort-head-blank {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+/* The two lines are one hit area: effort name over `model ›`. Its 126×44
+   surface is transparent at rest and paints #3A3A3A on hover/focus — the
+   reference's hover block — and the whole block opens the model list. */
+body[data-chatgpt-ui] .chatgpt-effort-choice {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 126px;
+  height: auto;
+  min-height: 44px;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--cgpt-effort-model-fg);
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+body[data-chatgpt-ui] .chatgpt-effort-choice:hover,
+body[data-chatgpt-ui] .chatgpt-effort-choice:focus-visible {
+  background: var(--cgpt-effort-choice-bg);
+}
+
+body[data-chatgpt-ui] .chatgpt-effort-choice-name {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--cgpt-effort-accent);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* P0-8: the top level paints its name purple, the normal levels stay blue. */
+body[data-chatgpt-ui] .chatgpt-effort-choice-name[data-max='true'] {
+  color: var(--cgpt-effort-accent-max);
+}
+
+body[data-chatgpt-ui] .chatgpt-effort-choice-model {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  max-width: 100%;
+  color: var(--cgpt-effort-model-fg);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+body[data-chatgpt-ui] .chatgpt-effort-choice-model-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body[data-chatgpt-ui] .chatgpt-effort-choice-chevron {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  color: currentColor;
+}
+
+/* 20px icon button, 16px from the panel's right edge via the head grid. It
+   starts on the first text line (12px panel padding), not centred in the
+   whole panel. */
+body[data-chatgpt-ui] .chatgpt-effort-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: start;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--cgpt-effort-icon);
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-effort-reset:hover {
+  background: var(--cgpt-work-hover);
+  color: var(--cgpt-text-primary);
+}
+
+/* P0-8: the track fills the 248px content box (280 - 16 - 16) and sits 12px
+   under the header block. The wrapper is 34 high, exactly the thumb, so the
+   30px track is centred inside it and the 34px thumb overhangs 2px each side. */
+body[data-chatgpt-ui] .chatgpt-effort-slider {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 34px;
+  margin: 12px 0 0;
+}
+
+/* advanced view — provider-grouped model list */
+body[data-chatgpt-ui] .chatgpt-model-advanced {
+  box-sizing: border-box;
+  padding: 8px 0;
+}
+
+body[data-chatgpt-ui] .chatgpt-model-list {
+  display: flex;
+  flex-direction: column;
+}
+
+body[data-chatgpt-ui] .chatgpt-model-group {
+  display: flex;
+  flex-direction: column;
+}
+
+body[data-chatgpt-ui] .chatgpt-model-group-title {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 16px;
+  background: var(--cgpt-effort-group-bg);
+  color: var(--cgpt-effort-group-fg);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0.01em;
+}
+
+body[data-chatgpt-ui] .chatgpt-model-choice {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  height: 40px;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--cgpt-text-primary);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  text-align: left;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-model-choice:hover,
+body[data-chatgpt-ui] .chatgpt-model-choice:focus-visible {
+  background: var(--cgpt-effort-row-hover);
+  outline: none;
+}
+
+body[data-chatgpt-ui] .chatgpt-model-choice-name {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body[data-chatgpt-ui] .chatgpt-model-choice-check {
+  display: inline-flex;
+  flex: none;
+  color: var(--cgpt-effort-accent);
+}
+
+/* ---- the effort track (simple view) ------------------------------------- */
+/* P0-8: 30px pill, 15px corners. The 34px handle is centred on it (top: -2px),
+   so it overhangs 2px above and below the bar, exactly as the reference allows,
+   and nothing clips it. */
+body[data-chatgpt-ui] .chatgpt-effort-track {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: 30px;
+  border-radius: 15px;
+  background: var(--cgpt-effort-track);
+}
+
+body[data-chatgpt-ui] .chatgpt-effort-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 30px;
+  border-radius: 15px;
+  background: var(--cgpt-effort-fill);
+  transition: width 0.16s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+/* P0-8: the top stop carries the three-stop #4F6BFF → #A855F7 → #7C3AED
+   sweep (light theme slightly paler). */
+body[data-chatgpt-ui] .chatgpt-effort-fill[data-max='true'] {
+  background: linear-gradient(90deg, var(--cgpt-effort-max-a) 0%, var(--cgpt-effort-max-b) 52%, var(--cgpt-effort-max-c) 100%);
+}
+
+/* White star specks over the gradient: 14 1–2px dots, denser on the selected
+   (right) side. The layer is clipped to the pill and sits above the fill,
+   below the ticks and the thumb. */
+body[data-chatgpt-ui] .chatgpt-effort-stars {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  border-radius: 15px;
+  pointer-events: none;
+}
+
+body[data-chatgpt-ui] .chatgpt-effort-star {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  background: var(--cgpt-effort-thumb);
+  box-shadow: 0 0 2px var(--cgpt-effort-thumb);
+  transform: translate(-50%, -50%);
+}
+
+/* 4px stops, evenly spread on the 17px thumb radius; the selected side paints
+   the white thumb token at 50%, the unselected side stays #8B8B8B. Ticks sit
+   above the fill so both sides stay visible. */
+body[data-chatgpt-ui] .chatgpt-effort-tick {
+  position: absolute;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  margin-top: -2px;
+  border-radius: 50%;
+  background: var(--cgpt-effort-tick);
+  z-index: 3;
+}
+
+body[data-chatgpt-ui] .chatgpt-effort-tick[data-selected='true'] {
+  background: var(--cgpt-effort-thumb);
+  opacity: 0.5;
+}
+
+/* The handle is a perfect circle: 34px sides, 50% radius, no border, no
+   shadow in the dark theme. `flex: 0 0 34px` keeps it from being stretched by
+   the flex line. In the light theme a soft drop shadow (not a border) keeps
+   the pure-white disc legible against the white panel when it sits at the
+   track's right end. */
+body[data-chatgpt-ui] .chatgpt-effort-thumb {
+  position: absolute;
+  top: -2px;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--cgpt-effort-thumb);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--cgpt-text-primary) 16%, transparent);
+  z-index: 4;
+  transition: left 0.16s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+body[data-chatgpt-ui][data-ds-dark-theme] .chatgpt-effort-thumb {
+  box-shadow: none;
+}
+
+body[data-chatgpt-ui] .chatgpt-effort-range {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  width: 100%;
+  height: 30px;
+  margin: 0;
+  background: transparent;
+  opacity: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+body[data-chatgpt-ui] .chatgpt-effort-track:has(.chatgpt-effort-range:focus-visible) {
+  box-shadow: 0 0 0 2px var(--dsh-chatgpt-focus-ring);
+}
+
+/* ---- the tool bar under the card ---------------------------------------- */
+body[data-chatgpt-ui] .chatgpt-work-tools {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  position: absolute;
+  /* M13: the reference band is 13px inset on each side of the 768 card
+     (measured 741.5 wide) and 48 high, with 36px buttons inside. */
+  left: 13px;
+  right: 13px;
+  bottom: -48px;
+  width: auto;
+  height: 48px;
+  margin: 0;
+  padding: 6px 0;
+  border-radius: 0 0 24px 24px;
+  /* The reference's tool bar is a step darker than the card in both themes. */
+  background: var(--cgpt-work-tools-bg);
+  z-index: 1;
+}
+
+body[data-chatgpt-ui] .chatgpt-work-tools-left,
+body[data-chatgpt-ui] .chatgpt-work-tools-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+body[data-chatgpt-ui] .chatgpt-work-tool {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--cgpt-work-tool-fg);
+  font-size: 14px;
+  font-weight: 400;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-work-tool:hover,
+body[data-chatgpt-ui] .chatgpt-work-tool[aria-expanded='true'] {
+  background: var(--cgpt-work-hover);
+  color: var(--cgpt-text-primary);
+}
+
+body[data-chatgpt-ui] .chatgpt-work-tool-icon {
+  display: inline-flex;
+  opacity: 0.9;
+}
+
+body[data-chatgpt-ui] .chatgpt-work-tool-value {
+  margin-left: 2px;
+  color: var(--cgpt-text-tertiary);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- approval / project popovers ---------------------------------------- */
+body[data-chatgpt-ui] .chatgpt-work-menu {
+  position: fixed;
+  z-index: 2147483000;
+  box-sizing: border-box;
+  /* P0-13: the same measured surface as the sidebar menus — 10px gutter, 16px
+     corner, 90% elevated background over an 8px backdrop blur, and the
+     reference's own two-layer shadow. */
+  padding: var(--cgpt-menu-gutter);
+  border-radius: var(--cgpt-menu-radius);
+  background: var(--cgpt-menu-bg);
+  box-shadow: var(--cgpt-menu-shadow);
+  backdrop-filter: blur(var(--cgpt-menu-blur));
+  -webkit-backdrop-filter: blur(var(--cgpt-menu-blur));
+  color: var(--cgpt-menu-text);
+}
+
+body[data-chatgpt-ui] .chatgpt-work-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  height: 30px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--cgpt-text-primary);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-work-menu-item:hover {
+  background: var(--cgpt-work-hover);
+}
+
+body[data-chatgpt-ui] .chatgpt-work-menu-item[data-current='true']:not(.chatgpt-permission-row) {
+  background: var(--cgpt-work-hover);
+  font-weight: 600;
+}
+
+body[data-chatgpt-ui] .chatgpt-work-menu-check {
+  display: inline-flex;
+  color: var(--cgpt-effort-fill);
+}
+
+/* P0-13 permission menu — three rows: 20px leading slot with the reference's
+   own hand / command-square / shield-exclamation glyphs · title + description ·
+   right check in the measured trailing position. P0-18 drops the ChatGPT
+   caption row and keeps only the option list (298px wide, 12px side gutter,
+   42.5px rows, 9px top/bottom insets). */
+body[data-chatgpt-ui] .chatgpt-permission-menu {
+  width: var(--cgpt-desktop-permission-width) !important;
+  max-width: calc(100vw - 16px);
+  padding: var(--cgpt-desktop-permission-pad-y) var(--cgpt-desktop-menu-pad-x);
+  border-radius: var(--cgpt-desktop-menu-radius);
+}
+
+/* P0-18: the ChatGPT caption row (question + learn-more link) was a P0-14
+   reference import and is intentionally removed — it has no DSH counterpart.
+   The picker now starts directly with its first option; the 9px top inset
+   comes from --cgpt-desktop-permission-pad-y. */
+
+body[data-chatgpt-ui] .chatgpt-permission-row {
+  align-items: center;
+  gap: var(--cgpt-desktop-menu-icon-gap);
+  height: var(--cgpt-desktop-permission-row-height);
+  min-height: var(--cgpt-desktop-permission-row-height);
+  padding: var(--cgpt-desktop-permission-row-pad-y) 0;
+  border-radius: var(--cgpt-menu-row-radius);
+  color: var(--cgpt-desktop-menu-strong);
+  text-align: left;
+}
+
+body[data-chatgpt-ui] .chatgpt-permission-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--cgpt-desktop-menu-icon-slot);
+  height: var(--cgpt-desktop-menu-icon-slot);
+  margin-top: 0;
+  color: var(--cgpt-desktop-menu-icon-color);
+}
+
+body[data-chatgpt-ui] .chatgpt-permission-icon svg {
+  display: block;
+}
+
+body[data-chatgpt-ui] .chatgpt-permission-copy {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+
+body[data-chatgpt-ui] .chatgpt-permission-menu .chatgpt-work-menu-label {
+  color: var(--cgpt-desktop-menu-strong);
+  font-size: var(--cgpt-desktop-permission-title-font);
+  font-weight: 600;
+  line-height: var(--cgpt-desktop-permission-title-line);
+}
+
+body[data-chatgpt-ui] .chatgpt-permission-description {
+  color: var(--cgpt-desktop-menu-muted);
+  font-size: var(--cgpt-desktop-permission-description-font);
+  font-weight: 400;
+  line-height: var(--cgpt-desktop-permission-description-line);
+  white-space: normal;
+}
+
+/* P0-14: the whole 完全访问权限 row — glyph, title and description — is the
+   reference's warning orange (#ff8549 sampled from the 2x capture). */
+body[data-chatgpt-ui] .chatgpt-permission-row.is-full-access,
+body[data-chatgpt-ui] .chatgpt-permission-row.is-full-access .chatgpt-work-menu-label,
+body[data-chatgpt-ui] .chatgpt-permission-row.is-full-access .chatgpt-permission-description,
+body[data-chatgpt-ui] .chatgpt-permission-row.is-full-access .chatgpt-permission-icon,
+body[data-chatgpt-ui] .chatgpt-permission-row.is-full-access .chatgpt-work-menu-check {
+  color: var(--cgpt-desktop-menu-warning);
+}
+
+body[data-chatgpt-ui] .chatgpt-permission-row.is-full-access:hover {
+  background: var(--cgpt-menu-row-hover);
+}
+
+/* P0-14: the current row carries the trailing ✓ only — no fill, and the
+   description keeps the same grey as every other row (the previous build
+   brightened it, which the reference does not do). */
+body[data-chatgpt-ui] .chatgpt-permission-row[data-current='true'] {
+  background: transparent;
+}
+
+body[data-chatgpt-ui] .chatgpt-permission-row[data-current='true'] .chatgpt-permission-description {
+  color: var(--cgpt-desktop-menu-muted);
+  opacity: 1;
+}
+
+body[data-chatgpt-ui] .chatgpt-permission-row .chatgpt-work-menu-check {
+  flex: none;
+  margin-top: 0;
+  color: var(--cgpt-desktop-menu-icon-color);
+}
+
+body[data-chatgpt-ui] .chatgpt-work-menu-empty {
+  padding: 6px 8px;
+  color: var(--cgpt-text-tertiary);
+  font-size: 13px;
+}
+
+/* ---- narrow card -------------------------------------------------------- */
+/* The super-agent panel narrows this same card to ~520 without changing the
+   window width, so a viewport media query cannot see it. The card is the query
+   container: at <=600 every tool keeps its icon but drops its label, and the
+   pill's name ellipsizes, which leaves the 400K chip, the pill and the 36px send
+   button on one line instead of wrapping. */
+body[data-chatgpt-ui] [data-composer-card='true'] {
+  container: cgpt-card / inline-size;
+}
+
+@container cgpt-card (max-width: 600px) {
+  body[data-chatgpt-ui] .chatgpt-work-tool-label {
+    display: none;
+  }
+
+  body[data-chatgpt-ui] .chatgpt-model-pill {
+    max-width: 200px;
+  }
+
+  body[data-chatgpt-ui] .chatgpt-model-pill-name {
+    max-width: 120px;
+  }
+}
+
+/* ---- narrow windows ----------------------------------------------------- */
+@media (max-width: 720px) {
+  body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] {
+    padding: 12px 14px 6px;
+    border-radius: 24px;
+  }
+
+  /* The 14px gutter keeps the same 8px action-row inset as the wide card. */
+  body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) [data-composer-card='true'] [class*='_row'] {
+    margin-left: -6px;
+    margin-right: -6px;
+  }
+
+  body[data-chatgpt-ui] .chatgpt-work-tools {
+    left: 14px;
+    right: 14px;
+    border-radius: 0 0 18px 18px;
+  }
+
+  body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-panel])) .chatgpt-work-tool-label {
+    display: none;
+  }
+}

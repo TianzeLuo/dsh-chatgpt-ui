@@ -1,0 +1,744 @@
+/* dsh-chatgpt-ui — 30-chat.css
+ *
+ * Module 4: the message area. Every rule here is gated on the skin switch, so
+ * `data-cgpt-skin="off"` (or a profile with `config.skin: off`, which does not
+ * mount the plugin at all) leaves the Host transcript byte-identical. The Host
+ * still owns the DOM: this file changes paint and spacing, never information or
+ * interaction. Process rows, tool details, todos, goals, retry, copy, stop and
+ * attachment previews keep the Host's own handlers.
+ *
+ * Anchors: [data-chat-flow-kind], [data-step-process], [data-disclosure-row],
+ * [data-code-wrap], [data-code-block-banner], [data-conversation-tabs],
+ * [data-composer-card], [data-composer-stat], [data-message-attachments].
+ */
+
+/* ---- panel-level geometry and palette ---------------------------------- */
+body[data-chatgpt-ui][data-cgpt-skin='on'] {
+  --cgpt-msg-font-size: 16px;
+  --cgpt-msg-line-height: 26px;
+  --cgpt-user-bubble-bg: #e8f3fe;
+  --cgpt-user-bubble-fg: #0c274a;
+  --cgpt-code-surface: #0d0d0d;
+  --cgpt-code-header: #171717;
+  --cgpt-code-fg: #f3f3f3;
+  --cgpt-code-muted: #b4b4b4;
+  --cgpt-inline-code-bg: #f0f0f0;
+  --cgpt-inline-code-fg: #242424;
+  --cgpt-link: #0b57d0;
+  --cgpt-tab-track: rgba(13, 13, 13, 0.04);
+  --cgpt-tab-thumb: var(--cgpt-surface-thumb);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'][data-ds-dark-theme] {
+  --cgpt-user-bubble-bg: #173e76;
+  --cgpt-user-bubble-fg: #f6fafe;
+  --cgpt-inline-code-bg: #2f2f2f;
+  --cgpt-inline-code-fg: #ededed;
+  --cgpt-link: #8ab4f8;
+  --cgpt-tab-track: color-mix(in srgb, var(--cgpt-surface-thumb) 6%, transparent);
+  --cgpt-tab-thumb: #2f2f2f;
+}
+
+/* M11/P0-11: the reading column is the Host's. `.wSkVaW_body` derives
+   `--dsh-chat-content-width` from `--dsh-chat-user-width` (the inline value the
+   native width handles write while dragging) and the Host persists it in
+   `localStorage["dsh.conversation.contentWidth"]`. The skin must not redefine
+   that variable and must not hardcode a pixel width, or the drag is dead.
+   P0-11 removes the private text cap: the old `min(host width, 920px)` stopped
+   prose at 920px while the input card, code blocks and attachment cards kept
+   following the Host, so dragging past 920px left the text behind. One value
+   now drives the column and every card. */
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-conversation-scroll] .EvIC1a_column {
+  max-width: var(--dsh-chat-content-width, var(--cgpt-msg-max, 920px));
+  margin-inline: auto;
+}
+
+/* ---- user message ------------------------------------------------------ */
+/* P0-7: sending paints the Host's optimistic echo row first. That row is the
+   same user bubble (`[data-submission-echo]`) but has no `data-chat-flow-kind`
+   until the durable node replaces it, so every rule below must match both
+   states — otherwise the echo fell back to the Host's grey
+   `--dsw-specific-bubble` (#f4f4f4) and flipped to the blue bubble token when
+   the server confirmed.
+   P0-20: durable steering (`data-chat-flow-kind='steering'`) and pending
+   steering echoes are user-authored too. They used the Host's grey 14/22
+   surface while ordinary messages used the 16/24 blue capsule. Every user
+   origin now shares one bubble; the Host's `data-pending-steering` attribute
+   stays on the row (not deleted), it just no longer selects a different skin. */
+body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) {
+  margin-top: 24px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) .Sixlwa_userRow {
+  align-items: flex-end;
+  gap: 4px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) .Sixlwa_userStack {
+  max-width: 70%;
+  gap: 6px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) .Sixlwa_bubble {
+  max-width: 100%;
+  padding: 10px 16px;
+  border-radius: 22px;
+  background: var(--cgpt-user-bubble-bg);
+  color: var(--cgpt-user-bubble-fg);
+  font-size: 16px;
+  line-height: 24px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  /* P0-7: no cross-fade between the echo and the durable bubble (and no fade
+     if a Host upgrade adds a background transition). */
+  transition: none;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) .Sixlwa_bubble a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) .Sixlwa_bubble [data-code-wrap] {
+  margin-top: 6px;
+}
+
+/* Copy/time sit under the bubble and only appear on hover or keyboard focus. */
+body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) .xzv4MW_actions {
+  gap: 2px;
+  align-items: center;
+  height: 24px;
+  margin-top: 0;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]):hover .xzv4MW_actions,
+body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]):focus-within .xzv4MW_actions {
+  opacity: 1;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) .xzv4MW_timeStart {
+  color: var(--cgpt-text-tertiary);
+  font-size: 11px;
+  line-height: 20px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) .xzv4MW_action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--cgpt-text-tertiary);
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) .xzv4MW_action:hover {
+  background: var(--cgpt-surface-hover);
+  color: var(--cgpt-text-primary);
+}
+
+@media (hover: none) {
+  body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) .xzv4MW_actions {
+    opacity: 0.8;
+  }
+}
+
+/* ---- assistant message ------------------------------------------------- */
+/* M15: only the answer is the assistant message. The Host also renders the
+   reasoning member of a process group as `assistant-step`, with
+   `data-turn-process-member`; styling that node as prose is what inflated the
+   expanded 「思考」 body to 16/26. Every rule below is scoped to the answer so
+   process members keep the Host's own 13/20 secondary typography.
+   P0-15: the answer itself is a process member *while it streams* — the Host
+   marks the live turn-process window on every node of the turn, then clears
+   `data-turn-process-member` when the turn closes. Keying the answer on that
+   flag alone therefore dropped the whole rule set mid-stream (14/24 from the
+   Host) and re-applied it at completion (16/26): the font jump. The answer's
+   stable discriminator is `data-chat-group-part='response'`, which the grouping
+   pass emits for the reply in both states; the `:not(...)` arm is kept for
+   host builds that do not emit a group part. */
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) {
+  margin-top: 18px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_root {
+  color: var(--cgpt-text-primary);
+  font-size: var(--cgpt-msg-font-size);
+  line-height: var(--cgpt-msg-line-height);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body {
+  gap: 0;
+  font-size: var(--cgpt-msg-font-size);
+  line-height: var(--cgpt-msg-line-height);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body > :first-child {
+  margin-top: 0;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body p {
+  margin: 8px 0 0;
+  font-size: var(--cgpt-msg-font-size);
+  line-height: var(--cgpt-msg-line-height);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body h1,
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body h2,
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body h3 {
+  color: var(--cgpt-text-primary);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body h1 {
+  margin: 26px 0 8px;
+  font-size: 20px;
+  line-height: 28px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body h2 {
+  margin: 22px 0 8px;
+  font-size: 18px;
+  line-height: 26px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body h3 {
+  margin: 18px 0 6px;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body > :is(h1, h2, h3):first-child {
+  margin-top: 0;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body ul,
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body ol {
+  margin: 8px 0 0;
+  padding-left: 24px;
+  font-size: var(--cgpt-msg-font-size);
+  line-height: var(--cgpt-msg-line-height);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body li {
+  margin: 0;
+  font-size: var(--cgpt-msg-font-size);
+  line-height: var(--cgpt-msg-line-height);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body li + li {
+  margin-top: 4px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body li > p {
+  margin: 0;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body strong {
+  font-weight: 600;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body a {
+  color: var(--cgpt-link);
+  text-decoration: none;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body a:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body :not(pre) > code {
+  padding: 2px 5px;
+  border-radius: 5px;
+  background: var(--cgpt-inline-code-bg);
+  color: var(--cgpt-inline-code-fg);
+  font-family: var(--ds-font-family-code, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.875em;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body blockquote {
+  margin: 12px 0 0;
+  padding: 2px 0 2px 14px;
+  border-left: 3px solid var(--cgpt-border-strong);
+  color: var(--cgpt-text-secondary);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body hr {
+  height: 1px;
+  margin: 20px 0;
+  border: 0;
+  background: var(--cgpt-border-subtle);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body table {
+  width: 100%;
+  margin-top: 12px;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body th,
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body td {
+  padding: 8px 10px;
+  border: 1px solid var(--cgpt-border-subtle);
+  text-align: left;
+  vertical-align: top;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body th {
+  background: var(--cgpt-surface-hover);
+  font-weight: 600;
+}
+
+/* ---- code blocks ------------------------------------------------------- */
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) [data-code-wrap] {
+  --shiki-background: transparent;
+  --shiki-foreground: #f3f3f3;
+  --shiki-token-foreground: #f3f3f3;
+  --shiki-token-keyword: #ff7b72;
+  --shiki-token-function: #d2a8ff;
+  --shiki-token-constant: #79c0ff;
+  --shiki-token-string: #a5d6ff;
+  --shiki-token-string-expression: #a5d6ff;
+  --shiki-token-comment: #8b949e;
+  --shiki-token-parameter: #ffa657;
+  --shiki-token-punctuation: #c9d1d9;
+  margin-top: 12px;
+  overflow: hidden;
+  border: 1px solid #2f2f2f;
+  border-radius: 12px;
+  background: var(--cgpt-code-surface);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) [data-code-block-banner] {
+  box-sizing: border-box;
+  height: 40px;
+  padding: 0 8px 0 14px;
+  border-bottom: 1px solid #2a2a2a;
+  background: var(--cgpt-code-header);
+  color: var(--cgpt-code-muted);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) [data-code-block-banner] span {
+  color: var(--cgpt-code-muted);
+  font-family: var(--ds-font-family-code, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) [data-code-block-banner] button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--cgpt-code-muted);
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) [data-code-block-banner] button:hover {
+  background: #2f2f2f;
+  color: var(--cgpt-text-on-accent);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) [data-code-block-content] {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  background: var(--cgpt-code-surface);
+  scrollbar-width: thin;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) [data-code-block-content] > div {
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) [data-code-block-content] pre {
+  box-sizing: border-box;
+  min-width: 100%;
+  margin: 0;
+  padding: 14px 16px;
+  border: 0;
+  background: transparent !important;
+  color: var(--cgpt-code-fg) !important;
+  font-family: var(--ds-font-family-code, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 13px;
+  line-height: 20px;
+  tab-size: 2;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) [data-code-wrap]:has(button[aria-label='Wrap lines'][aria-pressed='false']) [data-code-block-content] pre {
+  width: max-content;
+  white-space: pre;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) [data-code-block-content] pre code {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+/* Inline code inside a user bubble follows the bubble's own contrast. */
+body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) [data-code-wrap] {
+  --shiki-background: transparent;
+  --shiki-foreground: #f3f3f3;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--cgpt-code-surface);
+}
+
+/* ---- native process and tool rows --------------------------------------
+ * M15: the process/step/thinking region is the Host's, end to end. The skin
+ * used to pin the group title to 28px/13px, replace the Host's prose summary
+ * with a step count, force every tool row to 28px/4x6/13-18, shrink the icons
+ * to 65% opacity and inflate the expanded reasoning body to 16/26 — five
+ * independent copies of the Host's design. All of it is deleted rather than
+ * overridden: `[data-chat-flow-kind='turn-process']`, `[data-step-process]`,
+ * `[data-step-process-body]`, `[data-disclosure-row]` and the reasoning row
+ * now inherit the Host's own geometry, type, icons, hover and disclosure.
+ * The skin keeps only the outer column (30-chat.css:60) and the palette layer.
+ */
+
+/* ---- native todo card and goal dock ------------------------------------
+ * P0-12: these two docks are the Host's, end to end. `dsh-client-ui-conversation`
+ * renders the todo panel (`lXshSW_*`), `dsh-client-ui-goal` the goal bar
+ * (`nLMEza_*`). The skin used to replace both (38px rows, 13/20 type, 15px
+ * @65% icons, its own border/radius/surface, the bar's 36px box + 8px top
+ * margin). That whole layer is deleted, not overridden: the header, glyphs,
+ * counts, chevron, collapse state and hover all come from the Host untouched.
+ *
+ * The only thing the skin still owns is the outer column width. The Host sizes
+ * both docks from `--dsh-composer-card-max-width` (= content + 32px) minus its
+ * 2 x 8px dock inset — exactly `--dsh-chat-content-width`, which the skin's
+ * composer card (`40-composer.css`) and transcript column (`30-chat.css:51`)
+ * already cap at. P0-11's splitter writes only `--dsh-chat-user-width`;
+ * `wSkVaW_body` turns that into `--dsh-chat-content-width`, so this single
+ * variable keeps card, transcript and both panels on one column while the
+ * divider moves. `min(100% - 2 × --dsh-composer-side-clearance, …)` mirrors
+ * the card's own box (same 16px gutter per side) so narrow windows keep the
+ * same edges; centring is still the Host's `margin: auto`.
+ */
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-testid='todo-panel'] {
+  width: min(calc(100% - 2 * var(--dsh-composer-side-clearance, 16px)), var(--dsh-chat-content-width, var(--cgpt-msg-max, 920px)));
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.input.dock'] .nLMEza_dock {
+  width: min(calc(100% - 2 * var(--dsh-composer-side-clearance, 16px)), var(--dsh-chat-content-width, var(--cgpt-msg-max, 920px)));
+}
+
+/* ---- turn tail / retry / stopped ---------------------------------------
+ * M15: the tail is host typography and host spacing too. The M11 skin set
+ * `margin-top: 10px`, 12px/20px type and a button colour on the whole flow
+ * item, which also hosts the changed-files card; both rules are removed. Only
+ * the changed-files diff contract below stays (it is a functional M11 fix,
+ * not a restyle).
+ */
+
+/* ---- changed-files diff (M11) ------------------------------------------
+ * The Host's FileDiff is already a four-column grid:
+ *   `3.5em 3.5em 1.2em minmax(0,1fr)` — old number, new number, marker, code —
+ * with right-aligned numbers and an `overflow:auto` body, so the numbers never
+ * shrink when a long line scrolls. The skin pins the same contract: a token
+ * change (code font, line height, a stray `width`) must not collapse the number
+ * column or stack rows absolutely over the code.
+ */
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-changed-files] [class*='IP6KhG_line'] {
+  display: grid;
+  grid-template-columns: 3.5em 3.5em 1.2em minmax(0, 1fr);
+  min-height: 22px;
+  line-height: 22px;
+  white-space: pre;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-changed-files] [class*='IP6KhG_number'] {
+  padding-right: 8px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-changed-files] [class*='IP6KhG_body'] {
+  /* Only the horizontal axis is the skin's: a long line scrolls under a fixed
+     number column. The Host keeps the vertical axis (the preview scrolls). */
+  overflow-x: auto;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] .hWmORq_stopped {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--cgpt-surface-hover);
+  color: var(--cgpt-text-secondary);
+  font-size: 12px;
+  line-height: 20px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] .Sixlwa_turnErrorRow {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--cgpt-text-danger) 24%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--cgpt-text-danger) 5%, transparent);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] .Sixlwa_turnErrorTitle {
+  font-weight: 600;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] .Sixlwa_retrySummary {
+  color: var(--cgpt-text-secondary);
+  font-size: 12px;
+}
+
+/* ---- assistant actions (copy / retry / feedback) ----------------------- */
+/* Same reason as above: these slots wrap the changed-files card too. */
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.chat.assistant-actions'] button,
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.chat.turnTail'] button {
+  color: var(--cgpt-text-tertiary);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.chat.assistant-actions'] button > svg,
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.chat.turnTail'] button > svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* ---- Chat / Trajectory segmented control ------------------------------- */
+/* Structure is left alone: the Host's tablist, roles, aria-selected and click
+   handlers stay exactly where they are. Only the full-width strip is narrowed
+   and painted as a small segmented control. */
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.header'] [data-conversation-tabs] {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  box-sizing: border-box;
+  width: fit-content !important;
+  height: 32px;
+  margin-top: 2px;
+  padding: 2px !important;
+  gap: 2px !important;
+  border: 0;
+  border-radius: 10px;
+  background: var(--cgpt-tab-track);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.header'] [data-conversation-tabs] button[role='tab'] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 10px;
+  border: 0 !important;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none !important;
+  color: var(--cgpt-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.header'] [data-conversation-tabs] button[role='tab']::after {
+  display: none;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.header'] [data-conversation-tabs] button[role='tab']:hover {
+  color: var(--cgpt-text-primary);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.header'] [data-conversation-tabs] button[role='tab'][aria-selected='true'] {
+  background: var(--cgpt-tab-thumb);
+  color: var(--cgpt-text-primary);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--cgpt-text-primary) 12%, transparent) !important;
+}
+
+/* ---- composer status line (turns / steps / tokens / context) ----------- */
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-composer-stat] button,
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-composer-stat] .bOPqQW_pill,
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.composer.bar'] .bOPqQW_pill,
+body[data-chatgpt-ui][data-cgpt-skin='on'] .JObwrW_trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 2px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--cgpt-text-tertiary);
+  font-size: 12px;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-composer-stat] button:hover,
+body[data-chatgpt-ui][data-cgpt-skin='on'] .JObwrW_trigger:hover {
+  background: var(--cgpt-surface-hover);
+  color: var(--cgpt-text-secondary);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-composer-stat] svg,
+body[data-chatgpt-ui][data-cgpt-skin='on'] .JObwrW_trigger svg {
+  width: 13px;
+  height: 13px;
+  opacity: 0.6;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] .bOPqQW_sep {
+  margin: 0 2px;
+  color: var(--cgpt-text-tertiary);
+}
+
+/* ---- attachments and images -------------------------------------------- */
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-message-attachments] {
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-message-attachments] .Sixlwa_fileCard {
+  box-sizing: border-box;
+  width: 240px;
+  min-height: 60px;
+  padding: 8px 12px;
+  border: 1px solid var(--cgpt-border-subtle);
+  border-radius: 12px;
+  background: var(--cgpt-surface-raised);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-message-attachments] .Sixlwa_fileName {
+  color: var(--cgpt-text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 22px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-message-attachments] .Sixlwa_fileMeta {
+  color: var(--cgpt-text-tertiary);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.chat.user.images'] {
+  display: block;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.chat.user.images'] [class*='_gallery'] {
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.chat.user.images'] button {
+  overflow: hidden;
+  border: 1px solid var(--cgpt-border-subtle);
+  border-radius: 12px;
+  background: var(--cgpt-surface-hover);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.chat.user.images'] button[data-variant='single'] {
+  max-width: min(320px, 100%);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.chat.user.images'] button[data-variant='tile'] {
+  width: 96px !important;
+  height: 96px !important;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.chat.user.images'] img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.chat.user.images'] .JVDQca_thumbnail {
+  width: 96px;
+  height: 96px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.chat.message.images'] img {
+  max-width: 100%;
+  border-radius: 12px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.input.attachments'] .JVDQca_thumbnail,
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.input.attachments'] [class*='_thumbnail'] {
+  border-radius: 10px;
+}
+
+/* ---- original-image preview -------------------------------------------- */
+/* The Host's ImageLightbox keeps its own dialog, Escape/close handler and focus
+   trap; only the surface and the close control are painted. */
+body[data-chatgpt-ui][data-cgpt-skin='on'] [role='dialog'][aria-label='Original image preview'] {
+  background: color-mix(in srgb, var(--cgpt-surface-tooltip) 82%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [role='dialog'][aria-label='Original image preview'] img {
+  max-width: 90vw;
+  max-height: 84vh;
+  border-radius: 12px;
+  box-shadow: 0 24px 80px color-mix(in srgb, var(--cgpt-surface-tooltip) 55%, transparent);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [role='dialog'][aria-label='Original image preview'] button[aria-label^='Close original'] {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--cgpt-text-primary) 12%, transparent);
+  color: var(--cgpt-surface-thumb);
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [role='dialog'][aria-label='Original image preview'] button[aria-label^='Close original']:hover {
+  background: color-mix(in srgb, var(--cgpt-text-primary) 22%, transparent);
+}
+
+/* ---- narrow windows ---------------------------------------------------- */
+@media (max-width: 720px) {
+  body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) .Sixlwa_userStack {
+    max-width: 88%;
+  }
+
+  body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body h1 {
+    font-size: 19px;
+    line-height: 27px;
+  }
+
+  body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='assistant-step']:is([data-chat-group-part='response'], :not([data-turn-process-member])) .hWmORq_body h2 {
+    font-size: 17px;
+    line-height: 25px;
+  }
+}

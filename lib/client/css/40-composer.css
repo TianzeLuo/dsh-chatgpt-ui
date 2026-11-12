@@ -1,0 +1,510 @@
+/* dsh-chatgpt-ui — 40-composer.css
+ *
+ * The floating input card, its focus ring, placeholder, and the round send /
+ * add buttons.
+ *
+ * Anchors: [data-slot='conversation.composer.bar'], [data-composer-card='true'],
+ * [data-composer-input], [data-input-scroll], [data-composer-placeholder],
+ * class suffixes _primary / _add / _row / _tools / _trailing / _stack.
+ */
+
+/* ---- card --------------------------------------------------------------- */
+body[data-chatgpt-ui] [data-slot='conversation.composer.bar'] [data-composer-card='true'] {
+  /* P0-10B: the card is exactly the Host reading column — no extra 32px
+     gutter. Both boxes read the same variable, which the native width handles
+     rewrite while dragging, so card and transcript resize as one column. */
+  max-width: var(--dsh-chat-content-width, var(--cgpt-msg-max, 920px));
+  /* P0-21: Chat and Work share one content cap. The Host writes its own
+     `--dsh-composer-text-max-height` on the card (336px today); 40vh keeps a
+     short window usable. The cap applies to the editor scrollport, not to the
+     toolbar, so the card can still paint its buttons below the text. */
+  --dsh-chatgpt-composer-max-height: min(var(--dsh-composer-text-max-height, 336px), 40vh);
+  border: 1px solid var(--dsh-chatgpt-composer-border);
+  border-radius: var(--dsh-chatgpt-radius-card);
+  background: var(--dsw-specific-input-major);
+  box-shadow: var(--dsh-chatgpt-composer-shadow);
+  /* the host's elevation token draws its own hairline; with a real 1px border
+     that would read as a double edge */
+  --dsw-elevation-stroke-color: transparent;
+  gap: 6px;
+  padding-top: 6px;
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+/* Focus: same solid edge, one step darker, plus a soft outer ring. */
+body[data-chatgpt-ui] [data-slot='conversation.composer.bar'] [data-composer-card='true']:focus-within {
+  border-color: var(--dsh-chatgpt-composer-border-focus);
+  box-shadow:
+    var(--dsh-chatgpt-composer-focus),
+    0 0 0 2px var(--dsh-chatgpt-composer-focus-ring);
+}
+
+/* The host overlays a dashed 1px outline for the "choose a workspace" state
+   (.uV2eYG_cardWorkspaceTrigger:after). ChatGPT's composer has one solid edge in
+   every idle state, so the overlay is switched off; the chip row above still
+   carries the affordance. */
+body[data-chatgpt-ui] [data-slot='conversation.composer.bar'] [class*='_cardWorkspaceTrigger']::after {
+  border: 0;
+}
+
+/* ---- inner geometry ----------------------------------------------------- */
+body[data-chatgpt-ui] [data-slot='conversation.composer.bar'] [data-input-scroll='true'] {
+  max-height: var(--dsh-chatgpt-composer-max-height);
+}
+
+body[data-chatgpt-ui] [data-slot='conversation.composer.bar'] [data-composer-input='true'] {
+  padding: 4px 8px 0 16px;
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 32px;
+}
+
+body[data-chatgpt-ui] [data-slot='conversation.composer.bar'] [data-composer-placeholder='true'] {
+  padding-left: 16px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--cgpt-text-placeholder);
+}
+
+body[data-chatgpt-ui] [data-slot='conversation.composer.bar'] [class*='_row'] {
+  padding: 0 8px 7px;
+}
+
+/* ---- round actions ------------------------------------------------------ */
+body[data-chatgpt-ui] [data-slot='conversation.composer.bar'] button[class*='_primary'] {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--dsh-chatgpt-send-bg);
+  color: var(--dsh-chatgpt-send-fg);
+  transform: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body[data-chatgpt-ui] [data-slot='conversation.composer.bar'] button[class*='_primary']:hover:not(:disabled) {
+  background: var(--dsh-chatgpt-send-bg-hover);
+}
+
+/* Disabled is its own palette, not a dimmed version of the enabled one: the
+   host's opacity:.4 over #0d0d0d lands on a muddy mid-grey. */
+body[data-chatgpt-ui] [data-slot='conversation.composer.bar'] button[class*='_primary']:disabled {
+  opacity: 1;
+  background: var(--dsh-chatgpt-send-bg-disabled);
+  color: var(--dsh-chatgpt-send-fg-disabled);
+}
+
+/* Phase 5b: Chat loses the reference's mic/voice pair and keeps exactly one
+   round action. That action is the same blue disc as Work, not the host's
+   monochrome arrow — including the empty/disabled state, which is dimmed but
+   still blue.
+
+   P0-16: the glyph on that disc is white in both themes. `--cgpt-text-on-accent`
+   is the *neutral* brand ink (near-black in the dark theme), which is right on a
+   near-white surface and wrong on blue — the measured dark build painted a
+   #0d0d0d arrow on #2c67c5. The disc keeps the reference's white mic/caption
+   contrast, so the arrow uses the disc-ink token. */
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [data-slot='conversation.composer.bar'] button[class*='_primary'],
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [data-slot='conversation.composer.bar'] button[class*='_primary']:hover:not(:disabled),
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [data-slot='conversation.composer.bar'] button[class*='_primary']:disabled {
+  background: var(--cgpt-work-voice);
+  color: var(--cgpt-send-on-disc-fg);
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [data-slot='conversation.composer.bar'] button[class*='_primary'] svg,
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [data-slot='conversation.composer.bar'] button[class*='_primary'] svg path {
+  fill: currentColor;
+  color: inherit;
+  opacity: 1;
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [data-slot='conversation.composer.bar'] button[class*='_primary']:disabled {
+  opacity: 0.92;
+}
+
+body[data-chatgpt-ui] [data-slot='conversation.composer.bar'] button[class*='_add'] {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  border: 0;
+  background: transparent;
+  color: var(--dsw-alias-label-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body[data-chatgpt-ui] [data-slot='conversation.composer.bar'] button[class*='_add']:hover:not(:disabled) {
+  background: var(--dsh-chatgpt-hover);
+  color: var(--dsw-alias-label-primary);
+}
+
+/* Note: the hero stack's cross-axis alignment is left alone on purpose. Setting
+   `align-items: center` there shrink-wraps the card (its width:100% then resolves
+   against a content-sized parent and collapses to the send button). */
+
+/* ---- permission selector (P0-10B) -------------------------------------- */
+/* One chip in the composer's action row, immediately right of the attachment
+   control (`+` in Work, the paperclip in Chat). Its caption is the Host's
+   current approval preset (the catalog gives the enum, `chatgptApprovalLabel`
+   the wording); the popover lists that same catalog and every switch goes
+   through the Host `/permission` command, so the Host approval policy — not
+   this file — is what changes.
+
+   P0-14: the desktop reference draws it as a filled capsule — 24px tall, the
+   帮我批准 shield-prompt glyph (the same glyph the menu row uses, 16px) and a
+   13px #a2a2a2 caption on rgba(255,255,255,.08). The old rule was a transparent
+   28px chip with a 20px shield.
+
+   P0-18: the chip shares the tool-button spec measured on 选择项目 / 文件 —
+   36px high, 0/8 padding, 9999 radius, transparent fill, 14px/400 label, 20px
+   glyph — so only the icon and the caption remain, and hover paints the same
+   surface. P0-18b puts it in this row for both Work states and pulls it to
+   two thirds of the Host's 16px started-card gap. The Host owns the flex gap,
+   so the margin subtracts the Host-side base (8px blank / 16px started) from
+   the one target token; both states land on 10.67px. */
+body[data-chatgpt-ui] .chatgpt-permission {
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  max-width: 168px;
+  height: 36px;
+  /* The Host puts an empty `_modes` seat between `+` and this slot only on a
+     started card, so the Host-side base is one 8px gap on a new card and two
+     on a started one. Both subtract that base from the one target gap. */
+  --cgpt-work-permission-host-gap: 8px;
+  margin: 0 0 0 calc(var(--cgpt-work-permission-gap) - var(--cgpt-work-permission-host-gap));
+  padding: 0 8px;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--cgpt-work-tool-fg);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-permission:hover,
+body[data-chatgpt-ui] .chatgpt-permission[aria-expanded='true'] {
+  background: var(--cgpt-work-hover);
+  color: var(--cgpt-text-primary);
+}
+
+body[data-chatgpt-ui] .chatgpt-permission:focus-visible {
+  outline: 2px solid var(--cgpt-focus-ring);
+  outline-offset: 2px;
+}
+
+body[data-chatgpt-ui] .chatgpt-permission[data-cgpt-permission-blank='false'] {
+  --cgpt-work-permission-host-gap: 16px;
+}
+
+body[data-chatgpt-ui] .chatgpt-permission-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  opacity: 0.9;
+}
+
+body[data-chatgpt-ui] .chatgpt-permission-icon svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+body[data-chatgpt-ui] .chatgpt-permission-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body[data-chatgpt-ui] .chatgpt-permission-menu {
+  width: 240px;
+}
+
+body[data-chatgpt-ui] .chatgpt-permission-note {
+  padding: 6px 8px 2px;
+  color: var(--cgpt-text-tertiary);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+/* ---- pending attachments ------------------------------------------------ */
+/* P0-5: the Host's attachment rail carries a -6px bottom margin, so a pasted
+   image's lower edge sat on the editor's first text line (measured gap -6px
+   in Work, 0px in Chat after the card's own 6px gap). Give the rail its own
+   8px breathing room. The card's flex gap is 0 in Work and 6 in Chat, so the
+   margin is mode-specific: 8 and 2 both resolve to an 8px visible gap.
+   The rail is also allowed to wrap: a long paste row used to scroll sideways
+   with the last row clipped; wrapped rows keep the same 8px line spacing. */
+body[data-chatgpt-ui] [data-slot='conversation.input.attachments'] > div:has([role='group'][aria-label='Pending attachments']) {
+  height: auto;
+  min-height: 64px;
+  margin-bottom: 8px;
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [data-slot='conversation.input.attachments'] > div:has([role='group'][aria-label='Pending attachments']) {
+  margin-bottom: 2px;
+}
+
+body[data-chatgpt-ui] [data-slot='conversation.input.attachments'] [role='group'][aria-label='Pending attachments'] {
+  flex-wrap: wrap;
+  row-gap: 8px;
+  overflow: visible;
+}
+
+/* ---- P0-17: a started Chat conversation is one capsule ------------------ */
+/* The reference draws the established conversation's composer as the same
+   single-row capsule as the blank page: one line, full-round, inset 30px from
+   each side of the Host message column (card = column − 60). The column itself
+   remains Host-driven — `--dsh-chat-content-width` is the variable the native
+   divider rewrites, so the card and the transcript resize together. */
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) [data-composer-card='true'] {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: calc(var(--dsh-chat-content-width, var(--cgpt-msg-max)) - var(--cgpt-chat-card-inset));
+  /* P0-21: the single-line card keeps its 52px minimum; content growth comes
+     from the editor's natural height, not from a measured inline height. */
+  height: auto;
+  min-height: var(--cgpt-chat-card-height);
+  margin-inline: auto;
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: var(--dsw-specific-input-major);
+  border: 1px solid var(--dsh-chatgpt-composer-border);
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) [data-input-scroll='true'] {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: auto;
+  min-height: calc(var(--cgpt-chat-card-height) - 2px);
+  max-height: var(--dsh-chatgpt-composer-max-height);
+  overflow-y: auto;
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) [data-input-scroll='true'] > div {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: auto;
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) [data-composer-input='true'] {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--cgpt-composer-empty-line);
+  padding: 0 var(--cgpt-empty-composer-pad-right) 0 var(--cgpt-empty-composer-pad-left);
+  font-size: var(--cgpt-composer-empty-font);
+  line-height: var(--cgpt-composer-empty-line);
+}
+
+/* P0-21: once the editor owns more than one line, align its first line to the
+   top and pin the overlay row to the card bottom. The extra height grows from
+   the editor, so single-line remains the same 52px capsule and the bottom edge
+   of a started Chat card stays fixed. */
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) [data-composer-card='true'][data-cgpt-composer-grow],
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerHero'] [data-composer-card='true'][data-cgpt-composer-grow] {
+  /* A 338px-tall capsule would have a 169px radius; the multiline card keeps
+     the reference's 26px corner instead. */
+  border-radius: var(--cgpt-composer-empty-radius);
+}
+
+/* P0-21: at the cap the scrollport always shows its own thin rail, so the
+   "scroll inside" state is visible rather than only measurable. Before the cap
+   `overflow-y:auto` keeps the rail out of the layout. */
+body[data-chatgpt-ui] [data-composer-card='true'][data-cgpt-composer-capped] [data-input-scroll='true'] {
+  overflow-y: scroll;
+  scrollbar-width: thin;
+  scrollbar-color: var(--cgpt-text-tertiary) transparent;
+}
+
+body[data-chatgpt-ui] [data-composer-card='true'][data-cgpt-composer-capped] [data-input-scroll='true']::-webkit-scrollbar {
+  width: 8px;
+}
+
+body[data-chatgpt-ui] [data-composer-card='true'][data-cgpt-composer-capped] [data-input-scroll='true']::-webkit-scrollbar-thumb {
+  background: var(--cgpt-text-tertiary);
+  border-radius: 8px;
+}
+
+body[data-chatgpt-ui] [data-composer-card='true'][data-cgpt-composer-capped] [data-input-scroll='true']::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [data-composer-card='true'][data-cgpt-composer-grow] [data-composer-input='true'] {
+  /* Keep the first line off the 26px corner and the last line off the overlay
+     row; the single-line capsule keeps its original 0 top/bottom padding. */
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [data-composer-card='true'][data-cgpt-composer-grow] [data-input-scroll='true'] {
+  align-items: flex-start;
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [data-composer-card='true'][data-cgpt-composer-grow] [data-input-scroll='true'] > div {
+  align-items: flex-start;
+}
+
+/* The Host insets the placeholder box by 14px; 52 − 14 = 38 lands the copy on
+   the input's text edge, exactly like the blank hero. */
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) [data-composer-placeholder='true'] {
+  top: 50%;
+  padding: 0 var(--cgpt-empty-composer-pad-right) 0 calc(var(--cgpt-empty-composer-pad-left) - 14px);
+  font-size: 0;
+  line-height: var(--cgpt-composer-empty-line);
+  color: var(--cgpt-empty-composer-muted, var(--cgpt-text-placeholder));
+  transform: translateY(-50%);
+}
+
+/* The Host row becomes a click-through overlay; only its two control groups
+   take pointer events, so the middle of the capsule still focuses the editor. */
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) [data-composer-card='true'] [class*='_row'] {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0;
+  min-width: 0;
+  padding: 0 8px;
+  pointer-events: none;
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) [data-composer-card='true'] [class*='_row'] > [class*='_tools'],
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) [data-composer-card='true'] [class*='_row'] > [class*='_trailing'] {
+  display: flex;
+  align-items: center;
+  pointer-events: auto;
+}
+
+/* P0-21: a multiline editor pins the overlay row to the bottom edge. The
+   selector repeats the stack qualifier so it wins over the `inset: 0` overlay
+   rule above instead of needing `!important`. */
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) [data-composer-card='true'][data-cgpt-composer-grow] [class*='_row'] {
+  top: auto;
+  bottom: 0;
+  height: 50px;
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) [data-composer-card='true'] [class*='_row'] > [class*='_tools'] {
+  gap: 0;
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) [data-composer-card='true'] [class*='_row'] > [class*='_trailing'] {
+  gap: 12px;
+  margin-left: auto;
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) [data-composer-card='true'] [class*='_standardControls'] {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+/* Left `+`: the same 36px disc / 20px glyph as the blank page. */
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) .chatgpt-chat-files {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--dsw-alias-label-primary);
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) .chatgpt-chat-files:hover:not(:disabled) {
+  background: var(--dsh-chatgpt-hover);
+  color: var(--dsw-alias-label-primary);
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) .chatgpt-chat-files svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+/* Right 「高 ⌄」: plain 16px text, no border or fill until hover, exactly the
+   blank page's compact trigger. It sits in the Host's trailing group, before
+   the 32px send disc (the Host gap supplies the 12px between them). */
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) [data-cgpt-pill-compact='true'] {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  max-width: 200px;
+  min-width: 0;
+  padding: 0 12px 0 16px;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--cgpt-empty-composer-muted, var(--cgpt-text-placeholder));
+  font-family: var(--cgpt-font-body);
+  font-size: var(--cgpt-composer-empty-font);
+  font-weight: var(--cgpt-font-weight-regular);
+  line-height: var(--cgpt-composer-empty-line);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) [data-cgpt-pill-compact='true']:hover,
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) [data-cgpt-pill-compact='true'][aria-expanded='true'] {
+  background: var(--dsh-chatgpt-hover);
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) [data-cgpt-pill-compact='true'] .chatgpt-model-pill-effort {
+  color: inherit;
+  font-weight: inherit;
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) [data-cgpt-pill-compact='true'] .chatgpt-model-pill-chevron {
+  display: inline-flex;
+  opacity: 1;
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerStack']:not([class*='_composerHero']) [data-cgpt-pill-compact='true'] .chatgpt-model-pill-chevron svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Chat keeps exactly: `+`, text, 「高 ⌄」, send. The Host context-size chip, the
+   Host model seat and this plugin's approval chip are workspace/context
+   affordances the reference does not have, so they do not paint. Our compact
+   trigger is the only direct child of the right seat that survives. */
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [data-composer-card='true'] [data-slot='conversation.input.right'] > :not([data-cgpt-model-pill]) {
+  display: none !important;
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [data-composer-card='true'] [data-slot='conversation.input.model'] > :not([data-cgpt-model-pill]) {
+  display: none !important;
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] .chatgpt-permission {
+  display: none;
+}

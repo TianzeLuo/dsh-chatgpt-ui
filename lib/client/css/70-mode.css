@@ -1,0 +1,315 @@
+/* 70-mode.css — Phase 1: the centred Chat/Work segment in the page-top header,
+ * the new-page title row, and the display-only rules that follow
+ * `body[data-chatgpt-mode]`.
+ *
+ * Permissions are NOT here: Chat mode's read-only sandbox and fixed approval
+ * live in lib/host/chat-policy.js. This slice only hides coding-oriented
+ * chrome and swaps copy, so a wrong attribute can never widen access.
+ */
+
+body[data-chatgpt-ui] .chatgpt-mode {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* 224×36 track, 112×36 items, 112×36 pill. Measured from the reference header.
+   P0-16: the thumb is the item box itself — the desktop capture draws the
+   selected half as a capsule that fills the track's height exactly (sampled
+   #212121 on a #1b1b1b track), not the old 121×37 pill that overhung it. */
+body[data-chatgpt-ui] .chatgpt-mode-group {
+  position: relative;
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--cgpt-segment-item-width);
+  box-sizing: border-box;
+  width: var(--cgpt-segment-width);
+  height: var(--cgpt-segment-height);
+  border-radius: var(--cgpt-radius-full);
+  background: transparent;
+}
+
+body[data-chatgpt-ui] .chatgpt-mode-group::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--cgpt-radius-full);
+  background: var(--cgpt-segment-bg);
+}
+
+body[data-chatgpt-ui] .chatgpt-mode-seg {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cgpt-segment-item-width);
+  height: var(--cgpt-segment-height);
+  padding: 0;
+  border: 0;
+  border-radius: var(--cgpt-radius-full);
+  background: transparent;
+  color: var(--cgpt-segment-text-muted);
+  /* P0-16: the reference's two halves are regular sans (14/500), never a
+     monospace face — the skin states the stack instead of inheriting it from
+     the host header. */
+  font-family: var(--cgpt-font-body);
+  font-size: var(--cgpt-font-body-size);
+  font-weight: var(--cgpt-font-weight-medium);
+  line-height: var(--cgpt-line-height-row);
+  letter-spacing: 0;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.12s ease;
+}
+
+body[data-chatgpt-ui] .chatgpt-mode-seg:hover {
+  color: var(--cgpt-segment-text);
+}
+
+body[data-chatgpt-ui] .chatgpt-mode-seg[aria-pressed='true'] {
+  color: var(--cgpt-segment-text);
+}
+
+body[data-chatgpt-ui] .chatgpt-mode-seg[aria-pressed='true']::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: 50%;
+  width: var(--cgpt-segment-thumb-width);
+  height: var(--cgpt-segment-thumb-height);
+  border: 0.5px solid var(--cgpt-segment-border);
+  border-radius: var(--cgpt-radius-full);
+  background: var(--cgpt-segment-thumb);
+  box-shadow: var(--cgpt-segment-shadow);
+  transform: translate(-50%, -50%);
+}
+
+/* The header.leading seat is root-scoped and renders before the title cluster.
+   Absolute positioning keeps it out of that grid flow so it can sit dead centre
+   without changing the title's left edge. The Host marks the whole header as a
+   window-drag region; interactive controls must opt out. */
+body[data-chatgpt-ui] [data-slot='conversation.header'] header {
+  position: relative;
+}
+
+body[data-chatgpt-ui] .chatgpt-header-mode {
+  position: absolute;
+  left: 50%;
+  /* The measured 36px control sits at y=8 in the 52px panel header; anchoring
+     to the header's centre (26px) is stable even when the sessionless header
+     collapses to 0px. */
+  top: 26px;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+  -webkit-app-region: no-drag;
+}
+
+/* Keep the title/toolbar usable on narrow windows: the reference collapses the
+   centre control before it can overlap the conversation title. */
+@media (max-width: 820px) {
+  body[data-chatgpt-ui] .chatgpt-header-mode {
+    display: none;
+  }
+}
+
+/* ---- confirmation toast (non-blank session, mode switch) ---- */
+/* Bottom-centre, one line, dark translucent — ChatGPT's own note style rather
+   than the Host's grey dialog. Fixed so it reads the same from the session
+   header and from the new-page cards. */
+body[data-chatgpt-ui] .chatgpt-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(92vw, 560px);
+  padding: 8px 8px 8px 16px;
+  border: 1px solid var(--cgpt-toast-border);
+  border-radius: 12px;
+  background: var(--cgpt-toast-bg);
+  color: var(--cgpt-toast-fg);
+  box-shadow: var(--cgpt-toast-shadow);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.3;
+  transform: translateX(-50%);
+  animation: chatgpt-toast-in 0.14s ease-out;
+}
+
+@keyframes chatgpt-toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 6px);
+  }
+}
+
+body[data-chatgpt-ui] .chatgpt-toast-text {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+body[data-chatgpt-ui] .chatgpt-toast-action {
+  flex: none;
+  height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--cgpt-toast-action-bg);
+  color: var(--cgpt-toast-fg);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-toast-action:hover {
+  background: var(--cgpt-toast-action-hover);
+}
+
+body[data-chatgpt-ui] .chatgpt-toast-close {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--cgpt-toast-close);
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] .chatgpt-toast-close:hover {
+  color: var(--cgpt-toast-fg);
+  background: var(--cgpt-toast-action-bg);
+}
+
+/* ---- new-page title row (conversation.hero.options) ---- */
+/* The top segment is the switch; this slot stays empty in the current product.
+   The Host paints the workspace/preset chips and this slot on one row, so the
+   slot is kept out of the way without adding a visible line. */
+body[data-chatgpt-ui] [class*='_composerHero'] [class*='_heroWorkspaceRow'] {
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 8px;
+}
+
+body[data-chatgpt-ui] [class*='_composerHero'] [class*='_heroWorkspaceRow'] [class*='_heroOptions'] {
+  flex: 1 1 100%;
+  justify-content: center;
+}
+
+/* ---- brand slots ---- */
+body[data-chatgpt-ui] .chatgpt-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+  color: var(--cgpt-text-primary);
+}
+
+body[data-chatgpt-ui] .chatgpt-brand-name {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--cgpt-text-primary);
+}
+
+body[data-chatgpt-ui] .chatgpt-brand-name::after {
+  content: var(--dsh-chatgpt-brand-name, 'Chat');
+}
+
+/* ---- Chat mode's read-only note (conversation.input.left) ---- */
+body[data-chatgpt-ui] .chatgpt-readonly {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 8px;
+  border: 1px solid var(--cgpt-composer-border);
+  border-radius: 999px;
+  color: var(--cgpt-text-secondary);
+  font-size: 11px;
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+}
+
+body[data-chatgpt-ui] .chatgpt-readonly-icon {
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.8;
+}
+
+/* The Host chip names a preset Chat mode overwrites, so it would be a lie; the
+   note above states what actually holds. Permission enforcement stays in
+   lib/host/chat-policy.js — this only hides a label. */
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [data-slot='conversation.input.permission'] {
+  /* the Host writes `display: contents` inline on this slot */
+  display: none !important;
+}
+
+/* P0-17: the reference's Chat row is `+` / text / 「高 ⌄」 / send only. The
+   read-only note is DSH-specific chrome; it does not belong in that row. */
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] .chatgpt-readonly {
+  display: none;
+}
+
+/* Chat has no project concept: no workspace chip above the card and no Host
+   workspace controls inside it. Chat keeps its own `+` (P0-16/P0-17). */
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerHero'] [class*='_heroWorkspaceRow'] > button[class*='_workspace'],
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerHero'] [class*='_heroWorkspaceRow'] > div:nth-child(2) {
+  display: none;
+}
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [data-composer-card] button[class*='_add'],
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [data-composer-card] input[type='file'] {
+  display: none;
+}
+
+/* ---- display-only Chat-mode differences ---- */
+/* The turn rail is native transcript chrome and is never hidden: Chat mode may
+   not change what the host shows about a session (see 30-chat.css). */
+
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [data-composer-placeholder] {
+  font-size: 0;
+}
+
+/* One rule and one token for every Chat composer (blank hero and started
+   Session). The Host keeps `<html lang="en">` while the whole UI is Chinese, so
+   `:lang(zh)` cannot choose the copy; this token is the single override point. */
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [data-composer-placeholder]::after {
+  content: var(--dsh-chatgpt-placeholder-chat);
+  font-size: var(--cgpt-composer-empty-font);
+  color: var(--cgpt-empty-composer-muted, var(--cgpt-text-placeholder));
+}
+
+/* ---- sidebar empty state (dsh-client-ui-workspace's `empty.none`) ---- */
+body[data-chatgpt-ui] [data-slot='sidebar'] [data-row-key='empty'] > div {
+  font-size: 0;
+}
+
+body[data-chatgpt-ui] [data-slot='sidebar'] [data-row-key='empty'] > div::after {
+  content: var(--dsh-chatgpt-empty-sessions, 'No chats yet');
+  font-size: 13px;
+  color: var(--cgpt-text-tertiary);
+}
+
+body[data-chatgpt-ui]:lang(zh) [data-slot='sidebar'] [data-row-key='empty'] > div::after {
+  content: var(--dsh-chatgpt-empty-sessions-zh, '还没有对话');
+}
+
+
+/* P0-16: the reference's empty page has no preset chip above the composer, so
+   the seat is not painted there any more (60-hero.css). The renamed label is
+   kept for every other seat the Host mounts outside the hero. */

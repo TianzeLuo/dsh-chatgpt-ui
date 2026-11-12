@@ -1,0 +1,231 @@
+/* dsh-chatgpt-ui — 76-overlay.css
+ *
+ * P0-11 introduced one popover vocabulary; P0-13 replaced its guessed numbers
+ * with the ones measured off the live reference
+ * (`docs/capture/live/project-menus.json`, read-only CDP):
+ *
+ *   surface   90% elevated background over an 8px backdrop blur · 16px radius
+ *             · 10px gutter · min 160px, content-sized, capped at 360px
+ *             dark  #212121 @ .9 + inset 0 0 1px 0 #fff3 + 0 8px 16px -4px #0000001f
+ *             light #ffffff @ .9 + 0 0 0 .5px #0000001a + 0 8px 16px -4px #0000001f
+ *   row       36px · 6px 10px inline padding · 12px radius · 14/20 · hover
+ *             rgba(255,255,255,.1) dark / rgba(0,0,0,.05) light
+ *   icon      20px leading slot, 6px to the label; the glyph keeps the size the
+ *             reference renders it at (18px mask SVGs, 16px sprite SVGs) — the
+ *             captured markup carries width/height, so nothing rescales here.
+ *   divider   17px group: 8px top + 1px hairline + 8px bottom, inset 8px
+ *
+ * This slice loads after the per-surface sheets, so it owns the shared surface
+ * and row geometry while each menu keeps its own width/anchor.
+ */
+
+body[data-chatgpt-ui] :is(
+    .chatgpt-session-menu,
+    .chatgpt-work-menu,
+    .chatgpt-effort-menu,
+    .chatgpt-rail-menu,
+    [data-trigger-menu][data-cgpt-trigger-menu]
+  ) {
+  box-sizing: border-box;
+  padding: var(--cgpt-menu-gutter);
+  border-radius: var(--cgpt-menu-radius);
+  background: var(--cgpt-menu-bg);
+  box-shadow: var(--cgpt-menu-shadow);
+  backdrop-filter: blur(var(--cgpt-menu-blur));
+  -webkit-backdrop-filter: blur(var(--cgpt-menu-blur));
+  color: var(--cgpt-menu-text);
+}
+
+/* The Host's portals carry their own 1px border in 72-trigger.css; keep it,
+   but align its colour with the shared surface. */
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu] {
+  border-color: var(--cgpt-menu-border);
+}
+
+body[data-chatgpt-ui] :is(
+    .chatgpt-session-menu-item,
+    .chatgpt-rail-menu-item,
+    .chatgpt-work-menu-item:not(.chatgpt-permission-row),
+    [data-trigger-menu][data-cgpt-trigger-menu] [role='option']
+  ) {
+  box-sizing: border-box;
+  height: var(--cgpt-menu-row-height);
+  min-height: var(--cgpt-menu-row-height);
+  padding: var(--cgpt-menu-row-pad-y) var(--cgpt-menu-row-pad-x);
+  border: 0;
+  border-radius: var(--cgpt-menu-row-radius);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+body[data-chatgpt-ui] :is(
+    .chatgpt-session-menu-item,
+    .chatgpt-rail-menu-item,
+    .chatgpt-work-menu-item:not(.chatgpt-permission-row),
+    [data-trigger-menu][data-cgpt-trigger-menu] [role='option']
+  ):hover,
+body[data-chatgpt-ui] :is(
+    .chatgpt-session-menu-item,
+    .chatgpt-work-menu-item:not(.chatgpt-permission-row),
+    [data-trigger-menu][data-cgpt-trigger-menu] [role='option']
+  ):focus-visible {
+  background: var(--cgpt-menu-row-hover);
+}
+
+/* 20px leading slot in every menu. The glyph inside keeps the size it was
+   captured at — scaling a 16px sprite to 20px is exactly the drift P0-13 is
+   here to remove. */
+body[data-chatgpt-ui] :is(
+    .chatgpt-session-menu-icon,
+    .chatgpt-rail-menu-icon,
+    .chatgpt-project-menu-icon,
+    .chatgpt-project-menu-star,
+    .chatgpt-permission-icon,
+    [data-trigger-menu][data-cgpt-trigger-menu] [class*='itemIcon']
+  ) {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--cgpt-menu-icon-slot);
+  height: var(--cgpt-menu-icon-slot);
+}
+
+body[data-chatgpt-ui] :is(
+    .chatgpt-session-menu-icon,
+    .chatgpt-rail-menu-icon,
+    .chatgpt-project-menu-icon,
+    .chatgpt-project-menu-star,
+    .chatgpt-permission-icon,
+    [data-trigger-menu][data-cgpt-trigger-menu] [class*='itemIcon']
+  ) svg {
+  display: block;
+  width: auto;
+  height: auto;
+}
+
+/* Shared divider: the reference's 17px group — 8px above, a 1px hairline inset
+   8px on each side, 8px below. */
+body[data-chatgpt-ui] .chatgpt-session-menu-separator {
+  box-sizing: border-box;
+  width: 100%;
+  height: 17px;
+  min-height: 17px;
+  margin: 0;
+  padding: 8px var(--cgpt-menu-separator-inset);
+  background: transparent;
+}
+
+body[data-chatgpt-ui] .chatgpt-session-menu-separator::before {
+  display: block;
+  width: 100%;
+  border-top: 1px solid var(--cgpt-menu-separator);
+  content: '';
+}
+
+/* The project card is a header + meta + path, not a plain list; it takes the
+   same surface and row geometry and grows only as far as its content needs. */
+body[data-chatgpt-ui] .chatgpt-session-menu[data-cgpt-session-menu='project'] {
+  width: max-content;
+  min-width: var(--cgpt-desktop-menu-min-width);
+  max-width: min(360px, calc(100vw - 16px));
+  padding: var(--cgpt-desktop-card-pad-y) 8px;
+  border-radius: var(--cgpt-desktop-menu-radius);
+}
+
+body[data-chatgpt-ui] .chatgpt-project-menu-card {
+  gap: var(--cgpt-menu-icon-gap);
+  padding: var(--cgpt-menu-row-pad-y) var(--cgpt-menu-row-pad-x);
+}
+
+body[data-chatgpt-ui] .chatgpt-project-menu-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+body[data-chatgpt-ui] .chatgpt-project-menu-meta {
+  gap: var(--cgpt-menu-icon-gap);
+  padding: var(--cgpt-menu-row-pad-y) var(--cgpt-menu-row-pad-x);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+body[data-chatgpt-ui] .chatgpt-project-menu-path {
+  height: var(--cgpt-menu-row-height);
+  min-height: var(--cgpt-menu-row-height);
+  padding: var(--cgpt-menu-row-pad-y) var(--cgpt-menu-row-pad-x);
+  gap: var(--cgpt-menu-icon-gap);
+  border-radius: var(--cgpt-menu-row-radius);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+body[data-chatgpt-ui] .chatgpt-project-menu-path-icon svg,
+body[data-chatgpt-ui] .chatgpt-project-menu-meta-icon svg {
+  width: auto;
+  height: auto;
+}
+
+/* P0-19c: the two sidebar ⋯ menus (project row and session row) share one
+   surface — 164.5px floor, 4.25/12 gutter, 16px corner, and the same
+   max-height/scroll so neither one can grow past the viewport differently.
+   The rows, glyph slot and divider live in 25-sessions.css. */
+body[data-chatgpt-ui] :is(
+    .chatgpt-session-menu[data-cgpt-session-menu='project-hover'],
+    .chatgpt-session-menu[data-cgpt-session-menu='session']
+  ) {
+  width: max-content;
+  min-width: var(--cgpt-desktop-menu-min-width);
+  max-width: min(var(--cgpt-menu-max-width), calc(100vw - 16px));
+  max-height: calc(100vh - 16px);
+  overflow-y: auto;
+  padding: var(--cgpt-desktop-menu-pad-y) var(--cgpt-desktop-menu-pad-x);
+  border-radius: var(--cgpt-desktop-menu-radius);
+}
+
+/* ---- P0-14: the desktop surfaces ------------------------------------- */
+/* The three 2026-11-07 desktop captures are the skin's standard, and they are
+   denser than the web build the geometry above was read from. These rules
+   retune only the surfaces those captures show: the approval picker, the
+   project ⋯ menu, the project hover card and the composer's approval chip.
+   Every number is the capture's device pixels divided by 2 (a 1px hairline in
+   those captures is exactly two identical rows, so 1 CSS px = 2 device px);
+   the derivation and the per-element error table live in docs/m26.json. */
+body[data-chatgpt-ui] .chatgpt-work-menu.chatgpt-permission-menu {
+  width: var(--cgpt-desktop-permission-width) !important;
+  padding: var(--cgpt-desktop-permission-pad-y) var(--cgpt-desktop-menu-pad-x);
+  border-radius: var(--cgpt-desktop-menu-radius);
+}
+
+/* 18px glyph slot in the picker's rows; the composer chip now matches the
+   other three composer tool buttons (P0-18), whose glyph box is 20px.
+   These four declarations need !important on purpose: the shared icon rules
+   above are written as `:is(.chatgpt-session-menu-icon, …, .chatgpt-permission-icon)`,
+   and a `:is()` list is as specific as its most specific argument — the trigger
+   branch `[data-trigger-menu][data-cgpt-trigger-menu] [class*='itemIcon']`
+   makes that whole rule (0,4,1), i.e. higher than any plain two-class rule
+   scoped to this surface. Raising specificity by repeating classes would hide
+   that fact; the intent here is explicit. */
+body[data-chatgpt-ui] .chatgpt-permission-menu .chatgpt-permission-icon {
+  width: var(--cgpt-desktop-menu-icon-slot) !important;
+  height: var(--cgpt-desktop-menu-icon-slot) !important;
+}
+
+body[data-chatgpt-ui] .chatgpt-permission .chatgpt-permission-icon {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+body[data-chatgpt-ui] .chatgpt-permission .chatgpt-permission-icon svg {
+  display: block;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+/* Model list: the panel's inner sections supply their own rhythm; the outer
+   gutter is now the measured 10px. */
+
+body[data-chatgpt-ui] .chatgpt-model-menu[data-view='advanced'] {
+  padding-bottom: 4px;
+}

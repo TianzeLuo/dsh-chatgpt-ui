@@ -1,0 +1,198 @@
+/* dsh-chatgpt-ui — 72-trigger.css
+ *
+ * Host-owned `/` command and `@` reference menus, re-skinned in place.
+ *
+ * The Host renders both menus through the same portal (`[data-trigger-menu]`);
+ * `trigger-ui.js` tags one as command and the other as reference from their
+ * localized section labels. No command/mention data is copied here.
+ *
+ * Command menu: 240px wide, 16px radius, 36px rows, 14px labels (brief).
+ * Reference menu: the ChatGPT 760px content column; 16px radius, 32px rows.
+ * The Host portal only pins max-height (no inline width), so the width is ours.
+ */
+
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu] {
+  box-sizing: border-box;
+  padding: 6px;
+  border: 1px solid var(--cgpt-menu-border);
+  border-radius: 16px;
+  background: var(--cgpt-menu-bg);
+  box-shadow: var(--cgpt-menu-shadow);
+  color: var(--cgpt-text-primary);
+  font-family: inherit;
+  overflow: hidden;
+}
+
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu='command'] {
+  width: 240px !important;
+  min-width: 240px !important;
+  max-width: 240px !important;
+}
+
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu='reference'] {
+  width: min(760px, calc(100vw - 48px)) !important;
+  min-width: min(760px, calc(100vw - 48px)) !important;
+  max-width: min(760px, calc(100vw - 48px)) !important;
+  padding: 8px;
+}
+
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu] [role='listbox'] {
+  box-sizing: border-box;
+  width: 100%;
+  max-height: min(420px, calc(100vh - 180px));
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--cgpt-border-strong) transparent;
+}
+
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu] [role='listbox']:hover {
+  scrollbar-color: var(--cgpt-text-tertiary) transparent;
+}
+
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu] [role='listbox']::-webkit-scrollbar {
+  width: 4px;
+}
+
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu] [role='listbox']::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--cgpt-border-strong);
+}
+
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu] [role='listbox']::-webkit-scrollbar-thumb:hover {
+  background: var(--cgpt-text-tertiary);
+}
+
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu] [role='option'] {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 36px;
+  height: 36px;
+  margin: 1px 0;
+  padding: 0 8px;
+  gap: 8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--cgpt-text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  text-align: left;
+  cursor: pointer;
+}
+
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu] [role='option']:hover,
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu] [role='option'][aria-selected='true'] {
+  background: var(--cgpt-control-hover);
+}
+
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu] [role='option']:focus-visible {
+  outline: 2px solid var(--cgpt-focus-ring);
+  outline-offset: -2px;
+}
+
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu] [class*='itemIcon'] {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--cgpt-text-secondary);
+}
+
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu] [class*='itemName'] {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--cgpt-text-primary);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The brief asks for a compact command row: descriptions are reference-page
+   metadata, not command names. Hide them only in the command menu. */
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu='command'] [class*='itemDescription'],
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu='command'] [class*='itemAlias'] {
+  display: none;
+}
+
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu='command'] [class*='sectionTitle'],
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu='command'] [class*='groupTitle'] {
+  padding: 6px 8px 2px;
+  color: var(--cgpt-text-tertiary);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0;
+}
+
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu='reference'] [role='option'] {
+  height: 32px;
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+}
+
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu='reference'] [class*='itemName'] {
+  flex: 1;
+}
+
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu='reference'] [class*='itemDescription'] {
+  flex: none;
+  max-width: 44%;
+  overflow: hidden;
+  color: var(--cgpt-text-tertiary);
+  font-size: 12px;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu='reference'] [class*='sectionTitle'],
+body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu='reference'] [class*='groupTitle'] {
+  padding: 8px 12px 2px;
+  color: var(--cgpt-text-tertiary);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+body[data-chatgpt-ui] .chatgpt-trigger-empty {
+  position: fixed;
+  z-index: 74;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid var(--cgpt-menu-border);
+  border-radius: 12px;
+  background: var(--cgpt-menu-bg);
+  box-shadow: var(--cgpt-menu-shadow);
+  color: var(--cgpt-text-secondary);
+  font-size: 12px;
+  line-height: 18px;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  body[data-chatgpt-ui] [data-trigger-menu][data-cgpt-trigger-menu] {
+    animation: chatgpt-trigger-in 140ms ease-out both;
+  }
+}
+
+@keyframes chatgpt-trigger-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
