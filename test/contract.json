@@ -1,0 +1,746 @@
+{
+  "version": 1,
+  "snapshot": "test/fixtures/dom-snapshot.html",
+  "notes": [
+    "Every anchor the skin's CSS is allowed to depend on. The contract test asserts each 'boot' anchor appears in the snapshot, and lints css/*.css so no rule targets an anchor that is missing here.",
+    "tier=boot: rendered on a fresh, unsigned-in profile (captured by scripts/capture-snapshot.mjs).",
+    "tier=session: needs an open session on a signed-in profile; reported as pending until such a snapshot exists.",
+    "tier=flow: needs at least one message turn; same pending treatment.",
+    "M1 note: the transcript-side anchors (class.bubble / class.column / class.slot / flow.*) are still pending a real session, but their rules are checked separately by scripts/check-messages.mjs against test/fixtures/messages.html, which reproduces the host's message DOM (real class suffixes + data attributes, reduced host base CSS).",
+    "M1 note: attr.body.dark (data-ds-dark-theme on <body>) is written by ui-layout's theme presenter only in dark mode; scripts/screenshots.mjs emulates prefers-color-scheme: dark and asserts the attribute before saving m1-dark-new.png.",
+    "M2 note: attr.body.mode (data-chatgpt-mode) is written by this skin's own switcher for display rules only — permissions come from lib/host/chat-policy.js, never from the attribute. It is session tier because a fresh page has no conversation to describe.",
+    "M2 note: the hero mode cards and the header.leading product segment are asserted live on the sessionless page too (hero.options is behind `sessionId !== undefined`), so class.chatgptModeCard / class.chatgptModeSwitch stay session tier; scripts/screenshots.mjs asserts them live against a blank session.",
+    "M3 note: in Chat mode the Host permission chip ([data-slot='conversation.input.permission']) is hidden because it names a Host preset the policy overwrites; the skin's own read-only note (conversation.input.left) states what applies. Hiding a label never changes access — lib/host/chat-policy.js does."
+  ],
+  "anchors": [
+    {
+      "id": "slot.root",
+      "tier": "boot",
+      "kind": "data-slot",
+      "value": "root",
+      "usedBy": "AppFrame seat (never registered by this skin)"
+    },
+    {
+      "id": "slot.sidebar",
+      "tier": "boot",
+      "kind": "data-slot",
+      "value": "sidebar",
+      "usedBy": "css/20-sidebar.css"
+    },
+    {
+      "id": "slot.sidebar.brand.mark",
+      "tier": "boot",
+      "kind": "data-slot",
+      "value": "sidebar.brand.mark",
+      "usedBy": "M2 registration (brand mark)"
+    },
+    {
+      "id": "slot.sidebar.brand.name",
+      "tier": "boot",
+      "kind": "data-slot",
+      "value": "sidebar.brand.name",
+      "usedBy": "M2 registration (brand name)"
+    },
+    {
+      "id": "slot.sidebar.panellist",
+      "tier": "boot",
+      "kind": "data-slot",
+      "value": "sidebar.panellist",
+      "usedBy": "css/20-sidebar.css (dot entry row)"
+    },
+    {
+      "id": "slot.sidebar.workspaces",
+      "tier": "boot",
+      "kind": "data-slot",
+      "value": "sidebar.workspaces",
+      "usedBy": "css/20-sidebar.css (project tree)"
+    },
+    {
+      "id": "slot.sidebar.settings",
+      "tier": "boot",
+      "kind": "data-slot",
+      "value": "sidebar.settings",
+      "usedBy": "css/20-sidebar.css"
+    },
+    {
+      "id": "slot.sidebar.footer.action",
+      "tier": "boot",
+      "kind": "data-slot",
+      "value": "sidebar.footer.action",
+      "usedBy": "css/20-sidebar.css"
+    },
+    {
+      "id": "slot.main",
+      "tier": "boot",
+      "kind": "data-slot",
+      "value": "main",
+      "usedBy": "css/10-frame.css"
+    },
+    {
+      "id": "slot.main.conversation",
+      "tier": "boot",
+      "kind": "data-slot",
+      "value": "main.conversation",
+      "usedBy": "css/30-chat.css"
+    },
+    {
+      "id": "slot.conversation.header",
+      "tier": "boot",
+      "kind": "data-slot",
+      "value": "conversation.header",
+      "usedBy": "css/30-chat.css"
+    },
+    {
+      "id": "slot.conversation.composer.bar",
+      "tier": "boot",
+      "kind": "data-slot",
+      "value": "conversation.composer.bar",
+      "usedBy": "css/40-composer.css"
+    },
+    {
+      "id": "slot.conversation.input.attachments",
+      "tier": "boot",
+      "kind": "data-slot",
+      "value": "conversation.input.attachments",
+      "usedBy": "css/40-composer.css"
+    },
+    {
+      "id": "slot.conversation.hero.brand.mark",
+      "tier": "boot",
+      "kind": "data-slot",
+      "value": "conversation.hero.brand.mark",
+      "usedBy": "css/30-chat.css (empty-state mark)"
+    },
+    {
+      "id": "slot.shell.overlay",
+      "tier": "boot",
+      "kind": "data-slot",
+      "value": "shell.overlay",
+      "usedBy": "M2 toast seat"
+    },
+    {
+      "id": "slot.rightbar",
+      "tier": "boot",
+      "kind": "data-slot",
+      "value": "rightbar",
+      "usedBy": "css/10-frame.css (collapsed by default)"
+    },
+    {
+      "id": "attr.body.chatgpt",
+      "tier": "boot",
+      "kind": "attribute",
+      "value": "data-chatgpt-ui",
+      "usedBy": "lib/client/entry.js — gates every rule"
+    },
+    {
+      "id": "class.frame",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_frame",
+      "usedBy": "css/10-frame.css (grid container diagnostics only)"
+    },
+    {
+      "id": "class.sidebarCol",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_sidebarCol",
+      "usedBy": "css/20-sidebar.css"
+    },
+    {
+      "id": "class.newSession",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_newSession",
+      "usedBy": "css/20-sidebar.css (New chat button)"
+    },
+    {
+      "id": "class.brandMark",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_brandMark",
+      "usedBy": "css/20-sidebar.css (brand mark box)"
+    },
+    {
+      "id": "class.panelRow",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_panelRow",
+      "usedBy": "css/20-sidebar.css (panel list rows)"
+    },
+    {
+      "id": "slot.conversation.header.leading",
+      "tier": "session",
+      "kind": "data-slot",
+      "value": "conversation.header.leading",
+      "usedBy": "Phase 1 centred product segment"
+    },
+    {
+      "id": "slot.conversation.hero.options",
+      "tier": "session",
+      "kind": "data-slot",
+      "value": "conversation.hero.options",
+      "usedBy": "M2 registration (mode cards)"
+    },
+    {
+      "id": "slot.conversation.input.left",
+      "tier": "session",
+      "kind": "data-slot",
+      "value": "conversation.input.left",
+      "usedBy": "M2 registration (dot status badge)"
+    },
+    {
+      "id": "flow.user",
+      "tier": "flow",
+      "kind": "data-chat-flow-kind",
+      "value": "user",
+      "usedBy": "css/30-chat.css (user bubble)"
+    },
+    {
+      "id": "flow.assistant",
+      "tier": "flow",
+      "kind": "data-chat-flow-kind",
+      "value": "assistant",
+      "usedBy": "css/30-chat.css (assistant column)"
+    },
+    {
+      "id": "flow.turn-process",
+      "tier": "flow",
+      "kind": "data-chat-flow-kind",
+      "value": "turn-process",
+      "usedBy": "css/30-chat.css (process rows)"
+    },
+    {
+      "id": "class.brandName",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_brandName",
+      "usedBy": "css/20-sidebar.css"
+    },
+    {
+      "id": "class.newSessionContent",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_newSessionContent",
+      "usedBy": "css/20-sidebar.css"
+    },
+    {
+      "id": "class.panelActive",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "_panelActive",
+      "usedBy": "css/20-sidebar.css"
+    },
+    {
+      "id": "class.panelGlyph",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_panelGlyph",
+      "usedBy": "css/20-sidebar.css"
+    },
+    {
+      "id": "class.sessionRow",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "_sessionRow",
+      "usedBy": "css/20-sidebar.css"
+    },
+    {
+      "id": "class.selected",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "_selected",
+      "usedBy": "css/20-sidebar.css"
+    },
+    {
+      "id": "class.projectRow",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "_projectRow",
+      "usedBy": "css/20-sidebar.css"
+    },
+    {
+      "id": "class.slot",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "_slot",
+      "usedBy": "css/20-sidebar.css"
+    },
+    {
+      "id": "class.title",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_title",
+      "usedBy": "css/20-sidebar.css + css/30-chat.css"
+    },
+    {
+      "id": "class.sectionHeader",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_sectionHeader",
+      "usedBy": "css/20-sidebar.css"
+    },
+    {
+      "id": "class.sectionLabel",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_sectionLabel",
+      "usedBy": "css/20-sidebar.css"
+    },
+    {
+      "id": "class.column",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "_column",
+      "usedBy": "css/30-chat.css"
+    },
+    {
+      "id": "class.stack",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_stack",
+      "usedBy": "css/30-chat.css"
+    },
+    {
+      "id": "class.bubble",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "_bubble",
+      "usedBy": "css/30-chat.css"
+    },
+    {
+      "id": "class.headline",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_headline",
+      "usedBy": "css/30-chat.css"
+    },
+    {
+      "id": "class.cardWorkspaceTrigger",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_cardWorkspaceTrigger",
+      "usedBy": "css/40-composer.css"
+    },
+    {
+      "id": "class.row",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_row",
+      "usedBy": "css/40-composer.css"
+    },
+    {
+      "id": "class.primary",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_primary",
+      "usedBy": "css/40-composer.css"
+    },
+    {
+      "id": "class.add",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_add",
+      "usedBy": "css/40-composer.css"
+    },
+    {
+      "id": "class.composerStack",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_composerStack",
+      "usedBy": "css/40-composer.css"
+    },
+    {
+      "id": "attr.body.dark",
+      "tier": "session",
+      "kind": "attribute",
+      "value": "data-ds-dark-theme",
+      "usedBy": "lib/client + css gates"
+    },
+    {
+      "id": "attr.rowKey",
+      "tier": "boot",
+      "kind": "attribute",
+      "value": "data-row-key=",
+      "usedBy": "lib/client + css gates"
+    },
+    {
+      "id": "attr.composerCard",
+      "tier": "boot",
+      "kind": "attribute",
+      "value": "data-composer-card=\"true\"",
+      "usedBy": "lib/client + css gates"
+    },
+    {
+      "id": "attr.inputScroll",
+      "tier": "boot",
+      "kind": "attribute",
+      "value": "data-input-scroll=\"true\"",
+      "usedBy": "lib/client + css gates"
+    },
+    {
+      "id": "attr.composerInput",
+      "tier": "boot",
+      "kind": "attribute",
+      "value": "data-composer-input=\"true\"",
+      "usedBy": "lib/client + css gates"
+    },
+    {
+      "id": "attr.composerPlaceholder",
+      "tier": "boot",
+      "kind": "attribute",
+      "value": "data-composer-placeholder=\"true\"",
+      "usedBy": "lib/client + css gates"
+    },
+    {
+      "id": "class.composerHero",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_composerHero",
+      "usedBy": "css/60-hero.css"
+    },
+    {
+      "id": "class.heroWorkspaceRow",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_heroWorkspaceRow",
+      "usedBy": "css/60-hero.css"
+    },
+    {
+      "id": "class.workspace",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_workspace",
+      "usedBy": "css/60-hero.css"
+    },
+    {
+      "id": "class.seat",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_seat",
+      "usedBy": "css/60-hero.css (ui-agent-preset chip)"
+    },
+    {
+      "id": "class.chevron",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_chevron",
+      "usedBy": "css/60-hero.css"
+    },
+    {
+      "id": "attr.body.mode",
+      "tier": "session",
+      "kind": "attribute",
+      "value": "data-chatgpt-mode",
+      "usedBy": "M2 display rules (css/70-mode.css)"
+    },
+    {
+      "id": "class.chatgptModeCard",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "chatgpt-mode-card",
+      "usedBy": "M2 hero mode cards (own class, asserted live)"
+    },
+    {
+      "id": "class.chatgptModeSwitch",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "chatgpt-mode-switch",
+      "usedBy": "M2 header switcher (own class, asserted live)"
+    },
+    {
+      "id": "attr.emptyRow",
+      "tier": "session",
+      "kind": "attribute",
+      "value": "data-row-key=\"empty\"",
+      "usedBy": "M3 empty-state copy (css/70-mode.css, sidebar row)"
+    },
+    {
+      "id": "class.chatgptReadonly",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "chatgpt-readonly",
+      "usedBy": "M3 read-only chip (own class, asserted live)"
+    },
+    {
+      "id": "slot.conversation.input.permission",
+      "tier": "session",
+      "kind": "data-slot",
+      "value": "conversation.input.permission",
+      "usedBy": "M3 hides the Host permission chip in Chat mode"
+    },
+    {
+      "id": "class.heroOptions",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "_heroOptions",
+      "usedBy": "M3 gives the hero options slot its own row (css/70-mode.css)"
+    },
+    {
+      "id": "class.chatgptToast",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "chatgpt-toast",
+      "usedBy": "M3 confirmation toast (own class, asserted live)"
+    },
+    {
+      "id": "attr.toast",
+      "tier": "session",
+      "kind": "attribute",
+      "value": "data-chatgpt-toast",
+      "usedBy": "M3 confirmation toast hook for tests/screenshots"
+    },
+    {
+      "id": "class.searchButton",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "_searchButton",
+      "usedBy": "css/20-sidebar.css (host search control behind the measured panel-header button)"
+    },
+    {
+      "id": "class.brandIdentity",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "_brandIdentity",
+      "usedBy": "css/20-sidebar.css (host brand mark placeholder gap)"
+    },
+    {
+      "id": "class.newSessionLabel",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "_newSessionLabel",
+      "usedBy": "css/20-sidebar.css (New chat label alignment)"
+    },
+    {
+      "id": "class.fade",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "_fade",
+      "usedBy": "css/20-sidebar.css (list bottom fade must end in panel, not rail, colour)"
+    },
+    {
+      "id": "slot.conversation.hero.agentPreset",
+      "tier": "session",
+      "kind": "data-slot",
+      "value": "conversation.hero.agentPreset",
+      "usedBy": "css/70-mode.css (Chinese label on the Host agent-preset seat)"
+    },
+    {
+      "id": "class-substring._tools",
+      "kind": "class-substring",
+      "value": "_tools",
+      "tier": "boot",
+      "usedBy": "lib/client/css/65-work-card.css"
+    },
+    {
+      "id": "class-substring._trailing",
+      "kind": "class-substring",
+      "value": "_trailing",
+      "tier": "boot",
+      "usedBy": "lib/client/css/65-work-card.css"
+    },
+    {
+      "id": "class-substring._standardControls",
+      "kind": "class-substring",
+      "value": "_standardControls",
+      "tier": "boot",
+      "usedBy": "lib/client/css/65-work-card.css"
+    },
+    {
+      "id": "class-substring._modes",
+      "kind": "class-substring",
+      "value": "_modes",
+      "tier": "boot",
+      "usedBy": "lib/client/css/65-work-card.css"
+    },
+    {
+      "id": "class-substring._triggerLabel",
+      "kind": "class-substring",
+      "value": "_triggerLabel",
+      "tier": "boot",
+      "usedBy": "lib/client/css/65-work-card.css"
+    },
+    {
+      "id": "class-substring._triggerEffort",
+      "kind": "class-substring",
+      "value": "_triggerEffort",
+      "tier": "session",
+      "usedBy": "lib/client/css/65-work-card.css",
+      "note": "host model chip effort caption, only present once a model has been chosen (session snapshot)"
+    },
+    {
+      "id": "data-slot.conversation.input.model",
+      "kind": "data-slot",
+      "value": "conversation.input.model",
+      "tier": "boot",
+      "usedBy": "lib/client/css/65-work-card.css"
+    },
+    {
+      "id": "data-slot.conversation.input.right",
+      "kind": "data-slot",
+      "value": "conversation.input.right",
+      "tier": "boot",
+      "usedBy": "lib/client/css/65-work-card.css"
+    },
+    {
+      "id": "slot.conversation_chat_assistant_actions",
+      "tier": "session",
+      "kind": "data-slot",
+      "value": "conversation.chat.assistant-actions",
+      "usedBy": "css/30-chat.css"
+    },
+    {
+      "id": "slot.conversation_chat_turnTail",
+      "tier": "session",
+      "kind": "data-slot",
+      "value": "conversation.chat.turnTail",
+      "usedBy": "css/30-chat.css"
+    },
+    {
+      "id": "slot.conversation_chat_user_images",
+      "tier": "session",
+      "kind": "data-slot",
+      "value": "conversation.chat.user.images",
+      "usedBy": "css/30-chat.css"
+    },
+    {
+      "id": "slot.conversation_chat_message_images",
+      "tier": "session",
+      "kind": "data-slot",
+      "value": "conversation.chat.message.images",
+      "usedBy": "css/30-chat.css"
+    },
+    {
+      "id": "class.summary",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "_summary",
+      "usedBy": "css/30-chat.css"
+    },
+    {
+      "id": "class.body",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "_body",
+      "usedBy": "css/30-chat.css"
+    },
+    {
+      "id": "class.thumbnail",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "_thumbnail",
+      "usedBy": "css/30-chat.css"
+    },
+    {
+      "id": "class.gallery",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "_gallery",
+      "usedBy": "css/30-chat.css"
+    },
+    {
+      "id": "attr.triggerMenu",
+      "tier": "session",
+      "kind": "attribute",
+      "value": "data-trigger-menu",
+      "usedBy": "72-trigger.css (Host / and @ menu portal)"
+    },
+    {
+      "id": "class.itemIcon",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "itemIcon",
+      "usedBy": "72-trigger.css (Host trigger row icon)"
+    },
+    {
+      "id": "class.itemName",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "itemName",
+      "usedBy": "72-trigger.css (Host trigger row label)"
+    },
+    {
+      "id": "class.itemDescription",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "itemDescription",
+      "usedBy": "72-trigger.css (Host trigger row description)"
+    },
+    {
+      "id": "class.itemAlias",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "itemAlias",
+      "usedBy": "72-trigger.css (Host trigger alias)"
+    },
+    {
+      "id": "class.sectionTitle",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "sectionTitle",
+      "usedBy": "72-trigger.css (Host trigger section heading)"
+    },
+    {
+      "id": "class.groupTitle",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "groupTitle",
+      "usedBy": "72-trigger.css (Host trigger group heading)"
+    },
+    {
+      "id": "attr.cgptTriggerMenu",
+      "tier": "session",
+      "kind": "attribute",
+      "value": "data-cgpt-trigger-menu",
+      "usedBy": "trigger-ui.js tags the Host menu as command/reference"
+    },
+    {
+      "id": "attr.cgptSearchRow",
+      "tier": "session",
+      "kind": "attribute",
+      "value": "data-cgpt-search-row",
+      "usedBy": "75-search.css / sessions.js keyboard result row"
+    },
+    {
+      "id": "class.diffLine",
+      "tier": "flow",
+      "kind": "class-substring",
+      "value": "IP6KhG_line",
+      "usedBy": "css/30-chat.css (M11: changed-files FileDiff row grid)"
+    },
+    {
+      "id": "class.diffNumber",
+      "tier": "flow",
+      "kind": "class-substring",
+      "value": "IP6KhG_number",
+      "usedBy": "css/30-chat.css (M11: right-aligned line number column)"
+    },
+    {
+      "id": "class.diffBody",
+      "tier": "flow",
+      "kind": "class-substring",
+      "value": "IP6KhG_body",
+      "usedBy": "css/30-chat.css (M11: diff horizontal scroll port)"
+    },
+    {
+      "id": "class.activity",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "_activity",
+      "usedBy": "css/65-work-card.css (idle stop/activity seat)"
+    },
+    {
+      "id": "slot.conversation.input.dock",
+      "tier": "boot",
+      "kind": "data-slot",
+      "value": "conversation.input.dock",
+      "usedBy": "css/30-chat.css (P0-12 goal dock column width)"
+    },
+    {
+      "id": "class-substring._root",
+      "tier": "session",
+      "kind": "class-substring",
+      "value": "_root",
+      "usedBy": "css/60-hero.css (hero title wrapper min-height)"
+    }
+  ]
+}

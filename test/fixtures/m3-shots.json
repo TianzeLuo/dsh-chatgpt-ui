@@ -1,0 +1,280 @@
+{
+ "agentLight": {
+  "mode": "agent",
+  "dark": false,
+  "cards": [
+   "chat",
+   "agent",
+   "dot"
+  ],
+  "cardWidths": [
+   212,
+   212,
+   212
+  ],
+  "cardHeights": [
+   60,
+   60,
+   60
+  ],
+  "cardTops": [
+   476.9,
+   476.9,
+   476.9
+  ],
+  "titleLines": [
+   1,
+   1,
+   1
+  ],
+  "descLines": [
+   1,
+   1,
+   1
+  ],
+  "cardGapBelow": 12,
+  "cardGapBetween": 12,
+  "cardBg": "rgb(227, 227, 227)",
+  "cardFg": "rgb(13, 13, 13)",
+  "descFg": "rgb(93, 93, 93)",
+  "badge": "2 running · 3 unread",
+  "badgeBg": "rgba(127, 127, 127, 0.12)",
+  "badgeFg": "rgb(13, 13, 13)",
+  "navBadge": "3",
+  "readonly": null,
+  "readonlyFg": null,
+  "readonlyBg": null,
+  "permissionVisible": true,
+  "placeholder": "none",
+  "toast": null,
+  "toastBg": null,
+  "toastFg": null,
+  "toastHeight": null,
+  "toastBottom": null,
+  "toastCentered": null,
+  "composerTop": 548.9
+ },
+ "chatLight": {
+  "mode": "chat",
+  "dark": false,
+  "cards": [
+   "chat",
+   "agent",
+   "dot"
+  ],
+  "cardWidths": [
+   212,
+   212,
+   212
+  ],
+  "cardHeights": [
+   60,
+   60,
+   60
+  ],
+  "cardTops": [
+   476.9,
+   476.9,
+   476.9
+  ],
+  "titleLines": [
+   1,
+   1,
+   1
+  ],
+  "descLines": [
+   1,
+   1,
+   1
+  ],
+  "cardGapBelow": 12,
+  "cardGapBetween": 12,
+  "cardBg": "rgba(0, 0, 0, 0)",
+  "cardFg": "rgb(13, 13, 13)",
+  "descFg": "rgb(93, 93, 93)",
+  "badge": "2 running · 3 unread",
+  "badgeBg": "rgba(127, 127, 127, 0.12)",
+  "badgeFg": "rgb(13, 13, 13)",
+  "navBadge": "3",
+  "readonly": "Read-only",
+  "readonlyFg": "rgb(93, 93, 93)",
+  "readonlyBg": "rgba(0, 0, 0, 0)",
+  "permissionVisible": false,
+  "placeholder": "\"Ask anything\"",
+  "toast": null,
+  "toastBg": null,
+  "toastFg": null,
+  "toastHeight": null,
+  "toastBottom": null,
+  "toastCentered": null,
+  "composerTop": 548.9
+ },
+ "toastLight": {
+  "mode": "chat",
+  "dark": false,
+  "cards": [],
+  "cardWidths": [],
+  "cardHeights": [],
+  "cardTops": [],
+  "titleLines": [],
+  "descLines": [],
+  "cardGapBelow": null,
+  "cardGapBetween": null,
+  "cardBg": null,
+  "cardFg": null,
+  "descFg": null,
+  "badge": "2 running · 3 unread",
+  "badgeBg": "rgba(127, 127, 127, 0.12)",
+  "badgeFg": "rgb(13, 13, 13)",
+  "navBadge": "3",
+  "readonly": "Read-only",
+  "readonlyFg": "rgb(93, 93, 93)",
+  "readonlyBg": "rgba(0, 0, 0, 0)",
+  "permissionVisible": false,
+  "placeholder": "\"Ask anything\"",
+  "toast": "This chat already started — switch in a new chat?New chat×",
+  "toastBg": "rgba(32, 32, 32, 0.92)",
+  "toastFg": "rgb(255, 255, 255)",
+  "toastHeight": 46,
+  "toastBottom": 28,
+  "toastCentered": true,
+  "composerTop": 885
+ },
+ "darkToast": {
+  "mode": "chat",
+  "dark": true,
+  "cards": [],
+  "cardWidths": [],
+  "cardHeights": [],
+  "cardTops": [],
+  "titleLines": [],
+  "descLines": [],
+  "cardGapBelow": null,
+  "cardGapBetween": null,
+  "cardBg": null,
+  "cardFg": null,
+  "descFg": null,
+  "badge": "2 running · 3 unread",
+  "badgeBg": "rgba(127, 127, 127, 0.12)",
+  "badgeFg": "rgb(236, 236, 236)",
+  "navBadge": "3",
+  "readonly": "Read-only",
+  "readonlyFg": "rgb(180, 180, 180)",
+  "readonlyBg": "rgba(0, 0, 0, 0)",
+  "permissionVisible": false,
+  "placeholder": "\"Ask anything\"",
+  "toast": "This chat already started — switch in a new chat?New chat×",
+  "toastBg": "rgba(70, 70, 70, 0.96)",
+  "toastFg": "rgb(255, 255, 255)",
+  "toastHeight": 46,
+  "toastBottom": 28,
+  "toastCentered": true,
+  "composerTop": 885
+ },
+ "dark": {
+  "mode": "chat",
+  "dark": true,
+  "cards": [],
+  "cardWidths": [],
+  "cardHeights": [],
+  "cardTops": [],
+  "titleLines": [],
+  "descLines": [],
+  "cardGapBelow": null,
+  "cardGapBetween": null,
+  "cardBg": null,
+  "cardFg": null,
+  "descFg": null,
+  "badge": "2 running · 3 unread",
+  "badgeBg": "rgba(127, 127, 127, 0.12)",
+  "badgeFg": "rgb(236, 236, 236)",
+  "navBadge": "3",
+  "readonly": "Read-only",
+  "readonlyFg": "rgb(180, 180, 180)",
+  "readonlyBg": "rgba(0, 0, 0, 0)",
+  "permissionVisible": false,
+  "placeholder": "\"Ask anything\"",
+  "toast": null,
+  "toastBg": null,
+  "toastFg": null,
+  "toastHeight": null,
+  "toastBottom": null,
+  "toastCentered": null,
+  "composerTop": 885
+ },
+ "darkHero": {
+  "mode": "agent",
+  "dark": true,
+  "cards": [
+   "chat",
+   "agent",
+   "dot"
+  ],
+  "cardWidths": [
+   212,
+   212,
+   212
+  ],
+  "cardHeights": [
+   60,
+   60,
+   60
+  ],
+  "cardTops": [
+   476.9,
+   476.9,
+   476.9
+  ],
+  "titleLines": [
+   1,
+   1,
+   1
+  ],
+  "descLines": [
+   1,
+   1,
+   1
+  ],
+  "cardGapBelow": 12,
+  "cardGapBetween": 12,
+  "cardBg": "rgb(56, 56, 56)",
+  "cardFg": "rgb(236, 236, 236)",
+  "descFg": "rgb(180, 180, 180)",
+  "badge": "2 running · 3 unread",
+  "badgeBg": "rgba(127, 127, 127, 0.12)",
+  "badgeFg": "rgb(236, 236, 236)",
+  "navBadge": "3",
+  "readonly": null,
+  "readonlyFg": null,
+  "readonlyBg": null,
+  "permissionVisible": true,
+  "placeholder": "none",
+  "toast": null,
+  "toastBg": null,
+  "toastFg": null,
+  "toastHeight": null,
+  "toastBottom": null,
+  "toastCentered": null,
+  "composerTop": 548.9
+ },
+ "light": {
+  "cardTitle": 15.1,
+  "cardDesc": 5.1,
+  "toast": 12.9,
+  "readonly": 6.6,
+  "badge": 17
+ },
+ "darkContrast": {
+  "cardTitle": 9.9,
+  "cardDesc": 5.7,
+  "toast": 9.7,
+  "readonly": 7.8,
+  "badge": 11.8
+ },
+ "errors": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ],
+ "failedResponses": [
+  "404 http://127.0.0.1:3099/open-in-app/icon/filemanager"
+ ]
+}
