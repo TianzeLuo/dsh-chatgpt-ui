@@ -306,7 +306,7 @@ const report = {
     },
     {
       file: 'lib/client/css/30-chat.css',
-      line: lineOf('lib/client/css/30-chat.css', 'margin: 0;'),
+      line: lineOf('lib/client/css/30-chat.css', "[data-conversation-tabs] button[role='tab'] {"),
       what: 'tab 清掉负外边距与 35px 最小高度，恢复 46x28 并排、2px 间隙。'
     },
     {
