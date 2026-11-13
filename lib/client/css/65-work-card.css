@@ -417,7 +417,7 @@ body[data-chatgpt-ui]:is([data-chatgpt-mode='agent'], :has([data-super-agent-pan
    with a 34px perfect white circle. The model list below is grouped by the
    Host provider and keeps its M14 geometry. */
 /* P0-8 root cause: the Host theme ships
-     @deepseek-ai/dsh-client-ui-theme/corner-shape.css
+     @deepseek-ai/dsh-client-ui-theme/src/styles/corner-shape.css
      @supports (corner-shape:superellipse(1.5)) {
        :root { --dsw-corner-shape: superellipse(1.5) }
        *, :before, :after { corner-shape: var(--dsw-corner-shape) }

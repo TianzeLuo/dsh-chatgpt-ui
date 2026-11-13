@@ -2,7 +2,7 @@
 /**
  * scripts/m20-corners.mjs — P0-9 corner-shape evidence frames.
  *
- * The Host theme ships `@deepseek-ai/dsh-client-ui-theme/corner-shape.css`:
+ * The Host theme ships `@deepseek-ai/dsh-client-ui-theme/src/styles/corner-shape.css`:
  *
  *   @supports (corner-shape:superellipse(1.5)) {
  *     :root { --dsw-corner-shape: superellipse(1.5) }
@@ -82,7 +82,7 @@ const result = {
   url: url.replace(/([?&]token=)[^&]+/, '$1***'),
   environment: { width: 1600, height: 1000, dpr: 2, locale: 'zh-CN' },
   rootCause: {
-    hostSheet: '@deepseek-ai/dsh-client-ui-theme/corner-shape.css',
+    hostSheet: '@deepseek-ai/dsh-client-ui-theme/src/styles/corner-shape.css',
     hostSelector: '*, :before, :after',
     hostDeclaration: 'corner-shape: var(--dsw-corner-shape)',
     hostVariable: ':root { --dsw-corner-shape: superellipse(1.5) }',

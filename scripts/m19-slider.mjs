@@ -371,7 +371,7 @@ for (const theme of ['dark', 'light']) {
       symptom: 'thumb painted as a rounded square while computed border-radius was already 50%',
       cause: {
         property: 'corner-shape',
-        hostSheet: hostTag?.pluginCss ?? '@deepseek-ai/dsh-client-ui-theme/corner-shape.css',
+        hostSheet: hostTag?.pluginCss ?? '@deepseek-ai/dsh-client-ui-theme/src/styles/corner-shape.css',
         hostSelector: hostRule?.selector ?? '*, :before, :after',
         hostDeclaration: hostRule?.declarations.find((declaration) => declaration.startsWith('corner-shape')) ?? 'corner-shape: var(--dsw-corner-shape)',
         rootVariable: ':root { --dsw-corner-shape: superellipse(1.5) }',
