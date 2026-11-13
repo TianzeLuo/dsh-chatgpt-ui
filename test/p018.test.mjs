@@ -12,12 +12,13 @@
  *
  * Run: node test/p018.test.mjs
  */
-import { existsSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { loc, read, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 const m31 = JSON.parse(read('docs/m31.json'))
 
 const heroCss = read('lib/client/css/60-hero.css')
@@ -216,7 +217,7 @@ const shots = [
   'm31-permission-flip-dark.png'
 ]
 const missing = shots.filter((name) => {
-  const path = join(ROOT, 'docs/screenshots', name)
+  const path = loc(`docs/screenshots/${name}`)
   return !existsSync(path) || statSync(path).size < 8000
 })
 check('P0-18: every acceptance screenshot exists and is non-trivial', missing.length === 0, missing)

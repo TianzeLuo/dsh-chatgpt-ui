@@ -15,12 +15,13 @@
  * Run: node test/m21.test.mjs
  */
 
-import { existsSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { loc, read, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 const rail = read('lib/client/rail.js')
 const sessions = read('lib/client/sessions.js')
 const mode = read('lib/client/mode.js')
@@ -135,7 +136,7 @@ const check = (name, condition, detail) => {
   check('running came from the Host and cleared', doc.projectRow.running.fakeTimer === false && doc.projectRow.running.spinnersAtCapture > 0 && doc.projectRow.running.clearsWhenHostSettles === true)
   check('all recorded assertions passed', doc.assertionSummary.failed.length === 0 && doc.assertionSummary.pass === doc.assertionSummary.total)
   for (const path of [...doc.rail.screenshots, ...doc.sidebar.screenshots, ...doc.projectRow.screenshots]) {
-    check(`screenshot exists: ${path}`, existsSync(join(ROOT, path)) && statSync(join(ROOT, path)).size > 3000)
+    check(`screenshot exists: ${path}`, existsSync(loc(path)) && statSync(loc(path)).size > 3000)
   }
 }
 

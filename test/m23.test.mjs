@@ -9,12 +9,13 @@
  * Run: node test/m23.test.mjs
  */
 
-import { existsSync, readFileSync, statSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { loc, read, exists, size, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 const railCss = read('lib/client/css/21-rail.css')
 const chatCss = read('lib/client/css/30-chat.css')
 const overlayCss = read('lib/client/css/76-overlay.css')
@@ -37,7 +38,7 @@ const check = (name, condition, detail) => {
   failures += 1
   console.log(`FAIL  ${name}${detail === undefined ? '' : ` — ${detail}`}`)
 }
-const nonEmpty = (path) => existsSync(join(ROOT, path)) && statSync(join(ROOT, path)).size > 0
+const nonEmpty = (path) => exists(path) && size(path) > 0
 
 // 1. Rail: two captured filled states + a single highlight rule.
 check('rail: schedules/plugins selected glyphs are captured filled twins', /schedules:[\s\S]*?selected:[\s\S]*?M10\.001 1\.83496/.test(railIcons) && /plugins:[\s\S]*?selected:[\s\S]*?M10\.5218 1\.88086/.test(railIcons) && !railIcons.includes('CHATGPT_RAIL_SOLID_GLYPHS'))
@@ -57,7 +58,7 @@ check('menus: row hover opens the card, ⋯ opens the six-entry menu', sessionsJ
 const moreStart = sessionsJs.lastIndexOf('const items = [', sessionsJs.indexOf('const moveFocus', sessionsJs.indexOf("action: 'pin-project'")))
 const moreBlock = sessionsJs.slice(moreStart, sessionsJs.indexOf('const moveFocus', moreStart))
 check('menus: five entries grouped 置顶/编辑 ─ 打开 ─ 归档 ─ 移除, no 分区', (moreBlock.match(/\{ separator: true \}/g) ?? []).length === 3 && moreBlock.indexOf("label: '编辑'") < moreBlock.indexOf('{ separator: true }') && moreBlock.indexOf("label: '在资源管理器中打开'") < moreBlock.lastIndexOf('{ separator: true }') && moreBlock.indexOf("label: '归档聊天'") < moreBlock.indexOf("label: '移除项目'") && !moreBlock.includes("label: '分区'"))
-check('overlay: one shared surface file, not one set per menu', existsSync(join(ROOT, 'lib/client/css/76-overlay.css')) && /\.chatgpt-session-menu,[\s\S]*?\.chatgpt-work-menu,[\s\S]*?\.chatgpt-effort-menu,[\s\S]*?\.chatgpt-rail-menu/.test(overlayCss))
+check('overlay: one shared surface file, not one set per menu', existsSync(loc('lib/client/css/76-overlay.css')) && /\.chatgpt-session-menu,[\s\S]*?\.chatgpt-work-menu,[\s\S]*?\.chatgpt-effort-menu,[\s\S]*?\.chatgpt-rail-menu/.test(overlayCss))
 check('overlay: measured 16 radius / 10 gutter / 36 rows / 6x10 item padding / 8px separator inset', /--cgpt-menu-radius: 16px/.test(tokens) && /--cgpt-menu-gutter: 10px/.test(tokens) && /--cgpt-menu-row-height: 36px/.test(tokens) && /--cgpt-menu-row-pad-y: 6px/.test(tokens) && /--cgpt-menu-row-pad-x: 10px/.test(tokens) && /--cgpt-menu-separator-inset: 8px/.test(tokens) && /padding: 8px var\(--cgpt-menu-separator-inset\)/.test(overlayCss))
 check('overlay: dark surface #2B2B2B', /--cgpt-overlay-bg: #2b2b2b/.test(read('lib/client/css/06-cgpt-tokens-dark.css')))
 

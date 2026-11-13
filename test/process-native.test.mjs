@@ -26,11 +26,13 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import test from 'node:test'
 import { fileURLToPath } from 'node:url'
+import { loc, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
-const CSS_DIR = join(ROOT, 'lib/client/css')
+const CSS_DIR = loc('lib/client/css')
 const TOLERANCE = 1
-const report = JSON.parse(readFileSync(join(ROOT, 'docs/m15-process.json'), 'utf8'))
+const report = JSON.parse(readFileSync(loc('docs/m15-process.json'), 'utf8'))
 
 const BLANK = (text) => text.replace(/[^\n]/g, ' ')
 const withoutComments = (text) => text.replace(/\/\*[\s\S]*?\*\//g, BLANK)
@@ -149,8 +151,8 @@ test('the skin no longer ships a process/tool-row rule', () => {
 })
 
 test('the skin no longer rewrites the Host process summary', () => {
-  const fragment = readFileSync(join(ROOT, 'lib/client/messages.js'), 'utf8')
-  const bundle = readFileSync(join(ROOT, 'lib/client.js'), 'utf8')
+  const fragment = readFileSync(loc('lib/client/messages.js'), 'utf8')
+  const bundle = readFileSync(loc('lib/client.js'), 'utf8')
   for (const source of [fragment, bundle]) {
     assert.ok(!source.includes('data-cgpt-summary'), 'data-cgpt-summary must be gone')
     assert.ok(!source.includes('chatgptAnnotateProcess'), 'the annotation routine must be gone')
@@ -175,7 +177,7 @@ test('assistant prose rules skip process members', () => {
 
 test('native, before and after crops exist for the same region', () => {
   for (const tag of ['native', 'before', 'after']) {
-    const path = join(ROOT, 'docs', 'screenshots', `m15-process-${tag}.png`)
+    const path = loc(`docs/screenshots/m15-process-${tag}.png`)
     assert.ok(existsSync(path), `missing ${path}`)
     assert.ok(statSync(path).size > 5000, `screenshot looks empty: ${path}`)
     assert.ok(report.screenshots.includes(`screenshots/m15-process-${tag}.png`))

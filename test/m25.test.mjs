@@ -21,9 +21,10 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { loc, read, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 
 let checks = 0
 let failures = 0
@@ -203,12 +204,12 @@ check("evidence: the live row really renders two different paths",
 check("evidence: every assertion in the capture passed",
   evidence.assertions.every((row) => row.pass === true), evidence.assertions.filter((row) => row.pass !== true).map((row) => row.name))
 for (const [name, path] of Object.entries(evidence.frames)) {
-  check(`frame ${name} exists and is not empty`, existsSync(join(ROOT, path)) && readFileSync(join(ROOT, path)).length > 1000, path)
+  check(`frame ${name} exists and is not empty`, existsSync(loc(path)) && readFileSync(loc(path)).length > 1000, path)
 }
 check("sheets: reference and implementation frames are composed side by side",
-  existsSync(join(ROOT, 'docs/screenshots/m25-more-menu-sheet.png')) &&
-  existsSync(join(ROOT, 'docs/screenshots/m25-sidebar-projects-sheet.png')) &&
-  existsSync(join(ROOT, 'docs/screenshots/m25-session-menu-sheet.png')))
+  existsSync(loc('docs/screenshots/m25-more-menu-sheet.png')) &&
+  existsSync(loc('docs/screenshots/m25-sidebar-projects-sheet.png')) &&
+  existsSync(loc('docs/screenshots/m25-session-menu-sheet.png')))
 check("capture: the desktop-only menus are declared, not invented",
   capture.notCapturedFromWeb.some((entry) => entry.menu === 'permission') &&
   capture.notCapturedFromWeb.some((entry) => entry.menu === 'projectHoverCard') &&
@@ -251,7 +252,7 @@ check('selection: the implementation matches — no fill, generic current rule e
   /chatgpt-permission-row/.test(composerJs))
 const sheets = JSON.parse(read('docs/m25-sheets.json')).sheets
 check('sheets: at least 5 sheets, each with a live reference crop and an implementation',
-  sheets.length >= 5 && sheets.every((sheet) => typeof sheet.reference === 'string' && sheet.reference.startsWith('docs/capture/live/') && existsSync(join(ROOT, sheet.reference)) && existsSync(join(ROOT, sheet.frame))),
+  sheets.length >= 5 && sheets.every((sheet) => typeof sheet.reference === 'string' && sheet.reference.startsWith('docs/capture/live/') && existsSync(loc(sheet.reference)) && existsSync(loc(sheet.frame))),
   sheets.map((sheet) => [sheet.name, sheet.reference]))
 check('sheets: dark and light for the ⋯ menu and the permission menu, plus the hover card',
   ['more-menu', 'more-menu-light', 'permission-menu', 'permission-menu-light', 'hover-card'].every((name) => sheets.some((sheet) => sheet.name === name)) &&

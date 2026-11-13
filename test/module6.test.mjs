@@ -12,12 +12,12 @@
  * Run: node test/module6.test.mjs
  */
 
-import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { exists, read, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 const rail = read('lib/client/rail.js')
 const sidebarCss = read('lib/client/css/20-sidebar.css')
 const railCss = read('lib/client/css/21-rail.css')
@@ -113,7 +113,7 @@ const check = (name, condition, detail) => {
   for (const name of ['home', 'schedules', 'plugins', 'more', 'settings']) {
     const state = checkJson.results.find((entry) => entry.glyph === name && entry.variant === 'selected')
     check(`${name} selected state is measured`, state !== undefined && state.ratio <= 2)
-    check(`icon-check shot exists for ${name}`, existsSync(join(ROOT, `docs/screenshots/icon-check-${name}.png`)))
+    check(`icon-check shot exists for ${name}`, exists(`docs/screenshots/icon-check-${name}.png`))
   }
   check('gear is byte-identical to its sprite symbol', capture.icons.settings.selectedEqualsDefault === true && checkJson.results.find((entry) => entry.glyph === 'settings')?.ratio === 0)
   check('home has a distinct filled selected path', capture.icons.home.selectedEqualsDefault !== true && capture.icons.home.selected.inner !== capture.icons.home.default.inner)

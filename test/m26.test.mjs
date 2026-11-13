@@ -21,13 +21,14 @@
  * Run: node test/m26.test.mjs
  */
 
-import { existsSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { readPng } from '../scripts/png-read.mjs'
+import { loc, read, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 
 let checks = 0
 let failures = 0
@@ -114,8 +115,8 @@ const frames = [
   ['permission-chip', 'docs/capture/m26/impl-permission-chip.png', metrics['permission-chip'].box]
 ]
 const frameErrors = frames.map(([name, file, box]) => {
-  if (existsSync(join(ROOT, file)) !== true) return [name, 'missing']
-  const png = readPng(join(ROOT, file))
+  if (existsSync(loc(file)) !== true) return [name, 'missing']
+  const png = readPng(loc(file))
   // A screenshot is clipped to whole device pixels, so a fractional CSS box can
   // land one device px either side of the exact 2x product.
   return [name, Math.max(0, Math.abs(png.width - box.width * 2) - 1), Math.max(0, Math.abs(png.height - box.height * 2) - 1)]
@@ -187,8 +188,8 @@ check('fix 3: the chip stays the 帮我批准 glyph and no longer the P0-14 caps
 // ---- 5. the overlays exist ------------------------------------------------
 const overlays = m26.surfaces.map((surface) => surface.overlay)
 check('m26: one same-scale overlay per surface, each written and non-trivial',
-  overlays.length === 4 && overlays.every((file) => existsSync(join(ROOT, file)) && statSync(join(ROOT, file)).size > 3000),
-  overlays.filter((file) => !existsSync(join(ROOT, file))))
+  overlays.length === 4 && overlays.every((file) => existsSync(loc(file)) && statSync(loc(file)).size > 3000),
+  overlays.filter((file) => !existsSync(loc(file))))
 check('m26: the overlay report lists the same four sheets with their alignment rule',
   JSON.parse(read('docs/m26-sheets.json')).sheets.length === 4 &&
   JSON.parse(read('docs/m26-sheets.json')).panels.join('|') === 'reference|implementation|blend 50/50')

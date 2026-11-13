@@ -20,11 +20,12 @@ import assert from 'node:assert/strict'
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import test from 'node:test'
+import nodeTest from 'node:test'
+import { loc, read, evidenceTest } from './evidence.mjs'
+const test = evidenceTest(nodeTest, import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const CSS_DIR = join(ROOT, 'lib/client/css')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
+const CSS_DIR = loc('lib/client/css')
 
 const BLANK = (text) => text.replace(/[^\n]/g, ' ')
 const stripComments = (css) => css.replace(/\/\*[\s\S]*?\*\//g, BLANK)
@@ -200,7 +201,7 @@ test('m27: screenshots are the recorded same-region DPR-2 crop', () => {
   assert.deepEqual(report.screenshots.mid.clip, clip)
   assert.deepEqual(report.screenshots.done.clip, clip)
   for (const relative of ['docs/screenshots/m27-stream-mid.png', 'docs/screenshots/m27-stream-done.png']) {
-    const path = join(ROOT, relative)
+    const path = loc(relative)
     assert.ok(existsSync(path), relative)
     assert.ok(statSync(path).size > 1024, relative)
     const png = readFileSync(path)

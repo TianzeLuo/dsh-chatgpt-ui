@@ -13,12 +13,13 @@
  *
  * Run: node test/m17.test.mjs
  */
-import { existsSync, readFileSync, statSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { loc, read, size, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 
 const composer = read('lib/client/composer.js')
 const core = read('lib/shared/composer-core.mjs')
@@ -78,7 +79,7 @@ check('a11y: reduced motion covers the block, fill and thumb', /prefers-reduced-
 // 5. Built bundle and package wiring.
 check('build: the bundle carries the new block and CSS', bundle.includes('chatgpt-effort-choice-name') && bundle.includes('chatgpt-effort-head-blank') && bundle.includes('chatgpt-effort-fill[data-max=') && bundle.includes('width: 34px') && bundle.includes('corner-shape: round'))
 check('build: the bundle has no lightning glyph', !bundle.includes('CHATGPT_LIGHTNING_SVG') && !bundle.includes('chatgpt-effort-head-icon'))
-check('wiring: npm test runs m17', /test\/m17\.test\.mjs/.test(packageJson.scripts?.test ?? ''))
+check('wiring: npm test runs m17', packageJson.scripts?.test === 'node scripts/run-tests.mjs' && read('scripts/run-tests.mjs').includes("'m17.test.mjs'"))
 check('wiring: npm run check runs the m17 report', /scripts\/m17-report\.mjs/.test(packageJson.scripts?.check ?? ''))
 
 // 6. The report table: reference → implementation → delta.
@@ -95,7 +96,7 @@ check('report: thumb overflow is the only failed numeric row and is flagged', ro
 
 // 7. The capture is the same panel in both themes.
 check('capture: both themes have default/hover/max frames', ['dark', 'light'].every((theme) => capture.themes[theme] && ['default', 'hover', 'max'].every((frame) => capture.themes[theme].frames[frame] !== null)))
-check('capture: six screenshots exist and are non-empty', ['m17-panel-dark.png', 'm17-panel-hover-dark.png', 'm17-panel-max-dark.png', 'm17-panel-light.png', 'm17-panel-hover-light.png', 'm17-panel-max-light.png'].every((name) => existsSync(join(ROOT, 'docs/screenshots', name)) && statSync(join(ROOT, 'docs/screenshots', name)).size > 5000))
+check('capture: six screenshots exist and are non-empty', ['m17-panel-dark.png', 'm17-panel-hover-dark.png', 'm17-panel-max-dark.png', 'm17-panel-light.png', 'm17-panel-hover-light.png', 'm17-panel-max-light.png'].every((name) => existsSync(loc(`docs/screenshots/${name}`)) && size(`docs/screenshots/${name}`) > 5000))
 for (const theme of ['dark', 'light']) {
   const frame = capture.themes[theme].frames.default
   const max = capture.themes[theme].frames.max

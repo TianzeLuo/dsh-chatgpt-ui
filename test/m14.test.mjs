@@ -11,12 +11,13 @@
  *
  * Run: node test/m14.test.mjs
  */
-import { existsSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { loc, read, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 
 const composer = read('lib/client/composer.js')
 const core = read('lib/shared/composer-core.mjs')
@@ -103,7 +104,7 @@ for (const path of [
   'docs/screenshots/m14-slider-max-dark.png',
   'docs/capture/live/m14-capture.json'
 ]) {
-  const full = join(ROOT, path)
+  const full = loc(path)
   check(`evidence: ${path} exists and is not empty`, existsSync(full) && statSync(full).size > 1000)
 }
 

@@ -9,13 +9,13 @@
  *
  * Run: node test/module8.test.mjs
  */
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
+import { readdirSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { loc, read, exists, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
-const exists = (path) => existsSync(join(ROOT, path))
 const json = (path) => JSON.parse(read(path))
 const tokens = read('lib/client/css/05-cgpt-tokens.css')
 const darkTokens = read('lib/client/css/06-cgpt-tokens-dark.css')
@@ -128,23 +128,24 @@ check('narrow search is edge-to-edge', /@media \(max-width: 640px\)[\s\S]*width:
 check('search modal keeps 720px default', search.includes('width: min(720px, calc(100vw - 32px))'))
 check('font token has Latin and CJK fallbacks', tokens.includes('--cgpt-font-body:') && /PingFang SC/.test(tokens) && /Microsoft YaHei/.test(tokens))
 check('DPR 2 shape rendering rule exists', a11y.includes('shape-rendering: geometricPrecision'))
-check('85-a11y stylesheet is in the build', build.includes("'85-a11y.css'") || readdirSync(join(ROOT, 'lib/client/css')).filter((name) => name.endsWith('.css')).length === 19)
-check('stylesheet directory has 19 files', readdirSync(join(ROOT, 'lib/client/css')).filter((name) => name.endsWith('.css')).length === 19, String(readdirSync(join(ROOT, 'lib/client/css')).filter((name) => name.endsWith('.css')).length))
+check('85-a11y stylesheet is in the build', build.includes("'85-a11y.css'") || readdirSync(loc('lib/client/css')).filter((name) => name.endsWith('.css')).length === 19)
+check('stylesheet directory has 19 files', readdirSync(loc('lib/client/css')).filter((name) => name.endsWith('.css')).length === 19, String(readdirSync(loc('lib/client/css')).filter((name) => name.endsWith('.css')).length))
 check('client bundle contains the keyboard marker code', client.includes('data-cgpt-keyboard'))
 
 // 7. Evidence files and package wiring.
 for (const width of [640, 768, 900, 1024, 1280, 1600]) {
   for (const theme of ['light', 'dark']) {
     const path = `docs/screenshots/m8-${width}-${theme}.png`
-    check(`matrix ${width}/${theme} exists`, exists(path) && statSync(join(ROOT, path)).size > 5000, path)
+    check(`matrix ${width}/${theme} exists`, exists(path) && statSync(loc(path)).size > 5000, path)
   }
 }
 check('collapsed screenshot exists', exists('docs/screenshots/m8-collapsed-light.png'))
 check('600px screenshot exists', exists('docs/screenshots/m8-height600-light.png'))
 check('DPR2 screenshot exists', exists('docs/screenshots/m8-dpr2-dark.png'))
 check('reduced-motion screenshot exists', exists('docs/screenshots/m8-reduced-motion-light.png'))
-check('module 8 test is in npm test', pkg.scripts.test.includes('test/module8.test.mjs'))
-check('module 8 test runs before native parity', pkg.scripts.test.indexOf('test/module8.test.mjs') < pkg.scripts.test.indexOf('test/native-parity.test.mjs'))
+const runner = read('scripts/run-tests.mjs')
+check('module 8 test is in npm test', pkg.scripts.test === 'node scripts/run-tests.mjs' && runner.includes("'module8.test.mjs'"))
+check('module 8 test runs before native parity', runner.indexOf("'module8.test.mjs'") < runner.indexOf("'native-parity.test.mjs'"))
 check('theme audit script is syntax-checked', pkg.scripts.check.includes('scripts/theme-audit.mjs'))
 check('responsive script is syntax-checked', pkg.scripts.check.includes('scripts/check-responsive.mjs'))
 

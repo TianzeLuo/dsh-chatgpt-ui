@@ -26,9 +26,10 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { loc, read, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 
 let checks = 0
 let failures = 0
@@ -94,7 +95,7 @@ for (const tag of ['before', 'after']) {
         check(`${prefix}: type/line-height/padding equals native`, JSON.stringify(strip(item.typography)) === JSON.stringify(strip(native.typography)), JSON.stringify({ implementation: item.typography, native: native.typography }))
       }
       check(`${prefix}: clip matches native and the other tag`, JSON.stringify(item.clip) === JSON.stringify(native.clip) && JSON.stringify(item.clip) === JSON.stringify(doc.tags[tag === 'before' ? 'after' : 'before'][theme][key].clip), JSON.stringify(item.clip))
-      check(`${prefix}: screenshot exists`, existsSync(join(ROOT, item.screenshot)), item.screenshot)
+      check(`${prefix}: screenshot exists`, existsSync(loc(item.screenshot)), item.screenshot)
     }
   }
 }

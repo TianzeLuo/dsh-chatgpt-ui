@@ -14,15 +14,15 @@
  * Run: node test/m32.test.mjs
  */
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync, statSync } from 'node:fs'
+import { readFileSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
+import { loc, read, exists, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 const json = (path) => JSON.parse(read(path))
-const exists = (path) => existsSync(join(ROOT, path))
 
 const rail = read('lib/client/rail.js')
 const sessions = read('lib/client/sessions.js')
@@ -33,7 +33,7 @@ const client = read('lib/client.js')
 const doc = json('docs/m32.json')
 
 const pngSize = (name) => {
-  const header = readFileSync(join(ROOT, 'docs/screenshots', name)).subarray(16, 24)
+  const header = readFileSync(loc(`docs/screenshots/${name}`)).subarray(16, 24)
   return { width: header.readUInt32BE(0), height: header.readUInt32BE(4) }
 }
 
@@ -149,7 +149,7 @@ test('P0-19a: spinner timing and project-row absence are recorded', () => {
 test('P0-19a: every screenshot exists, and the 3 peek frames are 2× 420×560', () => {
   for (const path of doc.screenshots) {
     assert.ok(exists(path), `${path} missing`)
-    assert.ok(statSync(join(ROOT, path)).size > 3000, `${path} too small`)
+    assert.ok(statSync(loc(path)).size > 3000, `${path} too small`)
   }
   for (const name of ['m32-peek-1-collapsed.png', 'm32-peek-2-hover.png', 'm32-peek-3-out.png', 'm32-peek-expanded.png']) {
     assert.deepEqual(pngSize(name), { width: 840, height: 1120 }, name)

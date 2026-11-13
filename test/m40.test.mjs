@@ -6,13 +6,15 @@
  */
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync } from 'node:fs'
-import { dirname, join, resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { loc, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const core = readFileSync(join(ROOT, 'lib/shared/sessions-core.mjs'), 'utf8')
-const sessions = readFileSync(join(ROOT, 'lib/client/sessions.js'), 'utf8')
-const report = JSON.parse(readFileSync(join(ROOT, 'docs/m40.json'), 'utf8'))
+const core = readFileSync(loc('lib/shared/sessions-core.mjs'), 'utf8')
+const sessions = readFileSync(loc('lib/client/sessions.js'), 'utf8')
+const report = JSON.parse(readFileSync(loc('docs/m40.json'), 'utf8'))
 const stripComments = (text) => text.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
 
 let checks = 0
@@ -112,7 +114,7 @@ check('m40 evidence images exist and are not empty', () => {
   ]
   assert.deepEqual(report.screenshots.map((shot) => shot.name), required)
   for (const shot of report.screenshots) {
-    const path = join(ROOT, 'docs', shot.path)
+    const path = loc(`docs/${shot.path}`)
     assert.ok(existsSync(path), path)
     assert.ok(readFileSync(path).length > 1000, path)
   }

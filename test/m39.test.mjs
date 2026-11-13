@@ -12,9 +12,10 @@ import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
+import { loc, read, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 const tokens = read('lib/client/css/00-tokens.css')
 const composerCss = read('lib/client/css/40-composer.css')
 const heroCss = read('lib/client/css/60-hero.css')
@@ -130,7 +131,7 @@ test('P0-21: every recorded assertion passes and every frame exists', () => {
   for (const entry of doc.assertions) assert.equal(entry.ok, true, entry.id)
   assert.equal(doc.screenshots.length, 7)
   for (const name of doc.screenshots) {
-    const path = join(ROOT, 'docs/screenshots', name)
+    const path = loc(`docs/screenshots/${name}`)
     assert.ok(existsSync(path), `missing ${name}`)
     const header = readFileSync(path).subarray(16, 24)
     const w = header.readUInt32BE(0)

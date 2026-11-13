@@ -13,17 +13,17 @@
  * Run: node test/m36.test.mjs
  */
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync, statSync } from 'node:fs'
+import { readFileSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
+import { loc, read, exists, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 const json = (path) => JSON.parse(read(path))
-const exists = (path) => existsSync(join(ROOT, path))
 const pngSize = (name) => {
-  const header = readFileSync(join(ROOT, 'docs/screenshots', name)).subarray(16, 24)
+  const header = readFileSync(loc(`docs/screenshots/${name}`)).subarray(16, 24)
   return { width: header.readUInt32BE(0), height: header.readUInt32BE(4) }
 }
 
@@ -104,7 +104,7 @@ test('P0-19d: every assertion and screenshot is present', () => {
   assert.deepEqual(doc.errors, [])
   for (const path of doc.screenshots) {
     assert.ok(exists(path), `${path} missing`)
-    assert.ok(statSync(join(ROOT, path)).size > 5000, `${path} too small`)
+    assert.ok(statSync(loc(path)).size > 5000, `${path} too small`)
   }
   for (const name of ['m36-hover-0ms.png', 'm36-hover-200ms.png', 'm36-hover-700ms.png', 'm36-hover-1500ms.png']) {
     assert.deepEqual(pngSize(name), { width: 484, height: 302 }, name)

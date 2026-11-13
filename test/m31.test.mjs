@@ -13,11 +13,10 @@
  * Run: node test/m31.test.mjs
  */
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
-
 import {
   CONNECTION_ACTION_TIMEOUT_MS,
   CONNECTION_AWAY_MS,
@@ -27,9 +26,11 @@ import {
   shouldAutoReload,
   shouldReconnectAfterAway
 } from '../lib/shared/connection-core.mjs'
+import { loc, read, skipSuite } from './evidence.mjs'
+
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 
 test('away threshold is five minutes and only a connected generation is rebuilt', () => {
   assert.equal(CONNECTION_AWAY_MS, 5 * 60 * 1000)
@@ -98,5 +99,5 @@ test('the bundle ships the watchdog and the shared policy', () => {
 })
 
 test('the evidence document exists', () => {
-  assert.ok(existsSync(join(ROOT, 'docs/p1e.json')))
+  assert.ok(existsSync(loc('docs/p1e.json')))
 })

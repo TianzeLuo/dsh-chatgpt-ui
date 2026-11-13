@@ -13,7 +13,7 @@
  * Run: node test/m35.test.mjs
  */
 
-import { existsSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
@@ -23,9 +23,11 @@ import {
   chatgptSortProjectsByPin,
   chatgptTogglePinnedProject
 } from '../lib/shared/sessions-core.mjs'
+import { loc, read, skipSuite } from './evidence.mjs'
+
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 
 const sessions = read('lib/client/sessions.js')
 const core = read('lib/shared/sessions-core.mjs')
@@ -179,7 +181,7 @@ const check = (name, condition, detail) => {
   check('evidence: 分区 removal is recorded', doc.sectionRemoval.absent === true && doc.sectionRemoval.projectMenuLabels.length === 5)
   check('evidence: both menus anchor 8px right and on the row top edge', doc.menus.project.anchor.project.gapX === 8 && doc.menus.project.anchor.project.topDelta <= 1 && doc.menus.project.anchor.session.gapX === 8 && doc.menus.project.anchor.session.topDelta <= 1)
   for (const path of doc.screenshots) {
-    check(`evidence: ${path} exists`, existsSync(join(ROOT, path)) && statSync(join(ROOT, path)).size > 3000)
+    check(`evidence: ${path} exists`, existsSync(loc(path)) && statSync(loc(path)).size > 3000)
   }
 }
 

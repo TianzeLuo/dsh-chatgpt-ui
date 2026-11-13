@@ -4,16 +4,16 @@
  * regression command produces docs/regression9.json.
  */
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync, statSync } from 'node:fs'
-import { join } from 'node:path'
+import { existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { loc, read, size, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 const json = (path) => JSON.parse(read(path))
-const exists = (path) => existsSync(path.startsWith('/') ? path : join(ROOT, path))
+const exists = (path) => existsSync(loc(path))
 const pngSize = (path) => {
-  const data = readFileSync(join(ROOT, path))
+  const data = readFileSync(loc(path))
   assert.equal(data.subarray(1, 4).toString(), 'PNG', `${path} is not a PNG`)
   return { width: data.readUInt32BE(16), height: data.readUInt32BE(20), bytes: data.length }
 }
@@ -65,12 +65,12 @@ check('regression covers all requested ids', ['01-new-session', '02-switch-mode'
 check('STATUS.md names all nine modules', ['模块 1', '模块 2', '模块 3', '模块 4', '模块 5', '模块 6', '模块 7', '模块 8', '模块 9'].every((name) => status.includes(name)))
 check('STATUS.md contains the required retained differences', ['340', '264', 'localStorage', '文件写', 'Trajectory', 'super-agent'].every((word) => status.includes(word)))
 check('STATUS.md has pending user confirmation and rerun sections', /待用户确认/.test(status) && /复跑/.test(status))
-check('README has development and acceptance section', /开发与验收/.test(readme) && /npm run matrix/.test(readme))
-check('package exposes matrix, check and test wiring', pkg.scripts.matrix === 'node scripts/matrix9.mjs' && /scripts\/matrix9\.mjs/.test(pkg.scripts.check) && /scripts\/regression9\.mjs/.test(pkg.scripts.check) && /test\/module9\.test\.mjs/.test(pkg.scripts.test))
+check('README links the development and acceptance docs', /docs\/testing\.md/.test(readme) && /npm run matrix/.test(read('docs/testing.md')))
+check('package exposes matrix, check and test wiring', pkg.scripts.matrix === 'node scripts/matrix9.mjs' && /scripts\/matrix9\.mjs/.test(pkg.scripts.check) && /scripts\/regression9\.mjs/.test(pkg.scripts.check) && pkg.scripts.test === 'node scripts/run-tests.mjs' && read('scripts/run-tests.mjs').includes("'module9.test.mjs'"))
 check('matrix script documents allow-diff and gate exit', /allow-diff/.test(read('scripts/matrix9.mjs')) && /process\.exitCode = 1/.test(read('scripts/matrix9.mjs')))
 check('default matrix command is not --allow-diff', !/allow-diff/.test(pkg.scripts.matrix))
 check('matrix and regression scripts pass node syntax check by npm check', true)
-check('durable docs exist', ['docs/matrix9.json', 'docs/regression9.json', 'docs/STATUS.md', 'docs/motion.md'].every(exists) && statSync(join(ROOT, 'docs/matrix9.json')).size > 1000)
+check('durable docs exist', ['docs/matrix9.json', 'docs/regression9.json', 'docs/STATUS.md', 'docs/motion.md'].every(exists) && size('docs/matrix9.json') > 1000)
 
 console.log(`module9: ${passed}/33 checks passed`)
 if (process.exitCode === 1) process.exit(1)

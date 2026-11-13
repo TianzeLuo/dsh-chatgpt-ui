@@ -10,15 +10,15 @@
  * Run: node test/m34.test.mjs
  */
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
+import { loc, read, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 const json = (path) => JSON.parse(read(path))
-const exists = (path) => existsSync(join(ROOT, path))
 const stripComments = (css) => css.replace(/\/\*[\s\S]*?\*\//g, '')
 
 const report = json('docs/m34.json')
@@ -82,7 +82,7 @@ test('M34: the live report passes and all screenshots exist', () => {
     'm34-project-new.png'
   ]
   for (const name of names) {
-    const path = join(ROOT, 'docs/screenshots', name)
+    const path = loc(`docs/screenshots/${name}`)
     assert.ok(existsSync(path), name)
     assert.ok(statSync(path).size > 1000, `${name} is not empty`)
   }

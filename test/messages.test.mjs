@@ -13,7 +13,9 @@
  * Run: node test/messages.test.mjs
  */
 
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync } from 'node:fs'
+import { loc, read, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 let failures = 0
 let checks = 0
@@ -23,7 +25,6 @@ const check = (name, condition, detail) => {
   failures += 1
   console.log(`FAIL  ${name}${detail === undefined ? '' : ` — ${detail}`}`)
 }
-const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8')
 const css = read('lib/client/css/30-chat.css')
 const cssRules = css.replace(/\/\*[\s\S]*?\*\//g, '')
 const js = read('lib/client/messages.js')
@@ -89,8 +90,8 @@ const pkg = JSON.parse(read('package.json'))
   check('skin off returns before any effect mounts', entry.includes("config?.skin === 'off'") && entry.includes('storedSkin === \'off\'') && entry.includes("localStorage?.getItem('cgpt-skin')"))
   check('messages fragment is in the bundle without the process annotation', bundle.includes('chatgptDefaultCodeWrap') && !bundle.includes('chatgptAnnotateProcess') && !bundle.includes('data-cgpt-summary'))
   check('messages fragment is checked by npm run check', pkg.scripts.check.includes('node --check lib/client/messages.js'))
-  check('reference/implementation pairs exist', ['m4-light-reference', 'm4-light-implementation', 'm4-dark-reference', 'm4-dark-implementation', 'm4-light-compare', 'm4-dark-compare'].every((name) => existsSync(new URL(`../docs/screenshots/${name}.png`, import.meta.url))))
-  check('long-content and interaction evidence exists', ['m4-light-long', 'm4-light-long-code', 'm4-light-process-collapsed', 'm4-light-process-expanded', 'm4-light-attachments', 'm4-light-preview', 'm4-light-file-card', 'm4-light-trajectory'].every((name) => existsSync(new URL(`../docs/screenshots/${name}.png`, import.meta.url))))
+  check('reference/implementation pairs exist', ['m4-light-reference', 'm4-light-implementation', 'm4-dark-reference', 'm4-dark-implementation', 'm4-light-compare', 'm4-dark-compare'].every((name) => existsSync(loc(`docs/screenshots/${name}.png`))))
+  check('long-content and interaction evidence exists', ['m4-light-long', 'm4-light-long-code', 'm4-light-process-collapsed', 'm4-light-process-expanded', 'm4-light-attachments', 'm4-light-preview', 'm4-light-file-card', 'm4-light-trajectory'].every((name) => existsSync(loc(`docs/screenshots/${name}.png`))))
 }
 
 console.log(`messages: ${checks - failures}/${checks} checks passed`)

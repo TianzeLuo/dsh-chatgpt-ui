@@ -13,13 +13,12 @@
  *
  * Run: node test/m19.test.mjs
  */
-import { existsSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { read, exists, size, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
-const exists = (path) => existsSync(join(ROOT, path))
 
 const composer = read('lib/client/composer.js')
 const core = read('lib/shared/composer-core.mjs')
@@ -107,11 +106,11 @@ for (const name of [
   'm19-slider-thumb-dark-4x.png', 'm19-slider-thumb-dark-default-4x.png',
   'm19-slider-thumb-light-4x.png', 'm19-slider-thumb-light-default-4x.png'
 ]) {
-  check(`screenshots: ${name} exists`, exists(`docs/screenshots/${name}`) && statSync(join(ROOT, 'docs/screenshots', name)).size > 2000)
+  check(`screenshots: ${name} exists`, exists(`docs/screenshots/${name}`) && size(`docs/screenshots/${name}`) > 2000)
 }
 
 // 5. Wiring.
-check('wiring: npm test runs m19', /test\/m19\.test\.mjs/.test(packageJson.scripts?.test ?? ''))
+check('wiring: npm test runs m19', packageJson.scripts?.test === 'node scripts/run-tests.mjs' && read('scripts/run-tests.mjs').includes("'m19.test.mjs'"))
 check('wiring: npm run check parses the capture script', /node --check scripts\/m19-slider\.mjs/.test(packageJson.scripts?.check ?? ''))
 
 if (failures > 0) {

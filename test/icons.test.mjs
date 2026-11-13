@@ -11,12 +11,12 @@
  * Run: node test/icons.test.mjs
  */
 
-import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { read, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 
 const capture = JSON.parse(read('docs/capture/icons.json'))
 const generated = read('lib/client/rail-icons.js')

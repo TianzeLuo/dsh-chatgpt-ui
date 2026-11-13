@@ -7,12 +7,12 @@
  *
  * Run: node test/m12.test.mjs
  */
-import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { read, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 
 const composer = read('lib/client/composer.js')
 const css = read('lib/client/css/65-work-card.css')

@@ -18,14 +18,13 @@
  * Run: node test/m28.test.mjs
  */
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import test from 'node:test'
+import nodeTest from 'node:test'
+import { read, exists, evidenceTest } from './evidence.mjs'
+const test = evidenceTest(nodeTest, import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
-const exists = (path) => existsSync(join(ROOT, path))
 
 const BLANK = (text) => text.replace(/[^\n]/g, ' ')
 const stripComments = (css) => css.replace(/\/\*[\s\S]*?\*\//g, BLANK)

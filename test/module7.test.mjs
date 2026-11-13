@@ -98,7 +98,7 @@ check('outside click hides the no-result trigger note', triggerJs.includes('poin
 // 6. Integration wiring.
 check('trigger fragment is in the bundle order', build.includes("'trigger-ui.js'"))
 check('trigger fragment is syntax-checked', pkg.scripts.check.includes('lib/client/trigger-ui.js'))
-check('module 7 tests are in npm test', pkg.scripts.test.includes('test/module7.test.mjs'))
+check('module 7 tests are in npm test', pkg.scripts.test === 'node scripts/run-tests.mjs' && read('scripts/run-tests.mjs').includes("'module7.test.mjs'"))
 check('feedback overlay is registered on shell.overlay', entryJs.includes('mountChatgptTriggerFeedback'))
 check('search menu tag is plugin-scoped', triggerCss.includes("[data-cgpt-trigger-menu]"))
 

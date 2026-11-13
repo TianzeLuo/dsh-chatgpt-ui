@@ -12,9 +12,10 @@ import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
+import { loc, read, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 const composerJs = read('lib/client/composer.js')
 const modeUiJs = read('lib/client/mode-ui.js')
 const composerCss = read('lib/client/css/40-composer.css')
@@ -131,7 +132,7 @@ for (const theme of ['dark', 'light']) {
 
 test('P0-18b: every acceptance screenshot exists and is non-trivial', () => {
   for (const file of images) {
-    const path = join(ROOT, 'docs/screenshots', file)
+    const path = loc(`docs/screenshots/${file}`)
     assert.ok(existsSync(path), `missing ${file}`)
     const buffer = readFileSync(path)
     assert.ok(buffer.length > 4000, `${file} is too small`)
@@ -173,7 +174,7 @@ test('P0-18b: project-switch evidence has 10 + 10 frames, equal rects, focus and
   assert.equal(sw.checks.every((item) => item.ok), true)
   assert.match(sw.rootCause.file, /composer\.js$/)
   assert.match(sw.fix.files.join(','), /60-hero\.css/)
-  const shot = join(ROOT, 'docs/screenshots/m31b-project-switch-frames.png')
+  const shot = loc('docs/screenshots/m31b-project-switch-frames.png')
   assert.ok(existsSync(shot))
   assert.ok(readFileSync(shot).length > 10000)
 })

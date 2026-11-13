@@ -6,7 +6,8 @@
  *
  * Run: node test/m16.test.mjs
  */
-import { existsSync, readFileSync } from 'node:fs'
+import { exists, read, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 let failures = 0
 let checks = 0
@@ -16,7 +17,6 @@ const check = (name, condition, detail) => {
   failures += 1
   console.log(`FAIL  ${name}${detail === undefined ? '' : ` — ${detail}`}`)
 }
-const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8')
 const doc = JSON.parse(read('docs/m16.json'))
 const railJs = read('lib/client/rail.js')
 const sessionsJs = read('lib/client/sessions.js')
@@ -121,7 +121,7 @@ const darkTokens = read('lib/client/css/06-cgpt-tokens-dark.css')
 // 8. Assertions and screenshots are present.
 {
   check('all seven assertions pass', doc.assertions.every((item) => item.pass === true))
-  const missing = doc.screenshots.map(([path]) => path).filter((path) => !existsSync(new URL(`../${path}`, import.meta.url)))
+  const missing = doc.screenshots.map(([path]) => path).filter((path) => !exists(path))
   check('every evidence screenshot exists', missing.length === 0, missing.join(','))
 }
 

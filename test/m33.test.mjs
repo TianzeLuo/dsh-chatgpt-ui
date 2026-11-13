@@ -9,14 +9,14 @@
  * Run: node test/m33.test.mjs
  */
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import test from 'node:test'
+import nodeTest from 'node:test'
+import { loc, read, exists, evidenceTest } from './evidence.mjs'
+const test = evidenceTest(nodeTest, import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
-const exists = (path) => existsSync(join(ROOT, path))
 const json = (path) => JSON.parse(read(path))
 const stripComments = (css) => css.replace(/\/\*[\s\S]*?\*\//g, '')
 
@@ -93,7 +93,7 @@ test('M33: the three annotated comparison crops exist', () => {
   assert.equal(report.screenshots.length, 3)
   for (const shot of report.screenshots) {
     assert.ok(exists(shot.file), `${shot.file} missing`)
-    const buffer = readFileSync(join(ROOT, shot.file))
+    const buffer = readFileSync(loc(shot.file))
     assert.equal(buffer.subarray(1, 4).toString('ascii'), 'PNG', `${shot.file} is not PNG`)
     const [width, height] = shot.size.split('x').map(Number)
     assert.equal(buffer.readUInt32BE(16), width, `${shot.file} width`)

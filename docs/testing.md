@@ -4,28 +4,56 @@
 
 | 命令 | 需要什么 | 何时用 |
 | --- | --- | --- |
-| `npm run check:core` | 只要 Node 24 | 提交前最低门槛：入口与片段的 `node --check` |
+| `npm run check:core` | 只要 Node 24 | 提交前最低门槛：入口、片段与新测试脚手架的 `node --check` |
 | `npm run test:core` | 只要 Node 24 | 契约、纯函数逻辑、CSS 作用域、工具函数（12 个套件） |
-| `npm run check` | 本机已采集的证据（`docs/`） | 全量语法门禁 + 报告脚本重放 |
-| `npm test` | 本机已采集的证据（`docs/`） | 全量验收：契约 + 证据断言（49 个套件） |
+| `npm test` | 证据齐全时跑全量；缺证据自动降级 | 唯一的总门禁：12 个 core 套件 + 37 个证据套件（见第 2 节） |
+| `npm run check` | 本机已采集的证据（`docs/`） | 全量语法门禁 + 报告脚本重放；缺证据时同样会中断，属于开发机命令 |
 
 ```sh
 npm run check:core      # 任何 clone 都能跑
-npm run test:core
-npm run check           # 需要本机证据
-npm test                # 需要本机证据
+npm run test:core       # 任何 clone 都能跑
+npm test                # 干净 clone 跑 core 层并打印 skip 原因；证据齐全时跑全量
+npm run check           # 维护机：还会重放 m17/m14 报告，缺证据会中断
 ```
 
 `npm run build` 只影响产物，不参与门禁：改 `lib/client/**` 或 `lib/client/css/*.css`
 之后必须重新构建，`lib/client.js` 是提交产物。
 
-## 2. 为什么证据是「本机」的
+## 2. 哪些测试需要本机证据
 
-`npm test` 与 `npm run check` 的后半段会重放**采集证据**：几何 JSON、参考抓取、对照截图与维护者桌面的参考帧。这些文件里有真实会话标题、工作区路径与宿主 DOM，属于隐私材料，**已经移出仓库**，只保留在本机的 `_archive/dsh-chatgpt-ui/` 下；`.gitignore` 也继续排除这类产物。
+`npm test` 里有 **37 个套件会重放采集证据**：几何 JSON、参考抓取、对照截图与维护者桌面
+的参考帧。这些文件里有真实会话标题、工作区路径与宿主 DOM，属于隐私材料，**不在仓库里**；
+`.gitignore` 也继续排除这类产物。
 
-因此一份干净的 clone 能跑 `check:core` 与 `test:core`；`npm test` 的其余套件需要先
-按第 4 节采集，或在维护者机器上直接跑。缺失证据时测试会显式失败（`ENOENT` 或
-`is missing`），不会静默跳过——这是有意的：验收证据不允许「假装通过」。
+- **清单只有一处**：`test/evidence.mjs` 的 `EVIDENCE` 表，逐套件列出它需要的证据文件或
+  目录；`scripts/run-tests.mjs` 与每个套件的证据门都用这张表，改套件时只改这一处。
+- **默认位置**：`<repo>/docs`。证据放在别处时用环境变量指过去：
+
+  ```sh
+  export CHATGPT_UI_EVIDENCE=/path/to/_archive/dsh-chatgpt-ui/docs
+  npm test
+  ```
+
+  只有采集产物会被重定向；`docs/` 里提交的散文（`testing.md`、`architecture.md` 等）永远
+  从仓库读。
+- **怎么生成**：按第 4 节在隔离实例里跑对应的采集脚本，产物落在 `docs/`。每个套件的
+  `SKIP` 行会直接列出它缺哪些文件，按名去找对应脚本即可。
+
+### 没有证据时会怎样
+
+套件**跳过**，不通过也不失败，并把原因打在输出里：
+
+```
+SKIP  test/m25.test.mjs — 缺少本机证据：docs/m25.json、docs/m25-sheets.json、docs/screenshots（docs/testing.md §2）
+```
+
+- 手写 `check()` 的套件在模块顶层加载证据，所以在读证据前就 `SKIP` 并退出 0。
+- `node:test` 套件用 `{ skip }` 标记每个用例，`ℹ skipped` 计数与逐条原因都在输出里。
+- `npm test` 自己按证据是否齐全分层：开头一行说明这次跑的是哪一层，结尾一行汇总
+  `passed · skipped · failed`。**skip 不计入通过**，也不会让退出码变 1；只有真的失败才非零。
+
+这不是「假装通过」的旁路：证据齐全时全量套件必须通过，缺证据时失败即失败——
+证据门只负责把「本机没有证据」与「证据说实现坏了」区分开。
 
 ## 3. 主要套件
 

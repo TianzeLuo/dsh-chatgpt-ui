@@ -30,10 +30,12 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import test from 'node:test'
 import { fileURLToPath } from 'node:url'
+import { loc, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
-const CSS_DIR = join(ROOT, 'lib/client/css')
-const EVIDENCE = join(ROOT, 'docs/m20.json')
+const CSS_DIR = loc('lib/client/css')
+const EVIDENCE = loc('docs/m20.json')
 const ROUND_VALUES = ['round', 'superellipse(1)']
 
 const stripComments = (text) => text.replace(/\/\*[\s\S]*?\*\//g, '')
@@ -130,14 +132,14 @@ test('the skin never asks for a superellipse', () => {
 })
 
 test('the built bundle carries the root override', () => {
-  const bundle = readFileSync(join(ROOT, 'lib/client.js'), 'utf8')
+  const bundle = readFileSync(loc('lib/client.js'), 'utf8')
   const matches = bundle.match(/--dsw-corner-shape:\s*round/g) ?? []
   assert.equal(matches.length, 1, 'the bundle must carry exactly one root override')
   assert.ok(bundle.includes('body[data-chatgpt-ui]'), 'the bundle must keep the skin root selector')
 })
 
 test('the DOM snapshot carries the root attribute and the evidence proves the computed value', () => {
-  const snapshot = readFileSync(join(ROOT, 'test/fixtures/dom-snapshot.html'), 'utf8')
+  const snapshot = readFileSync(loc('test/fixtures/dom-snapshot.html'), 'utf8')
   assert.match(snapshot, /<body[^>]*data-chatgpt-ui=/, 'the snapshot body must carry data-chatgpt-ui; otherwise no rule in css/ applies to it')
   assert.ok(existsSync(EVIDENCE), 'docs/m20.json is required: run node scripts/m20-corners.mjs --url <instance>')
   const evidence = JSON.parse(readFileSync(EVIDENCE, 'utf8'))
@@ -222,7 +224,7 @@ test('skin=off keeps the Host outline untouched', () => {
 })
 
 test('the 4× acceptance frames exist in both themes', () => {
-  const shots = join(ROOT, 'docs/screenshots')
+  const shots = loc('docs/screenshots')
   for (const theme of ['dark', 'light']) {
     for (const kind of ['send', 'dots', 'avatar', 'thumb']) {
       const path = join(shots, `m20-corners-${theme}-${kind}-4x.png`)

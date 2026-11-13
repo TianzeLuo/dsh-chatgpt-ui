@@ -12,13 +12,14 @@
  * Run: node test/m37.test.mjs
  */
 
-import { existsSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { chatgptMenuPlacement } from '../lib/shared/sessions-core.mjs'
+import { loc, read, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 
 const tokens = read('lib/client/css/05-cgpt-tokens.css')
 const sessionsCss = read('lib/client/css/25-sessions.css')
@@ -104,7 +105,7 @@ const check = (name, condition, detail) => {
   check('evidence: the flip threshold is viewport height − 8px', alignment.flipThreshold.margin === 8 && alignment.flipThreshold.allowedBottomAt440 === 432 && alignment.flipThreshold.viewportHeights.includes(440))
   check('evidence: both paths are recorded as identical', alignment.consistency.identical === true && alignment.consistency.centreDeviation.includes('0/0'))
   for (const path of doc.screenshots) {
-    check(`evidence: ${path} exists`, existsSync(join(ROOT, path)) && statSync(join(ROOT, path)).size > 3000)
+    check(`evidence: ${path} exists`, existsSync(loc(path)) && statSync(loc(path)).size > 3000)
   }
 }
 

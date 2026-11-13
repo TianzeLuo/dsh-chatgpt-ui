@@ -25,9 +25,12 @@ import assert from 'node:assert/strict'
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import test from 'node:test'
+import { loc, skipSuite } from './evidence.mjs'
+
+skipSuite(import.meta.url)
 
 const ROOT = new URL('..', import.meta.url).pathname
-const CSS_DIR = join(ROOT, 'lib/client/css')
+const CSS_DIR = loc('lib/client/css')
 const BLANK = (text) => text.replace(/[^\n]/g, ' ')
 const stripComments = (text) => text.replace(/\/\*[\s\S]*?\*\//g, BLANK)
 
@@ -162,12 +165,12 @@ test('the changed-files diff keeps a fixed number column', () => {
 })
 
 /* ---- recorded evidence -------------------------------------------------- */
-const reportPath = join(ROOT, 'docs/m11-fixes.json')
+const reportPath = loc('docs/m11-fixes.json')
 const report = JSON.parse(readFileSync(reportPath, 'utf8'))
 
 test('the recorded evidence files exist and are not empty', () => {
   for (const item of ['m11-1-spacing', 'm11-2-composer', 'm11-3-diff', 'm11-4-width', 'm11-5-hover']) {
-    const path = join(ROOT, 'docs/screenshots', `${item}.png`)
+    const path = loc(`docs/screenshots/${`${item}.png`}`)
     assert.ok(statSync(path).size > 20_000, `${item}.png is missing or empty`)
   }
 })

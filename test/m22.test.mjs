@@ -16,12 +16,13 @@
  * Run: node test/m22.test.mjs
  */
 
-import { existsSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { loc, read, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 const sessionsCss = read('lib/client/css/25-sessions.css')
 const workCss = read('lib/client/css/65-work-card.css')
 const composerCss = read('lib/client/css/40-composer.css')
@@ -87,7 +88,7 @@ check('640px has no overflow and keeps the chip inline', doc.narrow.overflow.scr
 const shots = Object.values(doc.screenshots)
 check('all nine frames are recorded', shots.length === 9, String(shots.length))
 for (const path of shots) {
-  check(`screenshot exists: ${path}`, existsSync(join(ROOT, path)) && statSync(join(ROOT, path)).size > 3000)
+  check(`screenshot exists: ${path}`, existsSync(loc(path)) && statSync(loc(path)).size > 3000)
 }
 
 console.log(`${failures === 0 ? 'PASS' : 'FAIL'}  ${checks - failures}/${checks} P0-10B checks passed`)

@@ -9,14 +9,14 @@
  * Run: node test/m30.test.mjs
  */
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import test from 'node:test'
+import nodeTest from 'node:test'
+import { loc, read, exists, evidenceTest } from './evidence.mjs'
+const test = evidenceTest(nodeTest, import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
-const exists = (path) => existsSync(join(ROOT, path))
 const json = (path) => JSON.parse(read(path))
 const BLANK = (text) => text.replace(/[^\n]/g, ' ')
 const stripComments = (css) => css.replace(/\/\*[\s\S]*?\*\//g, BLANK)
@@ -72,7 +72,7 @@ test('M30: both same-scale crops exist', () => {
   for (const name of ['m30-placeholder-empty.png', 'm30-placeholder-existing.png']) {
     const path = `docs/screenshots/${name}`
     assert.ok(exists(path), `${path} missing`)
-    const header = readFileSync(join(ROOT, path)).subarray(16, 24)
+    const header = readFileSync(loc(path)).subarray(16, 24)
     assert.equal(header.readUInt32BE(0), 720, `${name} width`)
     assert.equal(header.readUInt32BE(4), 104, `${name} height`)
   }

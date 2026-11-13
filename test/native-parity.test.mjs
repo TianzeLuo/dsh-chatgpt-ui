@@ -12,12 +12,13 @@
 
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync, statSync } from 'node:fs'
-import { join } from 'node:path'
 import test from 'node:test'
 import { fileURLToPath } from 'node:url'
+import { loc, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
-const report = JSON.parse(readFileSync(join(ROOT, 'docs/native-parity.json'), 'utf8'))
+const report = JSON.parse(readFileSync(loc('docs/native-parity.json'), 'utf8'))
 const TOLERANCE = 1
 
 test('the skin-off transcript matches the clean transcript within 1px', () => {
@@ -57,7 +58,7 @@ test('the recorded before/after history shows the regression and its fix', () =>
 test('full and close-up screenshots exist for both instances', () => {
   for (const side of ['A', 'B']) {
     for (const kind of ['full', 'transcript', 'cards', 'answer']) {
-      const path = join(ROOT, `docs/screenshots/native-parity-${side}-${kind}.png`)
+      const path = loc(`docs/screenshots/native-parity-${side}-${kind}.png`)
       assert.ok(existsSync(path), `missing ${path}`)
       assert.ok(statSync(path).size > 5000, `screenshot looks empty: ${path}`)
     }

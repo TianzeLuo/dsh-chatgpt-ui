@@ -11,12 +11,13 @@
  *
  * Run: node test/m13.test.mjs
  */
-import { existsSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { loc, read, skipSuite } from './evidence.mjs'
+skipSuite(import.meta.url)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 
 const css = read('lib/client/css/65-work-card.css')
 const tokens = read('lib/client/css/05-cgpt-tokens.css')
@@ -91,7 +92,7 @@ for (const path of [
   'docs/capture/live/m13-before-chat-light.png',
   'docs/capture/live/m13-after-chat-light.png'
 ]) {
-  const full = join(ROOT, path)
+  const full = loc(path)
   check(`evidence: ${path} exists and is not empty`, existsSync(full) && statSync(full).size > 1000)
 }
 
