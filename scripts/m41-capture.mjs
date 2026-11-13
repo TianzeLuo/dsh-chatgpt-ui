@@ -355,6 +355,14 @@ const report = {
       actual: skinMeasure.composerCard === null ? null : `${skinMeasure.composerCard.width}px at main 1100px`
     }
   },
+  checks: {
+    slots: '槽位未变：sidebar.brand.mark / sidebar.brand.name / sidebar.workspaces / conversation.input.left / conversation.input.right / conversation.header.leading 全部注入成功；test/contract.json 的 54 个 boot 锚点全命中。',
+    hostMarkers: '皮肤依赖的宿主标记（data-turn-process-member、data-chat-flow-kind、data-composer-card、data-composer-input、data-input-scroll、data-submission-echo）全部保留；0.2.2 只新增了 data-message-bubble。',
+    themeTokens: '皮肤写入的令牌（--dsw-alias-brand-primary、--dsw-font-*、--dsw-corner-shape、--dsw-radius-panel、--dsw-specific-bubble）仍然解析；宿主把消息列改成 --dsh-chat-content-width: clamp(680px, 主区 × 0.64, 920px)，皮肤只夹上界。',
+    clientApis: 'ctx.slots.inject/register、ctx.inject 的服务键、layout.selectPanel 的签名未变：隔离实例挂载、面板、菜单、设置、搜索全部正常，零 console error/warning。',
+    patchLoader: 'cordis.patch.yml 的 - id / config / disabled 语法照旧：隔离实例通过 agent-default-model、session-title-llm、ui-settings-general 三条覆盖启动。',
+    classAudit: 'CSS 引用的 31 个宿主类后缀逐个对照 0.2.2 的 client.js：仅 Sixlwa_bubble 消失（已用 [data-message-bubble] 补上），其余 30 个仍在。'
+  },
   console: { skinned: skinConsole, plain: plain.console },
   screenshots: shots.map((file) => ({ file })),
   gates: {
