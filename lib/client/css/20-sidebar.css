@@ -31,6 +31,19 @@ body[data-chatgpt-ui] [data-slot='sidebar'] > div {
   overflow: hidden;
 }
 
+/* P3-a: the sidebar must expose exactly one scrollport (the session list).
+   DSH 0.2.2's sidebar body is a grid scrollArea with `8px / nav / 2px / region`
+   rows and `align-content: start`; the region row is `max-content`, so a list
+   sized to the viewport made the whole panel scroll by the host's 10px chrome —
+   a second, barely-visible scrollbar around 新聊天/super-agent. Give the region
+   the leftover height, then drop the host scrollbar: `.chatgpt-session-scroll`
+   is the only scroller left. Scoped to the 0.2.2 scrollport attribute, so the
+   0.2.1 shell (no such element) keeps its viewport-sized list. */
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='sidebar'] [data-sidebar-scrollport] {
+  grid-template-rows: 8px 0 2px minmax(0, 1fr);
+  overflow: hidden;
+}
+
 /* The rail's rail: hide the host's inline rail contents when collapsed; the
    overlay rail in rail.js is the persistent one. */
 body[data-chatgpt-ui] [data-sidebar-collapsed] [data-slot='sidebar'] > div {

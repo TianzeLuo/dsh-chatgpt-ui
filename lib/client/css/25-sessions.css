@@ -36,6 +36,15 @@ body[data-chatgpt-ui] .chatgpt-sessions {
   font-family: inherit;
 }
 
+/* P3-a: on the 0.2.2 shell the host scrollport now owns the height (see
+   20-sidebar.css); fill that region instead of the viewport, or the list
+   overhangs the panel by the host's 10px chrome and scrolls the panel itself.
+   The `100vh` rule above stays for the 0.2.1 structure, which has no
+   [data-sidebar-scrollport]. */
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-sidebar-scrollport] .chatgpt-sessions {
+  height: 100%;
+}
+
 /* P0-10A: 新聊天 + super-agent live here, outside the scrollport. The host
    sidebar clips overflow, so the fixed block must reserve its own height and
    the scroll container must start below it (flex column, not padding). */

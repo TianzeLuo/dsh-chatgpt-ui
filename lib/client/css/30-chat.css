@@ -18,6 +18,12 @@ body[data-chatgpt-ui][data-cgpt-skin='on'] {
   --cgpt-msg-line-height: 26px;
   --cgpt-user-bubble-bg: #e8f3fe;
   --cgpt-user-bubble-fg: #0c274a;
+  /* P3-a: one capsule recipe for every user-authored submission. The plain
+     user row and the answered-question reply live in different host components,
+     so sharing the values here is what keeps them from drifting again. */
+  --cgpt-user-bubble-max: 70%;
+  --cgpt-user-bubble-padding: 10px 16px;
+  --cgpt-user-bubble-radius: 22px;
   --cgpt-code-surface: #0d0d0d;
   --cgpt-code-header: #171717;
   --cgpt-code-fg: #f3f3f3;
@@ -79,14 +85,14 @@ body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [da
 }
 
 body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) .Sixlwa_userStack {
-  max-width: 70%;
+  max-width: var(--cgpt-user-bubble-max);
   gap: 6px;
 }
 
 body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) :is(.Sixlwa_bubble, [data-message-bubble]) {
   max-width: 100%;
-  padding: 10px 16px;
-  border-radius: 22px;
+  padding: var(--cgpt-user-bubble-padding);
+  border-radius: var(--cgpt-user-bubble-radius);
   background: var(--cgpt-user-bubble-bg);
   color: var(--cgpt-user-bubble-fg);
   font-size: 16px;
@@ -96,6 +102,45 @@ body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [da
   /* P0-7: no cross-fade between the echo and the durable bubble (and no fade
      if a Host upgrade adds a background transition). */
   transition: none;
+}
+
+/* ---- answered-question submission -------------------------------------- */
+/* P3-a: answering `ask_user_question` writes a durable `question-reply` node,
+   not a `user` node (the host projects it from `answered-user-question`). Its
+   bubble comes from the primitives `UserMessageBubble` too, but
+   QuestionReplyView does not stamp `data-message-bubble` on it and its wrapper
+   has no `Sixlwa` classes, so the group above missed it and it fell back to the
+   host's grey `--dsw-specific-bubble` at 14/22. These rules add the *missing*
+   anchor only: the reply keeps the host's own width container, Q/A definition
+   list and action row, and only the capsule surface is painted here.
+   Width guard: the host sets `min(70.2% of the column, 82%)` on the inner
+   container; the measured user stack is a flat 70%, so pin that one. */
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='question-reply'] {
+  margin-top: 24px;
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='question-reply'] [data-reply-outcome] > div:first-child {
+  max-width: var(--cgpt-user-bubble-max);
+}
+
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='question-reply'] [data-reply-outcome] > div:first-child > div:first-child {
+  max-width: 100%;
+  padding: var(--cgpt-user-bubble-padding);
+  border-radius: var(--cgpt-user-bubble-radius);
+  background: var(--cgpt-user-bubble-bg);
+  color: var(--cgpt-user-bubble-fg);
+  font-size: 16px;
+  line-height: 24px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  transition: none;
+}
+
+/* The host paints the question label in the secondary label colour (grey). On
+   the blue capsule every line belongs to the answer surface, so inherit the
+   bubble's foreground; the size steps inside the definition list stay. */
+body[data-chatgpt-ui][data-cgpt-skin='on'] [data-chat-flow-kind='question-reply'] [data-reply-outcome] :is(dl, dt, dd, p) {
+  color: inherit;
 }
 
 body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) :is(.Sixlwa_bubble, [data-message-bubble]) a {

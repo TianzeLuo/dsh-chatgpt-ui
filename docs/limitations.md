@@ -37,7 +37,9 @@ Chat 会话固定为 `chat` preset：无 shell、无文件写、无子代理，�
 ## 6. 侧栏宽度是皮肤既有值
 
 皮肤侧栏（含 52px 导轨）340px，宿主原生 264px。列表跟宿主 track 同步重排，但宽度本身
-不持久化（宿主不存这个值）。
+不持久化（宿主不存这个值）。侧栏只有一个滚动区：宿主 0.2.2 的 `scrollArea` 被钉成
+`overflow: hidden` 且区域行取剩余高度，新聊天 / super-agent 与列表一起留在面板内，
+只有会话列表自身滚动。
 
 ## 7. 参考里没有、DSH 也没有的，不迁移
 
@@ -73,9 +75,15 @@ Chat 会话固定为 `chat` preset：无 shell、无文件写、无子代理，�
 | 侧栏导航行 | `[data-slot='sidebar'] > div > nav`（独立导轨） | `sidebar > root > scrollArea > scrollRegion > nav[class*='_panelList']`（面板正文） | `lib/client/css/20-sidebar.css`，两个选择器并列，命中哪个都隐藏 |
 | 会话头分段控件 | 整条 tablist 铺满，可直接给 `width: fit-content` | 外层多一层 `.viewTabs`（`flex-wrap: wrap`），每个 tab 带 ±10px 负外边距、35px 最小高 | `lib/client/css/30-chat.css`：`max-content` + `nowrap` + `min-height: 32px`，tab 归零外边距后 46×28 并排 |
 | 用户气泡 | `.Sixlwa_bubble` | primitives `UserMessageBubble`：模块哈希类名 + `data-message-bubble` | `lib/client/css/30-chat.css`：`:is(.Sixlwa_bubble, [data-message-bubble])` |
+| 回答提问的提交 | 用户气泡同款，`data-chat-flow-kind='user'` | 独立 `question-reply` 节点；`QuestionReplyView` 的气泡**没有** `data-message-bubble` | `lib/client/css/30-chat.css`：`question-reply` 的 `[data-reply-outcome]` 结构 + 与普通气泡共用的胶囊变量 |
+| 侧栏滚动 | 宿主侧栏自身滚动 | `scrollArea` 网格区域行是 `max-content`，皮肤列表按视口高度会撑出第二根滚动条 | `lib/client/css/20-sidebar.css` + `25-sessions.css`：区域行 `minmax(0, 1fr)`、宿主 `overflow: hidden`、列表 `height: 100%` |
 
 - 选择器契约（`test/contract.json`）已收录 `class.panelList` 与气泡属性的说明；`npm test`
   会拦住「没登记的宿主选择器」。
+- 回答提问的提交不是 `user` 节点，而是 `question-reply`；它沿用宿主自己的问答定义列表与操作行，
+  皮肤只接管胶囊表面（背景、圆角、内边距、最大宽度），问答文案结构不复制。
+- 侧栏的单滚动区由「宿主 `scrollArea` 不滚动 + 列表填满区域」两段组成；升级宿主后若侧栏结构
+  变化，`npm run test:core` 的 `scoped-css` 套件会先失败，不要删断言。
 - 代码块、附件、图片、工具卡片的宿主类名在 0.2.2 没有变（逐包核对过 `client.js`），
   样式照旧；但「停止 / Retry」「窄窗」等状态仍属 §10 的未实测范围。
 - 实测几何（本机采集的 m41 证据，不在仓库）：导轨 52、面板 288、侧栏合计 340、Chat 卡片 26px /
