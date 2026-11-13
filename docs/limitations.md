@@ -48,14 +48,12 @@ Chat 会话固定为 `chat` preset：无 shell、无文件写、无子代理，�
 ## 8. 原生控件只做视觉适配
 
 执行步骤、任务/目标、文件与输出聚合、折叠面板、Trajectory 标签、`/` 命令与 `@` 菜单的
-**行为**全部归宿主，皮肤只改外观。宿主升级后若结构与样式钩子变化，先跑 `npm test`
+**行为**全部归宿主，皮肤只改外观。宿主升级后若结构与样式钩子变化，先跑 `npm run test:core`
 的契约套件，再按 `docs/architecture.md` §6 的流程处理，不删断言。
 
 ## 9. 验收证据不进仓库
 
-`npm test` / `npm run check` 的后半段需要本机采集的证据（`docs/*.json`、
-`docs/screenshots/`），这些文件含真实会话标题与路径，`.gitignore` 已整体排除。
-干净的 clone 只能跑 `npm run test:core` 与 `npm run check:core`，详见
+`npm test` / `npm run check` 的后半段需要本机采集的证据（几何 JSON、截图），这些文件含真实会话标题与路径，已经从仓库移出并保留在本机的 `_archive/dsh-chatgpt-ui/` 下，`.gitignore` 也继续排除。干净的 clone 只能跑 `npm run test:core` 与 `npm run check:core`，详见
 [测试与验收](testing.md) §2。
 
 ## 10. 未实测的部分
@@ -80,7 +78,7 @@ Chat 会话固定为 `chat` preset：无 shell、无文件写、无子代理，�
   会拦住「没登记的宿主选择器」。
 - 代码块、附件、图片、工具卡片的宿主类名在 0.2.2 没有变（逐包核对过 `client.js`），
   样式照旧；但「停止 / Retry」「窄窗」等状态仍属 §10 的未实测范围。
-- 实测几何（`docs/m41.json`）：导轨 52、面板 288、侧栏合计 340、Chat 卡片 26px /
+- 实测几何（本机采集的 m41 证据，不在仓库）：导轨 52、面板 288、侧栏合计 340、Chat 卡片 26px /
   Work 卡片 28px、气泡 22px / `#173e76` / 16–24、发送键 36×36、分段条 98×32。消息列跟随
   宿主 `--dsh-chat-content-width`（现在是 `clamp(680px, 主区 × 0.64, 920px)`，1600 视口下
   704px），皮肤只夹上界、不重指宿主变量，拖动列宽的把手因此仍然可用。

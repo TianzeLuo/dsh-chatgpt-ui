@@ -19,6 +19,11 @@ docs/reference/
 # screenshots and the nine-module status log; all of it quotes live session
 # titles, workspace paths and host DOM from a real instance, so it stays on the
 # machine that produced it (see docs/testing.md → "Why the evidence is local").
+# The evidence was moved to _archive/dsh-chatgpt-ui/ outside this repository.
+docs/**/*.json
+docs/**/*.html
+docs/capture/
+docs/screenshots/
 docs/*
 !docs/about.md
 !docs/architecture.md

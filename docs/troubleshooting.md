@@ -12,7 +12,7 @@
 ## 找不到 dot 入口
 
 Phase 1 起 dot 不再出现在顶部/新建页；从侧栏 `Super-agent` 面板行打开。没装
-`dsh-super-agent`（或它的 `main` 槽未注册）时没有这一行，这是预期行为。
+[dsh-super-agent](https://github.com/TianzeLuo/dsh-super-agent)（或它的 `main` 槽未注册）时没有这一行，这是预期行为。
 
 ## Chat 模式没有变只读
 

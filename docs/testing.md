@@ -21,11 +21,7 @@ npm test                # 需要本机证据
 
 ## 2. 为什么证据是「本机」的
 
-`npm test` 与 `npm run check` 的后半段会重放**采集证据**：`docs/*.json` 的几何读数、
-`docs/capture/live/*.json` 的参考抓取、`docs/screenshots/*.png` 的对照图
-（`docs/reference/` 是维护者桌面的截图，只作复刻依据）。这些文件里有真实会话标题、
-工作区路径与宿主 DOM，属于隐私材料，所以 `.gitignore` 里整棵 `docs/` 只放行
-`docs/images/` 与面向读者的文档；**不提交、不推送、不放进 CI**。
+`npm test` 与 `npm run check` 的后半段会重放**采集证据**：几何 JSON、参考抓取、对照截图与维护者桌面的参考帧。这些文件里有真实会话标题、工作区路径与宿主 DOM，属于隐私材料，**已经移出仓库**，只保留在本机的 `_archive/dsh-chatgpt-ui/` 下；`.gitignore` 也继续排除这类产物。
 
 因此一份干净的 clone 能跑 `check:core` 与 `test:core`；`npm test` 的其余套件需要先
 按第 4 节采集，或在维护者机器上直接跑。缺失证据时测试会显式失败（`ENOENT` 或

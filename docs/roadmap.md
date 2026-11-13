@@ -17,7 +17,7 @@
 
 ## 3. 证据与 CI
 
-- 把 `docs/*.json` 的采集结果换成**脱敏 fixture**（几何数值保留、标题与路径替成示例），
+- 把当前本机归档的采集证据换成**脱敏 fixture**（几何数值保留、标题与路径替成示例），
   让 `npm test` 能在 CI 里跑，而不是只留在维护者机器上。
 - GitHub Actions 先跑 `npm run check:core` + `npm run test:core`；证据测试作为可选 job。
 - 采集脚本统一走 `--url`，把「隔离实例 + 示例数据」的搭建步骤脚本化，减少人工步骤。

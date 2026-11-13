@@ -5,6 +5,10 @@
   "description": "ChatGPT-style UI skin for the DeepSeek Harness Web GUI: token layer, stylesheet, Chat preset + read-only policy, mode switcher, dot brand (M2).",
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=22.5",
+    "dsh": ">=0.2.1-rc.1"
+  },
   "main": "lib/host/index.js",
   "exports": {
     ".": "./lib/host/index.js",
@@ -69,9 +73,6 @@
     "m40:capture": "node tools/m40-capture.mjs"
   },
   "dsh": {
-    "engines": {
-      "dsh": ">=0.2.1-rc.1 <0.3.0"
-    },
     "bundle": {
       "patch": [
         "./cordis.patch.yml",

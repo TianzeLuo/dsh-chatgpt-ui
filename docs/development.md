@@ -38,7 +38,7 @@ npm run check     # node --check 全部入口
 6. `Work` 分段目标是部署默认 preset（`isDefault`），不是字面量 `agent`；显示名由
    `lib/shared/mode-core.mjs` 的 `PRODUCT_LABELS` 决定。
 7. 非空白会话切换先确认，确认后开新会话（宿主对已开始会话锁定 preset）。
-8. 徽标放在 `dsh-super-agent`，不放在皮肤里：皮肤卸载后徽标仍应存在。
+8. 徽标放在 [dsh-super-agent](https://github.com/TianzeLuo/dsh-super-agent)，不放在皮肤里：皮肤卸载后徽标仍应存在。
 9. 产品切换器放在 `sidebar.brand.name`，`mark` 清空；菜单必须 portal，否则会被宿主
    brand 按钮的 `aria-hidden`/新建会话点击吞掉。
 10. `brand` 配置现在只区分 `hidden` 和可见；名称跟随会话的 `agentPreset`（chat →
@@ -46,8 +46,7 @@ npm run check     # node --check 全部入口
 11. 客户端 `inject` 必须含 `uiWorkspace`、`remote`、`remote.agentPresets`；缺一个就会在
     点击处理里抛 `cannot get property … without inject`，表现为菜单点了没反应。
 
-完整方案与更多细节见 [`../../docs/chatgpt-ui-plan.md`](../../docs/chatgpt-ui-plan.md) 与
-[`manual-test.md`](manual-test.md)。
+完整方案与更多细节见 [测试与验收](testing.md) 与 [架构](architecture.md)。
 
 ## 与其它插件的独立性
 
@@ -55,7 +54,7 @@ npm run check     # node --check 全部入口
 
 - **只装本皮肤**：`apply` 只 inject `slots`，再等宿主 `theme` / `locale` / `remote` /
   `uiWorkspace` / `layout` 就绪后挂装饰；缺哪个就跳过对应部件。
-- **与 dsh-super-agent 的唯一耦合**是 dot 面板键：`chatgptDotPanelAvailable` 用
+- **与 [dsh-super-agent](https://github.com/TianzeLuo/dsh-super-agent) 的唯一耦合**是 dot 面板键：`chatgptDotPanelAvailable` 用
   `ctx.slots.entriesOfSlot('main')` 探测；产品切换器不再渲染 dot 分段。Super-agent 的徽标由它自己注册，本皮肤既不注册也不
   依赖它的 service/slot/配置。
 - **证据**：`test/independence.test.mjs`（8 项，已并入 `npm test`）；隔离实例
