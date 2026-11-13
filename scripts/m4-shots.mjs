@@ -122,7 +122,7 @@ await light.mouse.wheel(0, -4000)
 await sleep(300)
 
 // User bubble hover shows the copy/time affordance under the bubble.
-await light.locator('[data-chat-flow-kind="user"] .Sixlwa_bubble').first().hover()
+await light.locator('[data-chat-flow-kind="user"] :is(.Sixlwa_bubble, [data-message-bubble])').first().hover()
 await sleep(250)
 await shot(light, 'm4-light-user-hover')
 
@@ -229,7 +229,7 @@ await composite('light', 'm4-light-implementation', lightRef)
 /* ---- dark ------------------------------------------------------------- */
 const darkRef = await reference('dark')
 const dark = await open('dark')
-await dark.locator('[data-chat-flow-kind="user"] .Sixlwa_bubble').first().hover()
+await dark.locator('[data-chat-flow-kind="user"] :is(.Sixlwa_bubble, [data-message-bubble])').first().hover()
 await sleep(250)
 await shot(dark, 'm4-dark-user-hover')
 await dark.mouse.move(900, 420)

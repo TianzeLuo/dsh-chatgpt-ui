@@ -116,7 +116,7 @@ const bubbleStyle = (page) => page.evaluate(() => {
     state = 'none'
     row = null
   }
-  const bubble = row?.querySelector('.Sixlwa_bubble') ?? null
+  const bubble = row?.querySelector('.Sixlwa_bubble, [data-message-bubble]') ?? null
   const assistant = document.querySelector("[data-chat-flow-kind='assistant-step'] .hWmORq_root")
   const read = (el, keys) => el === null || el === undefined
     ? null

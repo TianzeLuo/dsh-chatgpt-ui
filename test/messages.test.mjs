@@ -43,9 +43,11 @@ const pkg = JSON.parse(read('package.json'))
       !css.includes('--dsh-chat-content-width: var(--cgpt-msg-max') &&
       !css.includes('max-width: var(--cgpt-msg-max, 760px)')
   )
-  check('user bubble is 22px / 10px 16px', /\.Sixlwa_bubble \{[^}]*padding: 10px 16px;[^}]*border-radius: 22px;/s.test(css))
+  // 0.2.2: the bubble class moved to the primitives package; the skin matches
+  // both `.Sixlwa_bubble` and the new `data-message-bubble` attribute.
+  check('user bubble is 22px / 10px 16px', /:is\(\.Sixlwa_bubble, \[data-message-bubble\]\) \{[^}]*padding: 10px 16px;[^}]*border-radius: 22px;/s.test(css))
   check('user stack caps at 70%', /\.Sixlwa_userStack \{[^}]*max-width: 70%;/s.test(css))
-  check('user text is 16/24', /\.Sixlwa_bubble \{[^}]*font-size: 16px;[^}]*line-height: 24px;/s.test(css))
+  check('user text is 16/24', /:is\(\.Sixlwa_bubble, \[data-message-bubble\]\) \{[^}]*font-size: 16px;[^}]*line-height: 24px;/s.test(css))
   check('light bubble uses the reference blue', css.includes('--cgpt-user-bubble-bg: #e8f3fe') && css.includes('--cgpt-user-bubble-fg: #0c274a'))
   check('dark bubble uses the reference navy', css.includes('--cgpt-user-bubble-bg: #173e76') && css.includes('--cgpt-user-bubble-fg: #f6fafe'))
   // The user-bubble selector now wraps user rows and pending-steering echoes in
@@ -70,7 +72,9 @@ const pkg = JSON.parse(read('package.json'))
   check('the fragment never reads a process group', !js.includes('[data-step-process]') && !js.includes('data-process-activity'))
   check('no process/tool-row/disclosure rule is shipped', !cssRules.includes('[data-step-process]') && !cssRules.includes("[data-chat-flow-kind='turn-process']") && !cssRules.includes('[data-disclosure-row]') && !cssRules.includes('.O_Ebla_') && !cssRules.includes('.lcKema_'))
   check('assistant prose is scoped away from process members', cssRules.includes(":not([data-turn-process-member])") && !/\.hWmORq_body p \{[^}]*font-size/s.test(cssRules.split(':not([data-turn-process-member])')[0]))
-  check('tabs are a fit-content 32px segmented control', /\[data-conversation-tabs\] \{[^}]*width: fit-content !important;[^}]*height: 32px;/s.test(css))
+  // 0.2.2 wraps the tablist in its own flex row and gave each tab negative
+  // inline margins; the strip now sizes to its content instead of a fixed box.
+  check('tabs are a content-sized 32px segmented control', /\[data-conversation-tabs\] \{[^}]*width: max-content !important;[^}]*min-height: 32px;/s.test(css) && /\[data-conversation-tabs\] button\[role='tab'\] \{[^}]*margin: 0;[^}]*height: 28px;/s.test(css))
   check('native tab underline is hidden', css.includes("button[role='tab']::after") && css.includes('display: none'))
   check('image tiles are 96px and rounded', /button\[data-variant='tile'\] \{[^}]*width: 96px !important;[^}]*height: 96px !important;/s.test(css) && css.includes('border-radius: 12px'))
   check('host image preview is painted, not replaced', css.includes("aria-label='Original image preview'") && css.includes('button[aria-label^=\'Close original\']'))

@@ -10,7 +10,8 @@
     "M1 note: attr.body.dark (data-ds-dark-theme on <body>) is written by ui-layout's theme presenter only in dark mode; scripts/screenshots.mjs emulates prefers-color-scheme: dark and asserts the attribute before saving m1-dark-new.png.",
     "M2 note: attr.body.mode (data-chatgpt-mode) is written by this skin's own switcher for display rules only — permissions come from lib/host/chat-policy.js, never from the attribute. It is session tier because a fresh page has no conversation to describe.",
     "M2 note: the hero mode cards and the header.leading product segment are asserted live on the sessionless page too (hero.options is behind `sessionId !== undefined`), so class.chatgptModeCard / class.chatgptModeSwitch stay session tier; scripts/screenshots.mjs asserts them live against a blank session.",
-    "M3 note: in Chat mode the Host permission chip ([data-slot='conversation.input.permission']) is hidden because it names a Host preset the policy overwrites; the skin's own read-only note (conversation.input.left) states what applies. Hiding a label never changes access — lib/host/chat-policy.js does."
+    "M3 note: in Chat mode the Host permission chip ([data-slot='conversation.input.permission']) is hidden because it names a Host preset the policy overwrites; the skin's own read-only note (conversation.input.left) states what applies. Hiding a label never changes access — lib/host/chat-policy.js does.",
+    "0.2.2 note: the user bubble lost the Sixlwa module class and now carries data-message-bubble from the primitives UserMessageBubble; css/30-chat.css matches both spellings. class.bubble already covers the new `_bubble_` suffix."
   ],
   "anchors": [
     {
@@ -299,6 +300,13 @@
       "kind": "class-substring",
       "value": "_stack",
       "usedBy": "css/30-chat.css"
+    },
+    {
+      "id": "class.panelList",
+      "tier": "boot",
+      "kind": "class-substring",
+      "value": "_panelList",
+      "usedBy": "css/20-sidebar.css (hide host nav rows: 0.2.2 moved them into the panel body)"
     },
     {
       "id": "class.bubble",

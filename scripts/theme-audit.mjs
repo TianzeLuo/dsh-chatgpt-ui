@@ -139,7 +139,7 @@ for (const theme of ['light', 'dark']) {
     host.style.cssText = 'position:fixed;left:-12000px;top:0;width:768px;height:900px;overflow:visible;'
     host.innerHTML = `
       <div class="wSkVaW_body"><div class="EvIC1a_column" style="max-width:768px">
-        <div data-chat-flow-kind="user"><div class="Sixlwa_userStack"><div class="Sixlwa_bubble" data-audit="bubble">用户消息 contrast</div></div></div>
+        <div data-chat-flow-kind="user"><div class="Sixlwa_userStack"><div class="Sixlwa_bubble" data-message-bubble="" data-audit="bubble">用户消息 contrast</div></div></div>
         <div data-chat-flow-kind="assistant-step"><div class="hWmORq_body">
           <div data-code-wrap="true" data-audit="code"><div data-code-block-banner="true">bash</div><div data-code-block-content="true"><div><pre>node scripts/build-client.mjs</pre></div></div></div>
           <div data-step-process="true" data-audit="process"><button type="button" data-process-activity="true">处理步骤</button></div>

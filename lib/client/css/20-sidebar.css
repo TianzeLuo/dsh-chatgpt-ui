@@ -273,8 +273,12 @@ body[data-chatgpt-ui] [data-slot='sidebar'] [class*='_newSession'] svg {
 }
 
 /* Host panel entries (Plugins / Automation / Super-agent) are reached from the
-   permanent rail now; their rows and the old footer Settings trigger are gone. */
-body[data-chatgpt-ui] [data-slot='sidebar'] > div > nav {
+   permanent rail now; their rows and the old footer Settings trigger are gone.
+   DSH <= 0.2.1-rc.1 kept that list as the sidebar's own child rail; 0.2.2 moved
+   it into the panel body (sidebar > root > scrollArea > scrollRegion > nav), so
+   the structural rule alone stops matching — the class suffix covers both. */
+body[data-chatgpt-ui] [data-slot='sidebar'] > div > nav,
+body[data-chatgpt-ui] [data-slot='sidebar'] nav[class*='_panelList'] {
   display: none;
 }
 

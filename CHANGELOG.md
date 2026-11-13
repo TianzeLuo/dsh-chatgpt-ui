@@ -3,6 +3,18 @@
 按里程碑倒序。`M*` 是九个复刻模块，`P0-*` 是复刻过程中按用户反馈插入的对齐项；
 每条都附当时的验收方式（矩阵截图 / 证据 JSON / 测试套件）。
 
+## 2026-11 — 适配 DSH 0.2.2-rc.3（P2-b）
+
+- 宿主升级后侧栏多出原生导航行、会话头分段控件被压成「对话轨迹」、用户气泡退回灰色
+  20px：三处分别修在 `20-sidebar.css`（隐藏面板正文里的 `nav` 列表）、`30-chat.css`
+  （分段条 `max-content`/`nowrap`/`min-height: 32px`，tab 外边距归零）与
+  `30-chat.css`（气泡匹配新增的 `data-message-bubble`）。
+- 兼容层一律双写选择器，保留 0.2.1 的 `.Sixlwa_bubble` 与 `> div > nav`，不写版本分支。
+- `test/contract.json` 收录 `class.panelList`；`test/m33.test.mjs`、`test/messages.test.mjs`
+  跟着新选择器更新，`docs/m27.json` 的规则行号刷新。
+- 新增 `scripts/m41-capture.mjs`：一次采齐侧栏 / 输入卡 / 消息 / 设置四张深色帧与
+  「不装插件」对照组，并断言 52/288/340、26px、22px、36×36、98×32 与零 console error。
+
 ## 2026-11 — 截图重拍（P1-f2）
 
 - 首图改成 **Chat 空态**（`我们从哪里开始?`）+ 推理强度滑块展开，与 README 正文一致。

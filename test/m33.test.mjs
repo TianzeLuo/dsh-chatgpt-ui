@@ -22,13 +22,17 @@ const stripComments = (css) => css.replace(/\/\*[\s\S]*?\*\//g, '')
 
 const USER_BUBBLE = "body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo])"
 const css = stripComments(read('lib/client/css/30-chat.css'))
+// 0.2.2 moved the bubble into the primitives UserMessageBubble, which carries
+// `data-message-bubble` instead of the old Sixlwa module class; the skin keeps
+// both spellings so the same rule serves either Host.
+const BUBBLE = ':is(.Sixlwa_bubble, [data-message-bubble])'
 
 test('M33: every user-bubble rule matches steering and pending echoes', () => {
   assert.doesNotMatch(css, /:not\(\[data-pending-steering\]\)/, 'pending steering must not be excluded')
   assert.doesNotMatch(css, /\[data-pending-steering\]/, 'the queue attribute must not select a different skin')
-  assert.match(css, new RegExp(USER_BUBBLE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ' \\.Sixlwa_bubble \\{'))
+  assert.match(css, new RegExp(USER_BUBBLE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ' ' + BUBBLE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ' \\{'))
   assert.equal((css.match(/data-chat-flow-kind='steering'/g) ?? []).length, 15, 'all 15 shared-user selectors include steering')
-  for (const selector of ['.Sixlwa_userRow', '.Sixlwa_userStack', '.Sixlwa_bubble', '.Sixlwa_bubble a', '[data-code-wrap]', '.xzv4MW_actions', '.xzv4MW_timeStart', '.xzv4MW_action']) {
+  for (const selector of ['.Sixlwa_userRow', '.Sixlwa_userStack', BUBBLE, BUBBLE + ' a', BUBBLE + ' [data-code-wrap]', '.xzv4MW_actions', '.xzv4MW_timeStart', '.xzv4MW_action']) {
     assert.match(css, new RegExp(USER_BUBBLE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ' ' + selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), selector)
   }
   const built = read('lib/client.js')

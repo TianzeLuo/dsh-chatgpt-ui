@@ -64,3 +64,26 @@ Chat 会话固定为 `chat` preset：无 shell、无文件写、无子代理，�
   running 窗口，因此只做了静态样式验收。
 - 极窄窗口（< 640px）下的输入卡与面板：DSH Web 的宿主布局在移动宽度下会切换结构，
   皮肤未覆盖该分支。
+
+## 11. 升级到 DSH 0.2.2-rc.3 后的兼容层
+
+宿主从 0.2.1-rc.1 升到 0.2.2-rc.3 时改了三处皮肤依赖的结构；每处都用「新旧同时匹配」
+而不是按版本分支：
+
+| 变更 | 旧结构 | 新结构 | 兼容位置 |
+| --- | --- | --- | --- |
+| 侧栏导航行 | `[data-slot='sidebar'] > div > nav`（独立导轨） | `sidebar > root > scrollArea > scrollRegion > nav[class*='_panelList']`（面板正文） | `lib/client/css/20-sidebar.css`，两个选择器并列，命中哪个都隐藏 |
+| 会话头分段控件 | 整条 tablist 铺满，可直接给 `width: fit-content` | 外层多一层 `.viewTabs`（`flex-wrap: wrap`），每个 tab 带 ±10px 负外边距、35px 最小高 | `lib/client/css/30-chat.css`：`max-content` + `nowrap` + `min-height: 32px`，tab 归零外边距后 46×28 并排 |
+| 用户气泡 | `.Sixlwa_bubble` | primitives `UserMessageBubble`：模块哈希类名 + `data-message-bubble` | `lib/client/css/30-chat.css`：`:is(.Sixlwa_bubble, [data-message-bubble])` |
+
+- 选择器契约（`test/contract.json`）已收录 `class.panelList` 与气泡属性的说明；`npm test`
+  会拦住「没登记的宿主选择器」。
+- 代码块、附件、图片、工具卡片的宿主类名在 0.2.2 没有变（逐包核对过 `client.js`），
+  样式照旧；但「停止 / Retry」「窄窗」等状态仍属 §10 的未实测范围。
+- 实测几何（`docs/m41.json`）：导轨 52、面板 288、侧栏合计 340、Chat 卡片 26px /
+  Work 卡片 28px、气泡 22px / `#173e76` / 16–24、发送键 36×36、分段条 98×32。消息列跟随
+  宿主 `--dsh-chat-content-width`（现在是 `clamp(680px, 主区 × 0.64, 920px)`，1600 视口下
+  704px），皮肤只夹上界、不重指宿主变量，拖动列宽的把手因此仍然可用。
+- 再次升级时：先 `npm run test:core`，再在隔离实例上跑
+  `node scripts/m41-capture.mjs`（会断言上面这组几何与零 console error），矩阵用
+  `npm run matrix -- --allow-diff --url <隔离实例>`复核。

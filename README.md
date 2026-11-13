@@ -12,9 +12,10 @@ ChatGPT 桌面版风格的 DSH Web GUI 皮肤：只换外观，不动行为—�
   对比「装/不装插件」两套界面，行为必须一致。
 - **super-agent 适配（dot 品牌位）。** 侧栏 `新聊天` 下方保留 super-agent 入口与未读
   徽标；Router / worker 的内部会话不进「最近」也不进项目段，只剩内部会话的项目组隐藏。
-- **高还原度。** 以 ChatGPT 桌面版截图为准逐像素对照（配色、侧栏 340、消息列 768、
-  卡片 26px 圆角、分段 224×36、滑块 252×36），网页版只用来补图标与实测间距；
-  尚未对齐的差异记录在 [已知限制](docs/limitations.md)。
+- **高还原度。** 以 ChatGPT 桌面版截图为准逐像素对照（配色、侧栏 340、卡片 26px 圆角、
+  分段 224×36、滑块 252×36）；消息列跟随宿主的 `--dsh-chat-content-width`，皮肤只夹上界，
+  拖动列宽的把手照常可用。网页版只用来补图标与实测间距；尚未对齐的差异记录在
+  [已知限制](docs/limitations.md)。
 - **作用域收口的样式。** 每条规则都以 `body[data-chatgpt-ui]` 开头，暗色只挂在
   `data-ds-dark-theme` 上；卸载走 `ctx.effect` 的 disposer，`<style>`、令牌层与面板
   一起消失，不刷新页面。`data-cgpt-skin="off"` 可让宿主回到「没装插件」的样子。
@@ -32,6 +33,18 @@ dsh plugin --profile web add /path/to/dsh-chatgpt-ui
    样式与令牌还原。
 
 首次使用请看 [开发说明](docs/development.md)，出问题看 [排障](docs/troubleshooting.md)。
+
+## 兼容的 DSH 版本
+
+- `package.json` 的 `engines.dsh` 是 `>=0.2.1-rc.1 <0.3.0`；实测通过 **0.2.2-rc.3**
+  （上一版实测 0.2.1-rc.1），两者共用同一套选择器。
+- 0.2.2 的三处破坏性变更已适配：宿主导航从侧栏导轨移进面板正文、会话头分段控件多了一层
+  flex 行、用户气泡迁到 `UserMessageBubble`。兼容层用双写选择器（如
+  `:is(.Sixlwa_bubble, [data-message-bubble])`、`nav[class*='_panelList']`）同时命中新旧
+  两版，不按版本号写死，位置在 `lib/client/css/20-sidebar.css` 与
+  `lib/client/css/30-chat.css`。
+- 换新版 DSH 后先跑 `npm run test:core`、`npm run check:core`；要重采证据就在隔离实例上
+  跑 `node scripts/m41-capture.mjs`，细节见 [已知限制](docs/limitations.md) §11。
 
 ## 截图
 

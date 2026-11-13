@@ -64,7 +64,11 @@ body[data-chatgpt-ui][data-cgpt-skin='on'] [data-conversation-scroll] .EvIC1a_co
    steering echoes are user-authored too. They used the Host's grey 14/22
    surface while ordinary messages used the 16/24 blue capsule. Every user
    origin now shares one bubble; the Host's `data-pending-steering` attribute
-   stays on the row (not deleted), it just no longer selects a different skin. */
+   stays on the row (not deleted), it just no longer selects a different skin.
+   DSH 0.2.2 moved the bubble into the primitives package's `UserMessageBubble`,
+   which drops the old `Sixlwa_bubble` class for a new module hash and instead
+   marks the element with `data-message-bubble`; both spellings are matched so
+   the skin keeps working on either Host. */
 body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) {
   margin-top: 24px;
 }
@@ -79,7 +83,7 @@ body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [da
   gap: 6px;
 }
 
-body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) .Sixlwa_bubble {
+body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) :is(.Sixlwa_bubble, [data-message-bubble]) {
   max-width: 100%;
   padding: 10px 16px;
   border-radius: 22px;
@@ -94,13 +98,13 @@ body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [da
   transition: none;
 }
 
-body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) .Sixlwa_bubble a {
+body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) :is(.Sixlwa_bubble, [data-message-bubble]) a {
   color: inherit;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
-body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) .Sixlwa_bubble [data-code-wrap] {
+body[data-chatgpt-ui][data-cgpt-skin='on'] :is([data-chat-flow-kind='user'], [data-chat-flow-kind='steering'], [data-submission-echo]) :is(.Sixlwa_bubble, [data-message-bubble]) [data-code-wrap] {
   margin-top: 6px;
 }
 
@@ -532,11 +536,14 @@ body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.chat.turnTai
    and painted as a small segmented control. */
 body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.header'] [data-conversation-tabs] {
   display: inline-flex;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 2px;
   box-sizing: border-box;
-  width: fit-content !important;
-  height: 32px;
+  /* 0.2.2 wraps the tablist in its own flex row, so the strip has to size to
+     its tabs; a fixed height plus the host's `flex-wrap: wrap` stacked them. */
+  width: max-content !important;
+  min-height: 32px;
+  height: auto;
   margin-top: 2px;
   padding: 2px !important;
   gap: 2px !important;
@@ -549,6 +556,11 @@ body[data-chatgpt-ui][data-cgpt-skin='on'] [data-slot='conversation.header'] [da
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  /* 0.2.2 grew the press target with negative inline margins (-10px) and a
+     35px min-height; inside the segmented track they made the two tabs overlap
+     and overflow the strip, so the track's own box takes over. */
+  margin: 0;
+  min-height: 0;
   height: 28px;
   padding: 0 10px;
   border: 0 !important;
