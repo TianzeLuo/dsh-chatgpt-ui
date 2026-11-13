@@ -134,3 +134,70 @@ test('the native conversation column knob is never re-pointed', () => {
   }
   assert.deepEqual(offenders, [], `--dsh-chat-user-width is a native layout setting and must not be overridden: ${offenders.join(', ')}`)
 })
+
+/** Declarations of the first rule whose selector matches `pattern`. */
+const ruleBody = (css, pattern, label) => {
+  for (const rule of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    if (pattern.test(rule[1].trim())) return rule[2]
+  }
+  assert.fail(`missing CSS rule: ${label}`)
+  return ''
+}
+
+test('answered-question replies use the same capsule recipe as user messages', () => {
+  const css = stripComments(readFileSync(join(CSS_DIR, '30-chat.css'), 'utf8'))
+  const user = ruleBody(
+    css,
+    /\[data-chat-flow-kind='user'\][^{]*:is\(\.Sixlwa_bubble, \[data-message-bubble\]\)/,
+    'plain user bubble'
+  )
+  const question = ruleBody(
+    css,
+    /\[data-chat-flow-kind='question-reply'\] \[data-reply-outcome\] > div:first-child > div:first-child/,
+    'question-reply bubble'
+  )
+  const questionWidth = ruleBody(
+    css,
+    /\[data-chat-flow-kind='question-reply'\] \[data-reply-outcome\] > div:first-child$/m,
+    'question-reply width container'
+  )
+  const recipe = [
+    'background: var(--cgpt-user-bubble-bg)',
+    'color: var(--cgpt-user-bubble-fg)',
+    'padding: var(--cgpt-user-bubble-padding)',
+    'border-radius: var(--cgpt-user-bubble-radius)',
+    'font-size: 16px',
+    'line-height: 24px'
+  ]
+  for (const declaration of recipe) {
+    assert.ok(user.includes(declaration), `the user bubble no longer declares "${declaration}"`)
+    assert.ok(question.includes(declaration), `the question-reply bubble does not share "${declaration}"`)
+  }
+  assert.match(css, /--cgpt-user-bubble-radius:\s*22px/)
+  assert.match(css, /--cgpt-user-bubble-padding:\s*10px 16px/)
+  assert.match(css, /--cgpt-user-bubble-max:\s*70%/)
+  assert.ok(questionWidth.includes('max-width: var(--cgpt-user-bubble-max)'), 'the answered-question container must cap at 70%')
+  assert.ok(!/assistant-step[^{]*question-reply/.test(css), 'answer styling must not capture assistant nodes')
+})
+
+test('the sidebar exposes exactly one in-flow scrollport', () => {
+  const sidebar = stripComments(readFileSync(join(CSS_DIR, '20-sidebar.css'), 'utf8'))
+  const sessions = stripComments(readFileSync(join(CSS_DIR, '25-sessions.css'), 'utf8'))
+  const shell = ruleBody(sidebar, /\[data-sidebar-scrollport\]\s*$/, 'host sidebar scrollport')
+  assert.ok(shell.includes('overflow: hidden'), 'the host sidebar scrollport must not scroll')
+  assert.match(shell, /grid-template-rows:\s*8px 0 2px minmax\(0, 1fr\)/, 'the region row must take the leftover height')
+  assert.ok(!/(?:^|\n)[^\n]*overflow-y:\s*(?:auto|scroll)/.test(sidebar), 'no sidebar-shell rule may introduce a second scrollport')
+  const fill = ruleBody(sessions, /\[data-sidebar-scrollport\] \.chatgpt-sessions\s*$/, 'sidebar list height fill')
+  assert.ok(fill.includes('height: 100%'), 'the list must fill the host region instead of the viewport')
+  const root = ruleBody(sessions, /^body\[data-chatgpt-ui\] \.chatgpt-sessions$/m, 'sidebar list root')
+  assert.ok(root.includes('overflow: hidden'), 'the list root must clip rather than scroll')
+  const list = ruleBody(sessions, /^body\[data-chatgpt-ui\] \.chatgpt-session-scroll$/m, 'session scroll area')
+  assert.ok(list.includes('overflow-y: auto') && list.includes('overflow-x: hidden'), 'the session list is the one scrollport')
+  const scrollers = [...sessions.matchAll(/([^{}]+)\{[^{}]*overflow-y:\s*(?:auto|scroll)/g)].map((match) => match[1].trim().replace(/\s+/g, ' '))
+  const unexpected = scrollers.filter((selector) => ![
+    'body[data-chatgpt-ui] .chatgpt-session-scroll',
+    'body[data-chatgpt-ui] .chatgpt-session-menu',
+    'body[data-chatgpt-ui] .chatgpt-session-search-results'
+  ].includes(selector))
+  assert.deepEqual(unexpected, [], `unexpected sidebar scrollers: ${unexpected.join(' | ')}`)
+})
