@@ -4,7 +4,7 @@ ChatGPT 桌面版风格的 DSH Web GUI 皮肤：只换外观，不动行为—�
 
 ## 截图
 
-![Chat 模式空态，推理强度面板在输入卡上方展开](docs/images/new-session-effort-dark.png)
+![Chat 模式空态，推理强度面板贴着模型药丸向下展开](docs/images/new-session-effort-dark.png)
 
 ![既有会话：用户气泡、助手正文与底部输入卡](docs/images/session-dark.png)
 
