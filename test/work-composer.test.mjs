@@ -237,9 +237,9 @@ const permissions = {
   check('header: the reset control is on the right', composer.includes("className: 'chatgpt-effort-reset'") && composer.includes('chatgptEffortDefaultIndex'))
   check('header: the effort name uses the blue accent token', css.includes('.chatgpt-effort-choice-name') && css.includes('var(--cgpt-effort-accent)'))
   check('panel: 16px corners and the 12/16/16 rhythm inside the 8px inset', /\.chatgpt-effort-menu \{[^}]*border-radius: var\(--cgpt-overlay-radius\)/.test(css) && /\.chatgpt-model-simple \{[^}]*padding: 4px 8px 8px/.test(css))
-  check('panel: 280 wide and 420px list cap', composer.includes("width: '280px'") && css.includes('max-height: 420px'))
-  check('list: provider headers are 32 high and full width', /\.chatgpt-model-group-title \{[^}]*height: 32px[^}]*background: var\(--cgpt-effort-group-bg\)/.test(css))
-  check('list: rows are 40 high', /\.chatgpt-model-choice \{[^}]*height: 40px/.test(css))
+  check('panel: 280 wide and 420px list cap', composer.includes("width: '280px'") && css.includes('max-height: var(--cgpt-model-panel-max, 420px)'))
+  check('list: provider headers are 26 high and full width', /\.chatgpt-model-group-title \{[^}]*height: 26px[^}]*background: var\(--cgpt-effort-group-bg\)/.test(css))
+  check('list: rows are 32 high with a 32px hit area', /\.chatgpt-model-choice \{[^}]*height: 32px[^}]*min-height: 32px[^}]*padding: 0 10px/.test(css))
   check('list: no description is rendered', !composer.includes('chatgpt-model-choice-description') && !composer.includes('chatgpt-model-choice-text'))
   check('list: the current row carries the check', composer.includes("className: 'chatgpt-model-choice-check'") && composer.includes("'data-current': selected"))
   check('pill: opening swaps the caption to 选择推理强度', composer.includes("chooseEffort: '选择推理强度'") && composer.includes("'data-cgpt-pill-placeholder'"))
@@ -289,12 +289,17 @@ const permissions = {
   check('palette: the dark card is #212121', darkTokens.includes('--cgpt-work-card-bg: #212121'))
 }
 
-// 13. the effort panel clears the composer card (P1-f2).
+// 13. the effort panel grows out of its trigger (P4-b).
 {
   const composer = read('lib/client/composer.js')
-  const helper = composer.slice(composer.indexOf('function chatgptPopoverAbove'), composer.indexOf('function chatgptPopoverBeside'))
-  check('panel: anchors its bottom edge to the card top, not the pill top', helper.includes("querySelector('[data-composer-card=\"true\"]')") && helper.includes('Math.min(anchor.top, card.top)'))
-  check('panel: right-aligns with the card so the empty-state greeting stays visible', helper.includes('card.right - width'))
+  const helper = composer.slice(composer.indexOf('function chatgptPopoverForTrigger'), composer.indexOf('function chatgptPanelRoom'))
+  check('panel: right edge sits on the trigger right edge, not the card', helper.includes('anchor.right - width') && !helper.includes('card.right'))
+  check('panel: keeps the 8px gap on its own side', helper.includes('const gap = CHATGPT_PANEL_GAP') && helper.includes('anchor.bottom + gap') && helper.includes('anchor.top - gap - height'))
+  check('panel: flips only when the preferred side has no room', helper.includes("preferred === 'below' && !fitsBelow && fitsAbove") && helper.includes("preferred === 'above' && !fitsAbove && fitsBelow"))
+  check('panel: a locked side never flips (the nested list stays put)', helper.includes('if (options.lock !== true)'))
+  check('panel: the blank hero prefers below, a started session above', /direction: chatgptComposerIsHero\(trigger\) \? 'below' : 'above'/.test(composer) && composer.includes("closest(\"[class*='_composerHero']\")"))
+  check('list: the side is capped to the room on that side, never flipped', composer.includes('chatgptPanelRoom(rect, direction)') && composer.includes("'--cgpt-model-panel-max'"))
+  check('list: the panel itself no longer scrolls; the inner list does', /\.chatgpt-model-menu\[data-view='advanced'\] \{[^}]*overflow: hidden/.test(css) && /\.chatgpt-model-advanced \{[^}]*max-height: calc\(var\(--cgpt-model-panel-max, 420px\) - 20px\)[^}]*overflow-y: auto/.test(css))
 }
 
 console.log(`${failures === 0 ? 'PASS' : 'FAIL'}  work composer: ${checks - failures}/${checks} checks`)

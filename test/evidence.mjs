@@ -125,7 +125,9 @@ export function evidenceTest(nodeTest, url) {
  */
 export const EVIDENCE = {
   'icons.test.mjs': ['docs/capture/icons.json'],
-  'messages.test.mjs': ['docs/screenshots'],
+  /* The suite also asserts the m4 reference/implementation pairs and the long
+     conversation frames; without them it must skip, not fail (AGENTS.md #5). */
+  'messages.test.mjs': ['docs/screenshots/m4-light-reference.png', 'docs/screenshots/m4-light-long.png'],
   'module6.test.mjs': ['docs/capture/icons.json', 'docs/icon-check.json', 'docs/screenshots'],
   'module8.test.mjs': ['docs/motion.md', 'docs/responsive-audit.json', 'docs/theme-audit.json', 'docs/screenshots'],
   'module9.test.mjs': ['docs/STATUS.md', 'docs/matrix9.json', 'docs/motion.md', 'docs/regression9.json'],
@@ -160,5 +162,6 @@ export const EVIDENCE = {
   'm37.test.mjs': ['docs/m37.json'],
   'm38.test.mjs': ['docs/m38.json', 'docs/screenshots'],
   'm39.test.mjs': ['docs/m39.json', 'docs/screenshots'],
-  'm40.test.mjs': ['docs/m40.json', 'docs/screenshots']
+  'm40.test.mjs': ['docs/m40.json', 'docs/screenshots'],
+  'p4b.test.mjs': ['docs/p4b.json', 'docs/screenshots']
 }

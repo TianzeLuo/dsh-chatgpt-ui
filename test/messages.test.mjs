@@ -46,8 +46,8 @@ const pkg = JSON.parse(read('package.json'))
   )
   // 0.2.2: the bubble class moved to the primitives package; the skin matches
   // both `.Sixlwa_bubble` and the new `data-message-bubble` attribute.
-  check('user bubble is 22px / 10px 16px', /:is\(\.Sixlwa_bubble, \[data-message-bubble\]\) \{[^}]*padding: 10px 16px;[^}]*border-radius: 22px;/s.test(css))
-  check('user stack caps at 70%', /\.Sixlwa_userStack \{[^}]*max-width: 70%;/s.test(css))
+  check('user bubble is 22px / 10px 16px', css.includes('--cgpt-user-bubble-padding: 10px 16px') && css.includes('--cgpt-user-bubble-radius: 22px') && /:is\(\.Sixlwa_bubble, \[data-message-bubble\]\) \{[^}]*padding: var\(--cgpt-user-bubble-padding\);[^}]*border-radius: var\(--cgpt-user-bubble-radius\);/s.test(css))
+  check('user stack caps at 70%', css.includes('--cgpt-user-bubble-max: 70%') && /\.Sixlwa_userStack \{[^}]*max-width: var\(--cgpt-user-bubble-max\);/s.test(css))
   check('user text is 16/24', /:is\(\.Sixlwa_bubble, \[data-message-bubble\]\) \{[^}]*font-size: 16px;[^}]*line-height: 24px;/s.test(css))
   check('light bubble uses the reference blue', css.includes('--cgpt-user-bubble-bg: #e8f3fe') && css.includes('--cgpt-user-bubble-fg: #0c274a'))
   check('dark bubble uses the reference navy', css.includes('--cgpt-user-bubble-bg: #173e76') && css.includes('--cgpt-user-bubble-fg: #f6fafe'))

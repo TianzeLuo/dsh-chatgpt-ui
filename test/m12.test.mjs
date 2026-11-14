@@ -50,9 +50,9 @@ check('panel: the current row uses a check, not bolder text', composer.includes(
 // 2. Geometry superseded by P0-4 (see m14.test.mjs); M12 keeps the interaction contract.
 check('geometry: panel is 280 wide', composer.includes("width: '280px'"))
 check('geometry: panel uses the 16px overlay radius', /\.chatgpt-effort-menu \{[^}]*border-radius: var\(--cgpt-overlay-radius\)/.test(css))
-check('geometry: advanced list caps at 420', /\.chatgpt-model-menu\[data-view='advanced'\] \{[^}]*max-height: 420px/.test(css))
+check('geometry: advanced list caps at 420', /\.chatgpt-model-menu\[data-view='advanced'\] \{[^}]*max-height: var\(--cgpt-model-panel-max, 420px\)/.test(css))
 check('geometry: simple view keeps 12/16/16 inside the 8px overlay inset', /\.chatgpt-model-simple \{[^}]*padding: 4px 8px 8px/.test(css))
-check('geometry: model rows are 40 high with 12px item padding', /\.chatgpt-model-choice \{[^}]*height: 40px[^}]*padding: 0 12px/.test(css))
+check('geometry: model rows are 32 high with 10px item padding', /\.chatgpt-model-choice \{[^}]*height: 32px[^}]*padding: 0 10px/.test(css))
 check('geometry: row name is 14/400', /\.chatgpt-model-choice \{[^}]*font-size: 14px[^}]*font-weight: 400/.test(css))
 check('geometry: the provider header is 12px tertiary', /\.chatgpt-model-group-title \{[^}]*color: var\(--cgpt-effort-group-fg\)[^}]*font-size: 12px/.test(css))
 check('geometry: the check uses the blue accent', /\.chatgpt-model-choice-check \{[^}]*color: var\(--cgpt-effort-accent\)/.test(css))

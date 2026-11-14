@@ -224,8 +224,9 @@ body[data-chatgpt-ui] .chatgpt-permission .chatgpt-permission-icon svg {
 }
 
 /* Model list: the panel's inner sections supply their own rhythm; the outer
-   gutter is now the measured 10px. */
+   gutter is the measured 10px on all four sides (P4-b: the inner scroller's
+   20px cap subtraction assumes that symmetric gutter). */
 
 body[data-chatgpt-ui] .chatgpt-model-menu[data-view='advanced'] {
-  padding-bottom: 4px;
+  padding: var(--cgpt-menu-gutter);
 }

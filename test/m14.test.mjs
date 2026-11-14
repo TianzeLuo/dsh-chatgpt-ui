@@ -64,12 +64,12 @@ check('pill: open caption is rendered only while open', composer.includes('open\
 
 // 4. Model list grouped by provider, no subtitles.
 check('list: grouped by provider', composer.includes('chatgptModelGroups(choices)') && composer.includes("'data-cgpt-model-group': group.provider"))
-check('list: the provider header is full-width and small grey', /\.chatgpt-model-group-title \{[^}]*height: 32px[^}]*background: var\(--cgpt-effort-group-bg\)[^}]*font-size: 12px/.test(css))
-check('list: rows are 40px with only a name and a check', /\.chatgpt-model-choice \{[^}]*height: 40px/.test(css) && !composer.includes('chatgpt-model-choice-description'))
+check('list: the provider header is full-width and small grey', /\.chatgpt-model-group-title \{[^}]*height: 26px[^}]*background: var\(--cgpt-effort-group-bg\)[^}]*font-size: 12px/.test(css))
+check('list: rows are 32px with only a name and a check', /\.chatgpt-model-choice \{[^}]*height: 32px[^}]*min-height: 32px/.test(css) && !composer.includes('chatgpt-model-choice-description'))
 check('list: the current row has a check on the right', composer.includes("className: 'chatgpt-model-choice-check'") && composer.includes("'data-current': selected"))
 check('list: selecting returns to the effort view', /setView\('simple'\)\s*\n\s*send\(request\)/.test(composer))
 check('list: width matches the panel', composer.includes("width: '280px'") && css.includes('width: 100%'))
-check('list: overflow scrolls', /\.chatgpt-model-menu\[data-view='advanced'\] \{[^}]*max-height: 420px[^}]*overflow-y: auto/.test(css))
+check('list: overflow scrolls inside the panel gutter', /\.chatgpt-model-advanced \{[^}]*max-height: calc\(var\(--cgpt-model-panel-max, 420px\) - 20px\)[^}]*overflow-y: auto/.test(css) && /\.chatgpt-model-menu\[data-view='advanced'\] \{[^}]*overflow: hidden/.test(css))
 
 // 5. Both themes.
 check('theme: light overlay is white and groups #F7F7F7', tokens.includes('--cgpt-overlay-bg: #ffffff') && tokens.includes('--cgpt-model-panel-bg: var(--cgpt-overlay-bg)') && tokens.includes('--cgpt-effort-group-bg: #f7f7f7'))

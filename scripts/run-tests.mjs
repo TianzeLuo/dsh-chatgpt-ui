@@ -2,7 +2,7 @@
 /**
  * `npm test` — the full gate, layered by the evidence that is on this machine.
  *
- * The 12 core suites read only repository files and always run. The other 37
+ * The 12 core suites read only repository files and always run. The other 38
  * replay locally captured evidence (geometry JSON, reference captures,
  * screenshots) that is deliberately not in the repository; each of them skips
  * itself when its evidence is missing, and this runner prints one line saying
@@ -71,7 +71,8 @@ const REPLAY = [
   'm38.test.mjs',
   'm40.test.mjs',
   'm37.test.mjs',
-  'm39.test.mjs'
+  'm39.test.mjs',
+  'p4b.test.mjs'
 ]
 
 const withoutEvidence = REPLAY.filter((suite) => EVIDENCE[suite].some((path) => !exists(path)))

@@ -476,10 +476,13 @@ body[data-chatgpt-ui] .chatgpt-effort-menu {
   overflow: hidden;
 }
 
+/* P4-b: the panel never scrolls itself. Its 10px gutter stays fixed and the
+   inner list does the scrolling, so the scrollbar track and thumb sit inside the
+   16px rounded edge instead of running over it. `--cgpt-model-panel-max` is set
+   inline: it is the room left on the side the panel opened on. */
 body[data-chatgpt-ui] .chatgpt-model-menu[data-view='advanced'] {
-  max-height: 420px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  max-height: var(--cgpt-model-panel-max, 420px);
+  overflow: hidden;
 }
 
 /* simple view — the two-line choice block over the pill slider */
@@ -621,7 +624,39 @@ body[data-chatgpt-ui] .chatgpt-effort-slider {
 /* advanced view — provider-grouped model list */
 body[data-chatgpt-ui] .chatgpt-model-advanced {
   box-sizing: border-box;
-  padding: 8px 0;
+  /* The outer panel keeps its 10px gutter; the list owns the scroll, so the
+     thumb is 10px inside the rounded edge at every row. The 20px is that
+     gutter twice (top + bottom), which the border-box cap has to subtract. */
+  padding: 4px 0;
+  max-height: calc(var(--cgpt-model-panel-max, 420px) - 20px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+body[data-chatgpt-ui] .chatgpt-model-advanced::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+body[data-chatgpt-ui] .chatgpt-model-advanced::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: content-box;
+  background-color: var(--cgpt-border-strong);
+}
+
+body[data-chatgpt-ui] .chatgpt-model-advanced::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Firefox has no `::-webkit-scrollbar`; the standard pair keeps the same thin
+   look there. Scoped in @supports so Chrome keeps the 8px custom bar: setting
+   `scrollbar-width` disables the webkit rules in Chromium. */
+@supports not selector(::-webkit-scrollbar) {
+  body[data-chatgpt-ui] .chatgpt-model-advanced {
+    scrollbar-width: thin;
+    scrollbar-color: var(--cgpt-border-strong) transparent;
+  }
 }
 
 body[data-chatgpt-ui] .chatgpt-model-list {
@@ -634,12 +669,13 @@ body[data-chatgpt-ui] .chatgpt-model-group {
   flex-direction: column;
 }
 
+/* P4-b: 26px provider header with the same 10px text inset as a row. */
 body[data-chatgpt-ui] .chatgpt-model-group-title {
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  height: 32px;
-  padding: 0 16px;
+  height: 26px;
+  padding: 0 10px;
   background: var(--cgpt-effort-group-bg);
   color: var(--cgpt-effort-group-fg);
   font-size: 12px;
@@ -648,6 +684,8 @@ body[data-chatgpt-ui] .chatgpt-model-group-title {
   letter-spacing: 0.01em;
 }
 
+/* P4-b: 32px row (was 40): a tighter list that still keeps a 32px hit area,
+   the label and the check centred on the row's middle line. */
 body[data-chatgpt-ui] .chatgpt-model-choice {
   box-sizing: border-box;
   display: flex;
@@ -655,11 +693,11 @@ body[data-chatgpt-ui] .chatgpt-model-choice {
   justify-content: space-between;
   gap: 8px;
   width: 100%;
-  height: 40px;
-  min-height: 40px;
-  padding: 0 12px;
+  height: 32px;
+  min-height: 32px;
+  padding: 0 10px;
   border: 0;
-  border-radius: 10px;
+  border-radius: 8px;
   background: transparent;
   color: var(--cgpt-text-primary);
   font-size: 14px;

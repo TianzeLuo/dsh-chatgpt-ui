@@ -18,7 +18,7 @@
  * Every frame is 1440×900 CSS pixels at devicePixelRatio 2, dark theme, zh-CN
  * UI, so the four files share one size and one zoom level:
  *
- *   new-session-effort-dark.png   new Chat session, effort slider expanded
+ *   new-session-effort-dark.png   new Chat session, effort slider expanded below the pill
  *   new-session-work-dark.png     new Work session, project bound, one bottom row
  *   session-dark.png              existing session: bubbles + composer + sidebar
  *   project-menu-dark.png         sidebar project ⋯ menu open
@@ -87,8 +87,10 @@ const auditSidebar = async () => {
    projects use synthetic paths and the audit keeps it that way. */
 const PATH_LEAK = /(\/tmp\/|\/mnt\/|[A-Za-z]:\\|\/home\/)/
 
-/* P1-f2: the panel must clear the whole composer card and stay the only open
-   trigger, otherwise the frame reads as a broken layout. */
+/* P4-b: on the blank Chat hero the panel grows out of the pill downwards, its
+   right edge on the pill's right edge and 8px below it. The frame only reads as
+   the reference when that anchor holds, so the capture refuses to save one that
+   drifted. */
 const openEffortPanel = async () => {
   await page.locator('[data-cgpt-model-pill]').click()
   await page.waitForTimeout(800)
@@ -96,18 +98,24 @@ const openEffortPanel = async () => {
     throw new Error('showcase: the effort slider did not open — is the demo model missing reasoning metadata?')
   }
   const geometry = await page.evaluate(() => {
-    const card = document.querySelector('[data-composer-card="true"]').getBoundingClientRect()
+    const pill = document.querySelector('[data-cgpt-model-pill]').getBoundingClientRect()
     const menu = document.querySelector('.chatgpt-effort-menu').getBoundingClientRect()
     return {
-      cardTop: Math.round(card.top),
+      pillRight: Math.round(pill.right),
+      pillBottom: Math.round(pill.bottom),
       menuTop: Math.round(menu.top),
-      menuBottom: Math.round(menu.bottom),
+      menuRight: Math.round(menu.right),
+      side: document.querySelector('.chatgpt-effort-menu').getAttribute('data-cgpt-panel-side'),
       pills: document.querySelectorAll('[data-cgpt-model-pill]').length,
       open: document.querySelectorAll('[data-cgpt-model-pill][data-open="true"]').length
     }
   })
-  if (geometry.menuBottom > geometry.cardTop - 4) {
-    throw new Error(`showcase: the effort panel overlaps the composer card — ${JSON.stringify(geometry)}`)
+  if (Math.abs(geometry.menuRight - geometry.pillRight) > 1) {
+    throw new Error(`showcase: the effort panel is not right-aligned to its pill — ${JSON.stringify(geometry)}`)
+  }
+  const gap = geometry.menuTop - geometry.pillBottom
+  if (geometry.side !== 'below' || gap < 6 || gap > 10) {
+    throw new Error(`showcase: the blank-hero panel is not 8px below the pill — ${JSON.stringify({ ...geometry, gap })}`)
   }
   if (geometry.pills !== 1 || geometry.open !== 1) {
     throw new Error(`showcase: expected exactly one open trigger — ${JSON.stringify(geometry)}`)
@@ -129,7 +137,7 @@ const modeGroup = page.locator('.chatgpt-mode-group')
 const chatTab = modeGroup.getByText('聊天', { exact: true })
 const workTab = modeGroup.getByText('工作', { exact: true })
 
-// 1 — new Chat session, effort panel open above the card.
+// 1 — new Chat session, effort panel open below the pill.
 await page.locator('[data-cgpt-new-chat]').first().click()
 await page.waitForTimeout(1200)
 await chatTab.click()
@@ -181,4 +189,4 @@ await shot('project-menu-dark.png')
 
 const rows = await auditSidebar()
 await browser.close()
-console.log(`showcase: panel bottom ${geometry.menuBottom} / card top ${geometry.cardTop}; sidebar — ${rows.projects.join(', ')}; ${rows.sessions.length} sessions`)
+console.log(`showcase: panel right ${geometry.menuRight} / pill right ${geometry.pillRight}; gap ${geometry.menuTop - geometry.pillBottom}; sidebar — ${rows.projects.join(', ')}; ${rows.sessions.length} sessions`)
