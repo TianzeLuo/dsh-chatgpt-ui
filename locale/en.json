@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "ChatGPT UI",
+    "description": "Reskins the DSH Web GUI in the ChatGPT desktop layout: rail, project and session list, message column, model pills and a rounded composer, with light and dark tokens. Choose Chat (read-only: no shell, no file writes) or Work in the mode switch above the conversation. Uninstalling the bundle restores the native DSH layout and behavior.",
+    "detail": "docs/DETAIL.md"
+  }
+}

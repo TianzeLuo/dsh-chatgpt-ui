@@ -28,8 +28,11 @@ docs/*
 !docs/about.md
 !docs/architecture.md
 !docs/design-tokens.md
+!docs/DETAIL.md
+!docs/DETAIL.zh.md
 !docs/development.md
 !docs/limitations.md
+!docs/preview.svg
 !docs/roadmap.md
 !docs/testing.md
 !docs/troubleshooting.md

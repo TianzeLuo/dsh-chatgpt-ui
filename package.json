@@ -5,6 +5,17 @@
   "description": "ChatGPT-style UI skin for the DeepSeek Harness Web GUI: token layer, stylesheet, Chat preset + read-only policy, mode switcher, dot brand (M2).",
   "license": "MIT",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TianzeLuo/dsh-chatgpt-ui.git"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "theme",
+    "chatgpt",
+    "ui"
+  ],
   "engines": {
     "node": ">=22.5",
     "dsh": ">=0.2.1-rc.1"
@@ -15,6 +26,8 @@
     "./client": "./lib/client.js",
     "./chat-policy": "./lib/host/chat-policy.js",
     "./presets/chat.patch.yml": "./presets/chat.patch.yml",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
     "./package.json": "./package.json"
   },
   "files": [
@@ -22,6 +35,12 @@
     "presets",
     "cordis.patch.yml",
     "skin.json",
+    "locale/*.json",
+    "icon.svg",
+    "docs/DETAIL.md",
+    "docs/DETAIL.zh.md",
+    "docs/preview.svg",
+    "LICENSE",
     "README.md"
   ],
   "scripts": {

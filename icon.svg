@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
+  <defs>
+    <linearGradient id="dsh_chatgpt_ui_blue" x1="8" y1="8" x2="28" y2="30" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4aa8ff"/>
+      <stop offset="1" stop-color="#2f5cf6"/>
+    </linearGradient>
+    <mask id="dsh_chatgpt_ui_bubble" maskUnits="userSpaceOnUse" x="0" y="0" width="36" height="36">
+      <rect width="36" height="36" fill="#000"/>
+      <rect x="6.9" y="7.8" width="22.2" height="16.6" rx="5.4" fill="#fff"/>
+      <path d="M11.2 23.2 9.7 30.4 17.6 24Z" fill="#fff"/>
+      <circle cx="12.9" cy="16.1" r="2.2" fill="#000"/>
+      <circle cx="18" cy="16.1" r="2.2" fill="#000"/>
+      <circle cx="23.1" cy="16.1" r="2.2" fill="#000"/>
+    </mask>
+  </defs>
+  <rect width="36" height="36" fill="url(#dsh_chatgpt_ui_blue)" mask="url(#dsh_chatgpt_ui_bubble)"/>
+</svg>

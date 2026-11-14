@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "ChatGPT 界面",
+    "description": "把 DSH Web GUI 换成 ChatGPT 桌面版布局：导轨、项目与会话列表、消息区、模型药丸与圆角输入卡，明暗两套令牌。会话顶部可在「聊天」与「工作」之间切换，聊天模式只读（无 shell、不写文件）。卸载插件即恢复 DSH 原生布局与行为。",
+    "detail": "docs/DETAIL.zh.md"
+  }
+}
