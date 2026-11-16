@@ -44,7 +44,7 @@ scripts/build-client.mjs  片段 + CSS → lib/client.js
 | `sidebar.workspaces` | 自绘会话列表 | 宿主外壳保留，只替换列表 occupant |
 | `conversation.input.left` | `+` 文件入口、权限按钮、项目按钮 | Work 卡的动作行与底部行 |
 | `conversation.input.right` | 模型/推理强度药丸、发送键装饰 | 面板与滑块由本插件渲染 |
-| `conversation.header.leading` | 会话头部补充控件 | 只在宿主提供该槽位时挂载 |
+| `conversation.header.leading` | 会话头部补充控件 + 无渲染的模型记忆位 | 只在空白会话显示分段；模型记忆位为空白会话恢复该产品的上次选择 |
 
 导轨是固定 52px 的覆盖层（不是槽位），入口包括首页 / 定时任务 / 插件 / 更多 / 设置。
 super-agent 的入口来自它自己的侧栏行；本插件只在运行时探测 `main` 槽位，找不到就跳过，
@@ -58,6 +58,11 @@ super-agent 的入口来自它自己的侧栏行；本插件只在运行时探�
   自己的主题 id，也不改用户的 light/dark/system 偏好。
 - 产品模式写在 `body[data-chatgpt-mode]`（`chat` / `agent`），只供显示规则使用；
   真正的行为差异来自 session 的 composed preset。
+- Chat 与 Work 的模型/推理强度选择各自持久在浏览器
+  `dsh-chatgpt-ui:model-selection-by-product`，新建或空白会话按所属产品重新应用；
+  宿主的全局默认模型仍是最后一次 `selectModel` 的结果，皮肤不改宿主策略。
+- Chat 会话在宿主侧保留 Workspace 锚点（输入卡需要），但所有项目表面都按
+  `chat` preset 过滤：分组的成员判定接收共享投影值，项目页同时过滤会话列表与计数。
 - `body[data-cgpt-skin="off"]`（或 profile 配置 `skin: off`）让插件不挂任何样式，用于
   「装/不装插件」的像素回归闸门。
 - `--dsw-corner-shape: round` 在皮肤根节点覆写一次，修正宿主默认的 squircle，使所有

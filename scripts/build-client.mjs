@@ -25,7 +25,7 @@ const CLIENT_DIR = join(ROOT, 'lib', 'client')
 const CSS_DIR = join(CLIENT_DIR, 'css')
 
 /** Shared modules inlined first: ESM sources that the node tests import directly. */
-const SHARED = ['mode-core.mjs', 'layout-core.mjs', 'sessions-core.mjs', 'composer-core.mjs', 'project-core.mjs', 'connection-core.mjs']
+const SHARED = ['mode-core.mjs', 'layout-core.mjs', 'sessions-core.mjs', 'composer-core.mjs', 'model-memory-core.mjs', 'project-core.mjs', 'connection-core.mjs']
 
 /** Fragments, in evaluation order. Must stay dependency-free statements. */
 const FRAGMENTS = [
