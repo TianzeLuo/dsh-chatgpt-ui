@@ -57,5 +57,35 @@ check('模式 UI 等宿主服务就绪后再挂', /CHATGPT_MODE_SERVICES = \['lo
 // 5. Super-agent badge lives on its side; the skin neither registers nor styles it.
 check('皮肤不注册 super-agent 徽标槽', !/conversation\.input\.left[\s\S]{0,200}super-agent/.test(client))
 
+// 6. Single-slot safety: the header seat has ONE occupant, and the rail grows
+// from its own list slot. The previous regression registered a headless
+// model-memory entry beside the switch on `conversation.header.leading`
+// (declared `kind: 'single'`), which dropped both the switch and the rail.
+const modeUi = readFileSync(join(root, 'lib/client', 'mode-ui.js'), 'utf8')
+const rail = readFileSync(join(root, 'lib/client', 'rail.js'), 'utf8')
+const entry = readFileSync(join(root, 'lib/client', 'entry.js'), 'utf8')
+check(
+  'header.leading 只有一个 occupant（分段）',
+  (modeUi.match(/name: 'conversation\.header\.leading'/g) ?? []).length === 1 &&
+    modeUi.includes("id: 'chatgpt-mode-switch'"),
+  'single slot received a second registration'
+)
+check('模型记忆没有占用新槽位', !modeUi.includes("id: 'chatgpt-model-memory'"))
+check(
+  '模型记忆 hook 在分段组件内',
+  /function ChatgptModeSwitch[\s\S]{0,1800}useChatgptProductModelMemory\(ctx, useSessions\)/.test(modeUi)
+)
+check(
+  '导轨仍注册在 shell.overlay',
+  rail.includes("name: 'shell.overlay'") && rail.includes("id: 'chatgpt-rail'"),
+  'rail registration missing'
+)
+check(
+  '挂载顺序仍是分段在前、导轨在后',
+  entry.indexOf('mountChatgptModeSlots') > 0 &&
+    entry.indexOf('mountChatgptModeSlots') < entry.indexOf('mountChatgptRail')
+)
+check('bundle 同时含分段与导轨', client.includes('chatgpt-mode-switch') && client.includes('chatgpt-rail'))
+
 console.log(`${failures === 0 ? 'PASS' : 'FAIL'}  ${checks - failures}/${checks} independence checks`)
 process.exit(failures === 0 ? 0 : 1)

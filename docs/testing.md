@@ -5,8 +5,8 @@
 | 命令 | 需要什么 | 何时用 |
 | --- | --- | --- |
 | `npm run check:core` | 只要 Node 24 | 提交前最低门槛：入口、片段与新测试脚手架的 `node --check` |
-| `npm run test:core` | 只要 Node 24 | 契约、纯函数逻辑、CSS 作用域、工具函数（12 个套件） |
-| `npm test` | 证据齐全时跑全量；缺证据自动降级 | 唯一的总门禁：12 个 core 套件 + 37 个证据套件（见第 2 节） |
+| `npm run test:core` | 只要 Node 24 | 契约、纯函数逻辑、CSS 作用域、工具函数（13 个套件） |
+| `npm test` | 证据齐全时跑全量；缺证据自动降级 | 唯一的总门禁：13 个 core 套件 + 38 个证据套件（见第 2 节） |
 | `npm run check` | 本机已采集的证据（`docs/`） | 全量语法门禁 + 报告脚本重放；缺证据时同样会中断，属于开发机命令 |
 
 ```sh
@@ -21,7 +21,7 @@ npm run check           # 维护机：还会重放 m17/m14 报告，缺证据会
 
 ## 2. 哪些测试需要本机证据
 
-`npm test` 里有 **37 个套件会重放采集证据**：几何 JSON、参考抓取、对照截图与维护者桌面
+`npm test` 里有 **38 个套件会重放采集证据**：几何 JSON、参考抓取、对照截图与维护者桌面
 的参考帧。这些文件里有真实会话标题、工作区路径与宿主 DOM，属于隐私材料，**不在仓库里**；
 `.gitignore` 也继续排除这类产物。
 
@@ -63,9 +63,10 @@ SKIP  test/m25.test.mjs — 缺少本机证据：docs/m25.json、docs/m25-sheets
 | `test/scoped-css.test.mjs` | 每条规则以 `body[data-chatgpt-ui]` 开头，无全局选择器、无宿主类名裸命中 |
 | `test/mode.test.mjs` / `test/preset.test.mjs` | Chat / Work 模式决策；`chat` preset 声明（无 shell、无写文件、无子代理） |
 | `test/chat-policy.test.mjs` | Host 只读策略：进入、恢复、非 chat 会话不动 |
-| `test/layout.test.mjs` / `test/independence.test.mjs` | 面板服务缺失时不崩；不 import 其它插件、无死按钮 |
+| `test/layout.test.mjs` / `test/independence.test.mjs` | 面板服务缺失时不崩；不 import 其它插件、无死按钮；`header.leading` 单槽只有一个注册、导轨仍挂载 |
 | `test/sessions.test.mjs` | 分页隔离、置顶、菜单、项目折叠、super-agent 内部会话过滤 |
 | `test/work-composer.test.mjs` | 强度档位取自 `modelCatalog`、轨道/手柄几何、`selectModel` 请求体、权限映射 |
+| `test/model-memory.test.mjs` | Chat / Work 各自持久模型选择、空白会话恢复、目录校验与写入/回滚路径 |
 | `test/native-parity.test.mjs` | 「装/不装插件」像素对照（15 项，`maxOffset 0px`） |
 | `test/m1x`–`test/m4x` | 各模块的证据断言：几何、令牌、图标字形、面板、消息区 |
 
@@ -86,6 +87,10 @@ dsh web --no-open --port 3105          # 打印带 token 的 URL
 - **全景矩阵（开发工具）**：`node tools/matrix.mjs --url-dark … --url-light … --out docs`，
   30 格 = 场景 × 会话状态 × 主题 × 交互 × 输入长度；加 `--include-sidebar` 才跑侧栏与
   项目格，结果写 `docs/matrix.json` 与 `matrix-*.png`。
+- **核心元素冒烟**：改动会话头部或导轨挂载时，在隔离实例刷新前后各截图，并断言
+  `shell.overlay` 的导轨按钮、「聊天/工作」分段、项目分组和输入卡都在。
+  `conversation.header.leading` 是 `single` 槽：模型记忆必须写在分段组件里，不能新增
+  第二个 entry。`test/independence.test.mjs` 有对应的源码断言。
 - **回归清单**：`node scripts/regression9.mjs --url … --playwright …`，写
   `docs/regression9.json`；无法在无持久会话的实例上验证的项显式记 `skip`，不以 skip
   冒充 pass。

@@ -2,7 +2,7 @@
 /**
  * `npm test` — the full gate, layered by the evidence that is on this machine.
  *
- * The 12 core suites read only repository files and always run. The other 38
+ * The 13 core suites read only repository files and always run. The other 38
  * replay locally captured evidence (geometry JSON, reference captures,
  * screenshots) that is deliberately not in the repository; each of them skips
  * itself when its evidence is missing, and this runner prints one line saying
@@ -27,6 +27,7 @@ const CORE = [
   'layout.test.mjs',
   'sessions.test.mjs',
   'work-composer.test.mjs',
+  'model-memory.test.mjs',
   'tools.test.mjs',
   'scoped-css.test.mjs',
   'project.test.mjs',

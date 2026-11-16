@@ -122,10 +122,12 @@ test('P0-17: a fresh Chat Session owns a Workspace so the editor mounts', () => 
   // P1-e wraps the Host call in the timeout helper; the workspace must still
   // be the request that creates the Chat session.
   assert.match(modeJs, /id = await [^\n]*sessions\.create\(request\)/)
-  // P0-19f retired the Chat-only project exclusion: the 项目 section and its
-  // membership are now mode-independent, so switching Chat/Work does not reflow.
+  // P0-17 owns the Workspace attachment; the newer de-projectization rule
+  // filters Chat out of every 项目 surface (the section itself still renders in
+  // both modes, so switching Chat/Work does not reflow it).
   assert.match(sessionsCore, /excludeFromProjects/)
-  assert.doesNotMatch(sessionsJs, /excludeFromProjects:/)
+  assert.match(sessionsJs, /excludeFromProjects:/)
+  assert.match(sessionsJs, /chatgptIsChatSessionId/)
   assert.match(sessionsJs, /className: 'chatgpt-projects-section'/)
   // Legacy ungrouped blank Sessions: a click on the Host trigger starts an
   // editable Chat instead of opening the workspace picker.
