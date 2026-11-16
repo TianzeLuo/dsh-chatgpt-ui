@@ -302,5 +302,30 @@ const permissions = {
   check('list: the panel itself no longer scrolls; the inner list does', /\.chatgpt-model-menu\[data-view='advanced'\] \{[^}]*overflow: hidden/.test(css) && /\.chatgpt-model-advanced \{[^}]*max-height: calc\(var\(--cgpt-model-panel-max, 420px\) - 20px\)[^}]*overflow-y: auto/.test(css))
 }
 
+// 14. pending attachments keep one normal line gap in every locale.
+// The Host localizes the group's aria-label, so the rail selector must never
+// depend on the English string: that silently dropped the 8px fix in zh-CN and
+// the editor text sat on the PDF card again.
+{
+  const composerCss = read('lib/client/css/40-composer.css')
+  check(
+    'attachments: rail is targeted by its slot, not a localized aria-label',
+    composerCss.includes("[data-slot='conversation.input.attachments'] > div") &&
+      !composerCss.includes("aria-label='Pending attachments'")
+  )
+  check(
+    'attachments: the rail reserves 8px below the card',
+    /\[data-slot='conversation\.input\.attachments'\] > div \{[^}]*margin-bottom: 8px/.test(composerCss)
+  )
+  check(
+    'attachments: wrapped rows keep an 8px row gap',
+    /\[data-slot='conversation\.input\.attachments'\] \[role='group'\] \{[^}]*flex-wrap: wrap[^}]*row-gap: 8px/.test(composerCss)
+  )
+  check(
+    'attachments: the built bundle carries the slot selector',
+    bundle.includes("[data-slot='conversation.input.attachments'] > div")
+  )
+}
+
 console.log(`${failures === 0 ? 'PASS' : 'FAIL'}  work composer: ${checks - failures}/${checks} checks`)
 if (failures > 0) process.exit(1)

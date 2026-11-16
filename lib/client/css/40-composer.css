@@ -245,24 +245,29 @@ body[data-chatgpt-ui] .chatgpt-permission-note {
 }
 
 /* ---- pending attachments ------------------------------------------------ */
-/* P0-5: the Host's attachment rail carries a -6px bottom margin, so a pasted
-   image's lower edge sat on the editor's first text line (measured gap -6px
-   in Work, 0px in Chat after the card's own 6px gap). Give the rail its own
-   8px breathing room. The card's flex gap is 0 in Work and 6 in Chat, so the
-   margin is mode-specific: 8 and 2 both resolve to an 8px visible gap.
+/* P0-5: the Host's attachment rail carries a -6px bottom margin, so a PDF or
+   pasted-image card's lower edge sat on the editor's first text line (measured
+   gap -6px). Give the rail its own 8px breathing room. The Host localizes the
+   group's aria-label ("Pending attachments" / "待发送附件"), so key off the
+   dedicated attachments slot and the role instead of that string: an English
+   selector silently stopped matching in zh-CN and the text overlapped again.
    The rail is also allowed to wrap: a long paste row used to scroll sideways
    with the last row clipped; wrapped rows keep the same 8px line spacing. */
-body[data-chatgpt-ui] [data-slot='conversation.input.attachments'] > div:has([role='group'][aria-label='Pending attachments']) {
+body[data-chatgpt-ui] [data-slot='conversation.input.attachments'] > div {
   height: auto;
   min-height: 64px;
   margin-bottom: 8px;
 }
 
-body[data-chatgpt-ui][data-chatgpt-mode='chat'] [data-slot='conversation.input.attachments'] > div:has([role='group'][aria-label='Pending attachments']) {
+/* Chat's editor is vertically centred inside a 50px scrollport, so the same
+   8px margin would read as 20px below the card; keep its previous 2px margin
+   instead. Work's block editor puts the glyph top on the scrollport top, where
+   8px is the actual line gap. */
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [data-slot='conversation.input.attachments'] > div {
   margin-bottom: 2px;
 }
 
-body[data-chatgpt-ui] [data-slot='conversation.input.attachments'] [role='group'][aria-label='Pending attachments'] {
+body[data-chatgpt-ui] [data-slot='conversation.input.attachments'] [role='group'] {
   flex-wrap: wrap;
   row-gap: 8px;
   overflow: visible;
