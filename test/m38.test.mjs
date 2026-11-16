@@ -3,12 +3,9 @@
  * section is visible and identical in Chat and Work.
  *
  * The source gate pins the empty mark entry, the zero-gap wordmark, and the
- * mode-independent project render. Chat Sessions are filtered out of the
- * groups in both modes (de-projectization), so the section itself still keeps
- * the same groups/order/expansion and switching modes does not reflow it.
- * The evidence gate reads the live report: the 52px line, the 16px text inset,
- * unchanged search/collapse coordinates, and equal project heights/rows in
- * both modes.
+ * mode-independent project render. The evidence gate reads the live report:
+ * the 52px line, the 16px text inset, unchanged search/collapse coordinates,
+ * and equal project heights/rows in both modes.
  *
  * Run: node test/m38.test.mjs
  */
@@ -48,11 +45,7 @@ test('M38: the sidebar mark is empty while the Host wordmark stays', () => {
 
 test('M38: 项目 renders without a product gate', () => {
   assert.doesNotMatch(sessions, /showProjects/, 'the Chat-only gate is gone')
-  // De-projectization filters Chat rows out of the groups in BOTH modes, so the
-  // section stays identical between Chat and Work while no Chat Session can
-  // masquerade as a project member.
-  assert.match(sessions, /excludeFromProjects:/)
-  assert.match(sessions, /chatgptIsChatSessionId/)
+  assert.doesNotMatch(sessions, /excludeFromProjects:/, 'Chat rows are grouped like Work')
   assert.match(sessions, /className: 'chatgpt-projects-section'/)
   assert.match(sessions, /rows\(page\.recent, false, true\)/)
   // Order, pin and fold are still the P0-19c/session machinery.

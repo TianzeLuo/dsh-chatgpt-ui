@@ -11,9 +11,6 @@
  * Run: node test/sessions.test.mjs
  */
 
-import { readFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import {
   CHATGPT_PROJECT_EXPANSION_KEY,
   CHATGPT_PROJECTS_VISIBLE_KEY,
@@ -26,8 +23,6 @@ import {
   CHATGPT_INTERNAL_TITLE_PREFIXES,
   chatgptBuildSessionSections,
   chatgptCurrentMainId,
-  chatgptIsChatSession,
-  chatgptIsChatSessionId,
   chatgptIsInternalSession,
   chatgptNextProjectLimit,
   chatgptNextRecentLimit,
@@ -35,13 +30,9 @@ import {
   chatgptPageSessionSections,
   chatgptProjectLimit,
   chatgptProjectTitle,
-  chatgptSessionPreset,
   chatgptSessionTitle,
   chatgptSessionVisible
 } from '../lib/shared/sessions-core.mjs'
-
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (path) => readFileSync(join(ROOT, path), 'utf8')
 
 let failures = 0
 let checks = 0
@@ -153,66 +144,27 @@ const row = (id, extra = {}) => ({
   check('that lone project session is visible on the first 最近 page', onlyProjectPage.recent.length === 1 && onlyProjectPage.recentHidden === 0)
 }
 
-// 3b. Chat is de-projectized: the Host still keeps a Workspace on a Chat
-// Session so its editor mounts, but every project surface filters it out and
-// the row stays in the global 最近 stream.
+// 3b. P0-17: Chat joins a Workspace for an editable composer but is displayed
+// outside every project group; it stays in the global 最近 stream.
 {
-  const workRow = row('work', { projectionValues: { agentPreset: 'standard' } })
-  const chatRow = row('chat', { projectionValues: { agentPreset: 'chat' } })
-  const summaries = { work: workRow, chat: chatRow }
+  const summaries = {
+    work: row('work', { projectionValues: { agentPreset: 'standard' } }),
+    chat: row('chat', { projectionValues: { agentPreset: 'chat' } })
+  }
   const list = { ids: ['work', 'chat'], byId: summaries }
   const workspaces = {
     items: [{ workspaceId: 'w', title: 'W', sessionIds: ['work', 'chat'] }],
     pinnedSessionIds: [],
     archivedSessionIds: []
   }
-  check('preset: summary projection wins', chatgptSessionPreset(chatRow) === 'chat')
-  check('preset: shared projection is the fallback', chatgptSessionPreset(undefined, { agentPreset: 'chat' }) === 'chat')
-  check(
-    'preset: nested projection values are read too',
-    chatgptSessionPreset({ projections: { values: { agentPreset: 'chat' } } }) === 'chat'
-  )
-  check('chat: the chat preset is detected', chatgptIsChatSession(chatRow) === true && chatgptIsChatSession(workRow) === false)
-  check(
-    'chat: an id remembered by the fragment is excluded before its row arrives',
-    chatgptIsChatSessionId('fresh', {}, {}, new Set(['fresh'])) === true
-  )
-  check(
-    'chat: a durable Work projection wins over the creation-time mark',
-    chatgptIsChatSessionId('switched', { switched: workRow }, {}, new Set(['switched'])) === false
-  )
-  const isChat = (id, entry, projections) => chatgptIsChatSession(entry, projections)
-  const sections = chatgptBuildSessionSections(list, workspaces, { excludeFromProjects: isChat })
+  const sections = chatgptBuildSessionSections(list, workspaces, {
+    excludeFromProjects: (id, entry) => entry?.projectionValues?.agentPreset === 'chat'
+  })
   check('Chat row is not in a project group', sections.projects[0].rows.length === 1 && sections.projects[0].rows[0].id === 'work', JSON.stringify(sections.projects[0].rows))
   check('Chat row stays in 最近', sections.recent.some((entry) => entry.id === 'chat'))
-  check('Chat row carries no project marker', sections.recent.find((entry) => entry.id === 'chat').project === undefined)
   check('Chat row counts once', sections.total === 2, String(sections.total))
-  // Projections-only classification: the list row can lag behind the shared
-  // projection map during reconnect, and that must not leak the row back.
-  const projectedOnly = chatgptBuildSessionSections(
-    {
-      ids: ['work'],
-      byId: { work: workRow },
-      projectionsBySession: { 'ghost-chat': { values: { agentPreset: 'chat' } } }
-    },
-    { items: [{ workspaceId: 'w', title: 'W', sessionIds: ['work', 'ghost-chat'] }], pinnedSessionIds: [], archivedSessionIds: [] },
-    {
-      excludeFromProjects: (id, entry, projections) => chatgptIsChatSession(entry, projections)
-    }
-  )
-  check('a project member known only by projection is excluded', projectedOnly.projects[0].rows.some((entry) => entry.id === 'ghost-chat') === false)
   const unfiltered = chatgptBuildSessionSections(list, workspaces)
   check('without the predicate the Host membership still groups both', unfiltered.projects[0].rows.length === 2)
-
-  // A project holding only Chat Sessions keeps its header (it is still a real
-  // project) but has no project rows; removing it would hide a user project.
-  const chatOnly = chatgptBuildSessionSections(
-    { ids: ['chat'], byId: { chat: chatRow } },
-    { items: [{ workspaceId: 'w', title: 'Chat only', sessionIds: ['chat'] }], pinnedSessionIds: [], archivedSessionIds: [] },
-    { excludeFromProjects: isChat }
-  )
-  check('a project with only Chat Sessions keeps its group', chatOnly.projects.length === 1 && chatOnly.projects[0].rows.length === 0, JSON.stringify(chatOnly.projects))
-  check('its Chat Session is still in 最近', chatOnly.recent.some((entry) => entry.id === 'chat'))
 }
 
 // 4. A Workspace member can precede the flat Session list without disappearing.
@@ -373,31 +325,6 @@ const row = (id, extra = {}) => ({
   check('no move-to-project action is advertised', CHATGPT_SESSION_MENU_ACTIONS.includes('move') === false)
   check('section visibility has its own storage key', CHATGPT_PROJECTS_VISIBLE_KEY === 'dsh-chatgpt-ui:projects-visible')
   check('section visibility is not the expansion key', CHATGPT_PROJECTS_VISIBLE_KEY !== CHATGPT_PROJECT_EXPANSION_KEY)
-}
-
-// 9. Every project surface wires the Chat exclusion (sidebar, overview, detail).
-{
-  const sessions = read('lib/client/sessions.js')
-  const project = read('lib/client/project.js')
-  const bundle = read('lib/client.js')
-  check(
-    'sidebar passes the Chat predicate to the section builder',
-    /excludeFromProjects:[\s\S]{0,260}chatgptIsChatSessionId/.test(sessions)
-  )
-  check(
-    'project overview counts without Chat',
-    /chatgptIsChatSessionId\(id, sessions\.byId, sessions\.projectionsBySession, CHATGPT_CHAT_SESSION_IDS\)/.test(project)
-  )
-  check(
-    'project detail rows filter Chat',
-    /const projectMembers[\s\S]{0,900}chatgptIsChatSessionId/.test(project)
-  )
-  check(
-    'file listing keeps a Workspace authorizer after de-projectizing rows',
-    /const authorizingSession =[\s\S]{0,160}projectMembers/.test(project)
-  )
-  check('bundle carries the projection-based Chat helper', bundle.includes('function chatgptIsChatSessionId'))
-  check('bundle carries the created-Chat id set', bundle.includes('const CHATGPT_CHAT_SESSION_IDS = new Set()'))
 }
 
 console.log(`sessions: ${checks - failures}/${checks} checks passed`)
