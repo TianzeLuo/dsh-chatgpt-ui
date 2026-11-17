@@ -69,6 +69,7 @@ test('P0-21: the grow controller covers all edit paths and resize', () => {
   assert.match(composerJs, /verticalPadding/)
   assert.match(composerJs, /toggleAttribute\('data-cgpt-composer-grow', multiline\)/)
   assert.match(composerJs, /toggleAttribute\('data-cgpt-composer-capped', capped\)/)
+  assert.match(composerJs, /exceedsSingleLineWidth/)
   assert.match(composerJs, /scroll\.scrollTop = 0/)
   assert.match(composerJs, /disposers\.push\(chatgptMountComposerAutoGrow\(\)\)/)
   assert.ok(bundle.includes('chatgptMountComposerAutoGrow'))

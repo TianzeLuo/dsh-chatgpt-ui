@@ -354,6 +354,14 @@ const permissions = {
       /animation: chatgpt-empty-card-work 180ms ease-out;/.test(heroCss) &&
       !/chatgpt-empty-card-(?:chat|work)[^;]*\bboth\b/.test(heroCss)
   )
+  const composerJs = read('lib/client/composer.js')
+  check(
+    'chat grow: the single-line width threshold prevents width feedback',
+    /exceedsSingleLineWidth/.test(composerJs) &&
+      /measureContext\.measureText/.test(composerJs) &&
+      /card\.hasAttribute\('data-cgpt-composer-grow'\)/.test(composerJs) &&
+      /data-chatgpt-mode'\) === 'chat'/.test(composerJs)
+  )
 }
 
 console.log(`${failures === 0 ? 'PASS' : 'FAIL'}  work composer: ${checks - failures}/${checks} checks`)
