@@ -52,7 +52,7 @@ test('P0-21: Chat keeps 52px at one line and grows from the editor', () => {
 test('P0-21: multiline Chat aligns to the top and pins its row to the bottom', () => {
   assert.match(composerCss, /\[data-cgpt-composer-grow\] \[data-input-scroll='true'\]\s*\{\s*align-items:\s*flex-start/)
   assert.match(composerCss, /\[data-cgpt-composer-grow\] \[data-input-scroll='true'\] > div\s*\{\s*align-items:\s*flex-start/)
-  assert.match(composerCss, /\[data-cgpt-composer-grow\] \[data-composer-input='true'\]\s*\{[\s\S]*?padding-top:\s*8px;[\s\S]*?padding-bottom:\s*8px/)
+  assert.match(composerCss, /\[data-cgpt-composer-grow\] \[data-composer-input='true'\]\s*\{[\s\S]*?padding:\s*8px 18px 58px/)
   assert.match(composerCss, /\[data-composer-card='true'\]\[data-cgpt-composer-grow\] \[class\*='_row'\]\s*\{[\s\S]*?top:\s*auto;[\s\S]*?bottom:\s*0;[\s\S]*?height:\s*50px/)
   assert.match(composerCss, /\[data-cgpt-composer-capped\] \[data-input-scroll='true'\]\s*\{\s*overflow-y:\s*scroll/)
   assert.equal(doc.chat.three.card.radius, '26px')
@@ -115,13 +115,18 @@ test('P0-21: Work uses the same cap and bottom anchor', () => {
   assert.equal(doc.work.cap.capped, true)
 })
 
-test('P0-21: blank Chat hero grows upward from a fixed bottom', () => {
+test('P0-21: blank Chat hero keeps its one-line top and grows downward', () => {
+  // P0-21 originally lifted the grown hero by half its growth to keep the
+  // single-line bottom edge. The multiline two-band card needs 50px for its
+  // action row; that lift pushed the card into the fixed headline, so the hero
+  // cancels the lift and keeps its one-line top while growing downward. The old
+  // evidence frame still carries the fixed-bottom readings; only its height/cap
+  // fields remain part of this contract until the frame is recaptured.
+  assert.match(heroCss, /\[data-cgpt-composer-grow\][\s\S]{0,260}top:\s*var\(--cgpt-hero-rise/)
   assert.equal(doc.chat.hero.one.card.h, 52)
   assert.ok(doc.chat.hero.three.card.h > doc.chat.hero.one.card.h)
-  assert.equal(doc.chat.hero.three.card.bottom, doc.chat.hero.one.card.bottom)
   assert.equal(doc.chat.hero.cap.capped, true)
   assert.equal(doc.chat.hero.cap.scroll.h, 336)
-  assert.equal(doc.chat.hero.cap.card.bottom, doc.chat.hero.one.card.bottom)
 })
 
 test('P0-21: every recorded assertion passes and every frame exists', () => {

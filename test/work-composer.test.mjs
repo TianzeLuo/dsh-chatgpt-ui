@@ -327,5 +327,28 @@ const permissions = {
   )
 }
 
+// 15. Chat multiline is a two-band card: full-width text on top, the 50px
+// action row below it. Single-line keeps the overlay capsule untouched.
+{
+  const composerCss = read('lib/client/css/40-composer.css')
+  const heroCss = read('lib/client/css/60-hero.css')
+  check(
+    'chat multiline: the editor spans the card with an 8px band gap',
+    /\[data-cgpt-composer-grow\] \[data-composer-input='true'\] \{[^}]*padding: 8px 18px 58px/.test(composerCss)
+  )
+  check(
+    'chat multiline: the action row stays a 50px bottom band',
+    /\[data-cgpt-composer-grow\] \[class\*='_row'\] \{[^}]*bottom: 0;[^}]*height: 50px/.test(composerCss)
+  )
+  check(
+    'chat multiline hero keeps its one-line top and grows downward',
+    /\[data-cgpt-composer-grow\] \{[^}]*top: var\(--cgpt-hero-rise/.test(heroCss)
+  )
+  check(
+    'chat multiline: the bottom band hides text at the scroll cap',
+    /\[data-cgpt-composer-grow\] \[class\*='_row'\] \{\s*background: var\(--dsw-specific-input-major\)/.test(composerCss)
+  )
+}
+
 console.log(`${failures === 0 ? 'PASS' : 'FAIL'}  work composer: ${checks - failures}/${checks} checks`)
 if (failures > 0) process.exit(1)

@@ -282,6 +282,14 @@ body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerHero'] [data-c
   top: calc(-1 * var(--cgpt-hero-rise, 0px));
 }
 
+/* A multiline Chat card gains the 50px action band below the text. Keep its top
+   on the one-line baseline and grow downward, like Work: the Host centres the
+   taller card, so this positive rise cancels that shift and the card cannot
+   climb into the fixed headline. */
+body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerHero'] [data-composer-card='true'][data-cgpt-composer-grow] {
+  top: var(--cgpt-hero-rise, 0px);
+}
+
 
 
 /* The Host renders `conversation.input.right` only when a session exists, and
