@@ -435,12 +435,17 @@ body[data-chatgpt-ui][data-chatgpt-mode='agent'] [class*='_composerHero'] [class
   animation: chatgpt-empty-in-work 180ms ease-out both;
 }
 
+/* No `both` fill on the card: a finished fill keeps `transform: translateY(0)`
+   on the card forever, and that permanent compositor layer can leave the old
+   single-line texture behind when the card is resized to multiple lines on
+   some GPUs. The end frame equals the base style, so dropping the fill keeps
+   the 180ms enter fade and drops the animation's transform layer afterwards. */
 body[data-chatgpt-ui][data-chatgpt-mode='chat'] [class*='_composerHero'] [data-composer-card='true'] {
-  animation: chatgpt-empty-card-chat 180ms ease-out both;
+  animation: chatgpt-empty-card-chat 180ms ease-out;
 }
 
 body[data-chatgpt-ui][data-chatgpt-mode='agent'] [class*='_composerHero'] [data-composer-card='true'] {
-  animation: chatgpt-empty-card-work 180ms ease-out both;
+  animation: chatgpt-empty-card-work 180ms ease-out;
 }
 
 /* P0-18b: a project switch navigates to another Session; the Host mounts a new

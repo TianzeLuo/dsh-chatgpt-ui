@@ -348,6 +348,12 @@ const permissions = {
     'chat multiline: the bottom band hides text at the scroll cap',
     /\[data-cgpt-composer-grow\] \[class\*='_row'\] \{\s*background: var\(--dsw-specific-input-major\)/.test(composerCss)
   )
+  check(
+    'chat hero card releases its enter transform after the fade',
+    /animation: chatgpt-empty-card-chat 180ms ease-out;/.test(heroCss) &&
+      /animation: chatgpt-empty-card-work 180ms ease-out;/.test(heroCss) &&
+      !/chatgpt-empty-card-(?:chat|work)[^;]*\bboth\b/.test(heroCss)
+  )
 }
 
 console.log(`${failures === 0 ? 'PASS' : 'FAIL'}  work composer: ${checks - failures}/${checks} checks`)
